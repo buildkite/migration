@@ -1,5 +1,5 @@
 package buildkite
 
 type Step struct {
-	Command string `yaml:"command"`
+	Commands []string `yaml:"commands"`
 }
