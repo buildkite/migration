@@ -3,29 +3,26 @@ module BK
     class CircleCI
       require "yaml"
 
-      def self.parse_file(file_path)
-        new(YAML.load_file(file_path)).parse
+      def self.parse_file(file_path, workflow:)
+        new(YAML.load_file(file_path), workflow: workflow).parse
       end
 
-      def initialize(config)
+      def initialize(config, workflow:)
         @config = config
+        @workflow = workflow
       end
 
       def parse
         bk_pipeline = Pipeline.new
 
-        @config.fetch("jobs").each do |(key, job)|
-          bk_step = BK::Compat::Pipeline::Step.new(key: key, label: key)
+        steps_by_key = @config.fetch("jobs").each_with_object({}) do |(key, job), hash|
+          bk_step = BK::Compat::Pipeline::Step.new(key: key, label: ":circleci: #{key}")
 
           job.fetch("steps").each do |circle_step|
             [*transform_circle_step_to_commands(circle_step)].each do |s|
               bk_step.commands << s if s
             end
           end
-
-          # bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
-          #   path: "thedyrt/skip-checkout#v0.1.1"
-          # )
 
           docker = job.fetch("docker")
           if docker.length == 1
@@ -42,7 +39,27 @@ module BK
             raise "Dunno how to docker with #{docker.length} defined"
           end
 
-          bk_pipeline.steps << bk_step
+          hash[key] = bk_step
+        end
+
+        @config.fetch("workflows").fetch(@workflow).fetch("jobs").each do |j|
+          case j
+          when String
+            bk_pipeline.steps << steps_by_key.fetch(j)
+          when Hash
+
+            key = j.keys.first
+            step = steps_by_key.fetch(key).dup
+
+            if requires = j[key]["requires"]
+              step.depends_on = [*requires]
+            end
+
+            bk_pipeline.steps << step
+
+          else
+            raise "Dunno what #{j.inspect} is"
+          end
         end
 
         bk_pipeline
@@ -50,18 +67,20 @@ module BK
 
       private
 
+      def run_command(x)
+        [
+          "echo #{"\e[90m$\e[0m #{x}".inspect}",
+          x
+        ]
+      end
+
       def transform_circle_step_to_commands(step)
         if step == "checkout"
           return [
-            "echo '--- :circleci: checkout'",
-            "echo '$ sudo cp -R /buildkite-checkout /home/circleci/checkout'",
-            "sudo cp -R /buildkite-checkout /home/circleci/checkout",
-
-            "echo '$ sudo chown -R circleci:circleci /home/circleci/checkout'",
-            "sudo chown -R circleci:circleci /home/circleci/checkout",
-
-            "echo '$ cd /home/circleci/checkout'",
-            "cd /home/circleci/checkout"
+            "echo '~~~ :circleci: checkout'",
+            *run_command("sudo cp -R /buildkite-checkout /home/circleci/checkout"),
+            *run_command("sudo chown -R circleci:circleci /home/circleci/checkout"),
+            *run_command("cd /home/circleci/checkout")
           ]
         end
 
@@ -86,21 +105,45 @@ module BK
                         end
 
               if name = config["name"]
-                "echo #{"--- #{name}".inspect}\n#{command}"
+                return [
+                  "echo #{"--- #{name}".inspect}",
+                  *run_command(command)
+                ]
               else
-                command
+                return [
+                  "echo #{"--- :terminal: #{command}".inspect}",
+                  *run_command(command)
+                ]
               end
             else
-              config
+              return [
+                "echo #{"--- :terminal: #{config}".inspect}",
+                *run_command(config)
+              ]
             end
           when "restore_cache"
             return [
-              "echo '--- :circleci: restore_cache'",
+              "echo '~~~ :circleci: restore_cache'",
               "echo '⚠️ Not support yet'"
             ]
           when "save_cache"
             return [
-              "echo '--- :circleci: save_cache'",
+              "echo '~~~ :circleci: save_cache'",
+              "echo '⚠️ Not support yet'"
+            ]
+          when "attach_workspace"
+            return [
+              "echo '~~~ :circleci: attach_workspace'",
+              "echo '⚠️ Not support yet'"
+            ]
+          when "store_artifacts"
+            return [
+              "echo '~~~ :circleci: store_artifacts'",
+              "echo '⚠️ Not support yet'"
+            ]
+          when "persist_to_workspace"
+            return [
+              "echo '~~~ :circleci: persist_to_workspace'",
               "echo '⚠️ Not support yet'"
             ]
           else

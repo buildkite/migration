@@ -15,13 +15,14 @@ module BK
       end
 
       class Step
-        attr_accessor :label, :key, :commands, :plugins
+        attr_accessor :label, :key, :commands, :plugins, :depends_on
 
-        def initialize(label: nil, key: nil, commands: [], plugins: [])
+        def initialize(label: nil, key: nil, commands: [], plugins: [], depends_on: [])
           @label = label
           @commands = commands
           @key = key
           @plugins = plugins
+          @depends_on = depends_on
         end
 
         def render
@@ -38,7 +39,9 @@ module BK
         end
 
         def to_h
-          { label: @label, key: @key, commands: @commands, plugins: @plugins.map(&:to_h) }
+          { label: @label, key: @key, commands: @commands, plugins: @plugins.map(&:to_h) }.tap do |h|
+            h[:depends_on] = @depends_on if @depends_on
+          end
         end
       end
 

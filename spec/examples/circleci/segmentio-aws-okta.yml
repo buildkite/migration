@@ -1,0 +1,137 @@
+version: 2
+jobs:
+  test-build-golang-prev:
+    docker:
+      - image: circleci/golang:1.12
+    steps:
+      - checkout
+      - run:
+          name: Install linux dependencies - libusb
+          command: |
+            sudo apt update -q
+            sudo apt install -yq libusb-dev libusb-1.0.0-dev
+      - run:
+          name: Test
+          command: |
+            go build -mod=vendor
+            ./aws-okta version
+
+  test:
+    docker:
+      - image: circleci/golang:1.13
+    working_directory: /go/src/github.com/segmentio/aws-okta
+    steps:
+      - checkout
+      - run:
+          name: Install linux dependencies - libusb
+          command: |
+            sudo apt update -q
+            sudo apt install -yq libusb-dev libusb-1.0.0-dev
+      - run:
+          name: Test
+          command: |
+            make test
+      - run:
+          name: Check modules are tidy and checked in
+          command: |
+            export GO111MODULE=on
+            go mod tidy
+            go mod vendor
+            if [ "$(git status --porcelain)" != "" ]; then
+              echo "git tree is dirty after tidying and vendoring modules"
+              echo "ensure go.mod and go.sum are tidy and vendor is checked in"
+              git status
+              exit 1
+            fi
+
+  dist-linux:
+    docker:
+      - image: circleci/golang:1.13
+    working_directory: /go/src/github.com/segmentio/aws-okta
+    steps:
+      - checkout
+      - run:
+          name: Install nfpm, rpmbuild
+          command: |
+            sudo make -f Makefile.tools nfpm-debian rpmbuild-debian
+      - run:
+          name: Install libusb
+          command: |
+            sudo apt update -q
+            sudo apt install -yq libusb-dev libusb-1.0.0-dev
+      - run:
+          name: Make distributables
+          command: |
+            make -f Makefile.release dist-linux
+      - persist_to_workspace:
+          root: .
+          paths: ['dist/*']
+
+  publish-packagecloud:
+    docker:
+      - image: circleci/golang:1.13
+    working_directory: /go/src/github.com/segmentio/aws-okta
+    steps:
+      - checkout
+      - attach_workspace: { at: . }
+      - run:
+          name: Install tools
+          command: |
+            make -f Makefile.tools github-release
+            # this is all for package_cloud :/
+            sudo apt update -q
+            sudo apt install -yq ruby ruby-dev build-essential
+            # fixes https://askubuntu.com/questions/872399/error-failed-to-build-gem-native-extension-when-trying-to-download-rubocop
+            sudo gem install rake
+            sudo make -f Makefile.tools package_cloud
+            make -f Makefile.release publish-packagecloud
+
+  publish-github-linux:
+    docker:
+      - image: circleci/golang:1.13
+    working_directory: /go/src/github.com/segmentio/aws-okta
+    steps:
+      - checkout
+      - attach_workspace: { at: . }
+      - run:
+          name: Install tools
+          command: |
+            make -f Makefile.tools github-release
+            make -f Makefile.release publish-github-linux
+
+workflows:
+  version: 2
+  # currently we only build/publish for linux: macOS builds require non-FOSS
+  # Keychain libs that require a macOS host to build on
+  # https://github.com/segmentio/aws-okta/issues/81
+  test-dist-publish-linux:
+    jobs:
+      - test
+      - test-build-golang-prev
+      - dist-linux:
+          # needed to ensure dist happens on tag events
+          filters:
+            tags:
+              only: /.*/
+      - publish-packagecloud:
+          context: packagecloud
+          requires:
+            - dist-linux
+          filters:
+            # never publish from a branch event
+            branches:
+              ignore: /.*/
+            # release only on tag push events like vX[.Y.Z...][-whatever]
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*(-[a-zA-Z0-9-]+)?/
+      - publish-github-linux:
+          context: github-segmentcircle-oss-release
+          requires:
+            - dist-linux
+          filters:
+            # never publish from a branch event
+            branches:
+              ignore: /.*/
+            # release only on tag push events like vX[.Y.Z...][-whatever]
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*(-[a-zA-Z0-9-]+)?/
