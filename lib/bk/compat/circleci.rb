@@ -23,17 +23,23 @@ module BK
             end
           end
 
+          # bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
+          #   path: "thedyrt/skip-checkout#v0.1.1"
+          # )
+
           docker = job.fetch("docker")
           if docker.length == 1
             image = docker.first.fetch("image")
 
             bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
               path: "docker#v3.3.0",
-              config: { "image" => image }
+              config: {
+                image: image,
+                workdir: "/buildkite-checkout"
+              }
             )
           else
-            p docker
-            raise "More than 1 docker"
+            raise "Dunno how to docker with #{docker.length} defined"
           end
 
           bk_pipeline.steps << bk_step
@@ -45,7 +51,19 @@ module BK
       private
 
       def transform_circle_step_to_commands(step)
-        return if step == "checkout"
+        if step == "checkout"
+          return [
+            "echo '--- :circleci: checkout'",
+            "echo '$ sudo cp -R /buildkite-checkout /home/circleci/checkout'",
+            "sudo cp -R /buildkite-checkout /home/circleci/checkout",
+
+            "echo '$ sudo chown -R circleci:circleci /home/circleci/checkout'",
+            "sudo chown -R circleci:circleci /home/circleci/checkout",
+
+            "echo '$ cd /home/circleci/checkout'",
+            "cd /home/circleci/checkout"
+          ]
+        end
 
         if step.is_a?(Hash)
           action = step.keys.first
@@ -61,15 +79,32 @@ module BK
                 end
               end
 
-              if env_prefix.any?
-                env_prefix.join(" ") + " " + config.fetch("command")
+              command = if env_prefix.any?
+                          env_prefix.join(" ") + " " + config.fetch("command")
+                        else
+                          config.fetch("command")
+                        end
+
+              if name = config["name"]
+                "echo #{"--- #{name}".inspect}\n#{command}"
               else
-                config.fetch("command")
+                command
               end
             else
               config
             end
+          when "restore_cache"
+            return [
+              "echo '--- :circleci: restore_cache'",
+              "echo '⚠️ Not support yet'"
+            ]
+          when "save_cache"
+            return [
+              "echo '--- :circleci: save_cache'",
+              "echo '⚠️ Not support yet'"
+            ]
           else
+
             "echo #{"???? #{action} ????".inspect}"
           end
         else
