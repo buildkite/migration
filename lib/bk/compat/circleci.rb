@@ -68,6 +68,7 @@ module BK
       private
 
       def run_command(x)
+        x = x.chomp
         [
           "echo #{"\e[90m$\e[0m #{x}".inspect}",
           x
@@ -131,23 +132,36 @@ module BK
               "echo '~~~ :circleci: save_cache'",
               "echo '⚠️ Not support yet'"
             ]
-          when "attach_workspace"
-            return [
-              "echo '~~~ :circleci: attach_workspace'",
-              "echo '⚠️ Not support yet'"
-            ]
           when "store_artifacts"
             return [
               "echo '~~~ :circleci: store_artifacts'",
               "echo '⚠️ Not support yet'"
             ]
           when "persist_to_workspace"
-            return [
-              "echo '~~~ :circleci: persist_to_workspace'",
-              "echo '⚠️ Not support yet'"
-            ]
-          else
+            root = config.fetch("root")
 
+            [*config.fetch("paths")].map do |path|
+              [
+                "echo '~~~ :circleci: persist_to_workspace (path: #{path.inspect})'",
+                *run_command("workspace_dir=$$(mktemp -d)"),
+                *run_command("sudo chown -R circleci:circleci $$workspace_dir"),
+                *run_command("mkdir $$workspace_dir/.workspace"),
+                *run_command("cp -R . $$workspace_dir/.workspace"),
+                *run_command("cd $$workspace_dir"),
+                *run_command("buildkite-agent artifact upload #{".workspace/#{path}".inspect}"),
+                *run_command("cd -")
+              ]
+            end.flatten
+          when "attach_workspace"
+            at = config.fetch("at")
+            return [
+              "echo '~~~ :circleci: attach_workspace (at: #{at.inspect})'",
+              *run_command("workspace_dir=$$(mktemp -d)"),
+              *run_command("sudo chown -R circleci:circleci $$workspace_dir"),
+              *run_command("buildkite-agent artifact download \".workspace/*\" $$workspace_dir"),
+              *run_command("mv $$workspace_dir/.workspace/* .")
+            ].flatten
+          else
             "echo #{"???? #{action} ????".inspect}"
           end
         else
