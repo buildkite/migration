@@ -38,8 +38,52 @@ module BK
                 workdir: "/buildkite-checkout"
               }
             )
-          else
-            raise "Dunno how to docker with #{docker.length} defined"
+          elsif docker.length > 1
+
+            docker_compose_services = docker.each_with_object({ }) do |d, c|
+              index = c.keys.length
+
+              d = d.dup
+              image = d.delete("image")
+              t = c[image.gsub(/[^a-z0-9]/, "_")] = { "image" => image }
+
+              if ports = d.delete("ports")
+                t["ports"] = ports
+              end
+
+              if env = d.delete("environment")
+                t["environment"] = env
+              end
+
+              if index == 0
+                t["volumes"] = [".:/buildkite-checkout"]
+              end
+
+              unless d.empty?
+                raise "Not sure what to do with these docker keys: #{d.keys.inspect}"
+              end
+            end
+
+            docker_compose_config = {
+              "version" => "3.6" ,
+              "services" => docker_compose_services
+            }
+
+            bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
+              path: "keithpitt/write-file#v0.1",
+              config: {
+                path: ".buildkite-compat-docker-compose.yml",
+                contents: docker_compose_config.to_yaml
+              }
+            )
+
+            bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
+              path: "docker-compose#v3.1.0",
+              config: {
+                config: ".buildkite-compat-docker-compose.yml",
+                run: docker_compose_services.keys.first
+              }
+            )
           end
 
           hash[key] = bk_step
