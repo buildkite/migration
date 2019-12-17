@@ -12,7 +12,7 @@ end
 require_relative "../lib/bk"
 
 parsed = if file
-           BK::Compat::CircleCI.parse_file(File.expand_path(file))
+           BK::Compat::CircleCI.parse_file(file)
          else
            BK::Compat::CircleCI.parse_text(stdin)
          end
