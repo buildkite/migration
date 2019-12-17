@@ -17,7 +17,7 @@ module BK
       class Step
         attr_accessor :label, :key, :commands, :plugins, :depends_on
 
-        def initialize(label: nil, key: nil, commands: [], plugins: [], depends_on: [])
+        def initialize(label: nil, key: nil, commands: [], plugins: [], depends_on: nil)
           @label = label
           @commands = commands
           @key = key
