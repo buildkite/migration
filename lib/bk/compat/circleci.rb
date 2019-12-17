@@ -82,7 +82,7 @@ module BK
       def run_command(x)
         x = x.chomp
         [
-          "echo #{"\e[90m$\e[0m #{x}".inspect}",
+          # "echo #{"\e[90m$\e[0m #{x}".inspect}",
           x
         ]
       end
@@ -90,7 +90,7 @@ module BK
       def transform_circle_step_to_commands(step)
         if step == "checkout"
           return [
-            "echo '~~~ :circleci: checkout'",
+            # "echo '~~~ :circleci: checkout'",
             *run_command("sudo cp -R /buildkite-checkout /home/circleci/checkout"),
             *run_command("sudo chown -R circleci:circleci /home/circleci/checkout"),
             *run_command("cd /home/circleci/checkout")
@@ -124,13 +124,13 @@ module BK
                 ]
               else
                 return [
-                  "echo #{"--- :terminal: #{command}".inspect}",
+                  # "echo #{"--- :terminal: #{command}".inspect}",
                   *run_command(command)
                 ]
               end
             else
               return [
-                "echo #{"--- :terminal: #{config}".inspect}",
+                # "echo #{"--- :terminal: #{config}".inspect}",
                 *run_command(config)
               ]
             end
