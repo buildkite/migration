@@ -115,16 +115,10 @@ module BK
                   command
                 ]
               else
-                return [
-                  "echo '--- :circleci: run'",
-                  command
-                ]
+                return command
               end
             else
-              return [
-                "echo '--- :circleci: run'",
-                config
-              ]
+              return config
             end
           when "persist_to_workspace"
             root = config.fetch("root")
