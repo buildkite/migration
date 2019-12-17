@@ -111,36 +111,21 @@ module BK
 
               if name = config["name"]
                 return [
-                  "echo '--- :circleci: run (#{name.inspect})'",
+                  "echo #{"--- #{name}".inspect}",
                   command
                 ]
               else
                 return [
-                  "echo '--- :circleci: run (#{command.inspect})'",
+                  "echo '--- :circleci: run'",
                   command
                 ]
               end
             else
               return [
-                "echo '--- :circleci: run (#{config.inspect})'",
+                "echo '--- :circleci: run'",
                 config
               ]
             end
-          when "restore_cache"
-            return [
-              "echo '~~~ :circleci: restore_cache'",
-              "echo '⚠️ Not support yet'"
-            ]
-          when "save_cache"
-            return [
-              "echo '~~~ :circleci: save_cache'",
-              "echo '⚠️ Not support yet'"
-            ]
-          when "store_artifacts"
-            return [
-              "echo '~~~ :circleci: store_artifacts'",
-              "echo '⚠️ Not support yet'"
-            ]
           when "persist_to_workspace"
             root = config.fetch("root")
 
@@ -165,6 +150,21 @@ module BK
               "buildkite-agent artifact download \".workspace/*\" $$workspace_dir",
               "mv $$workspace_dir/.workspace/* ."
             ].flatten
+          when "restore_cache"
+            return [
+              "echo '~~~ :circleci: restore_cache'",
+              "echo '⚠️ Not support yet'"
+            ]
+          when "save_cache"
+            return [
+              "echo '~~~ :circleci: save_cache'",
+              "echo '⚠️ Not support yet'"
+            ]
+          when "store_artifacts"
+            return [
+              "echo '~~~ :circleci: store_artifacts'",
+              "echo '⚠️ Not support yet'"
+            ]
           else
             "echo #{"???? #{action} ????".inspect}"
           end
