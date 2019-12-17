@@ -2,7 +2,7 @@
 
 A tool to transform pipelines from other CI providers to Buildkite
 
-```
+```shell
 $ cat examples/circleci/basic.yml
 version: 2
 jobs:
@@ -26,6 +26,30 @@ steps:
   - docker#v3.3.0:
       image: "circleci/python:3.6.2-stretch-browsers"
       workdir: "/buildkite-checkout"
+```
+
+Buildkite Compat can also be used via a HTTP API:
+
+```shell
+$ curl -X POST -F 'file=@examples/circleci/basic.yml' https://buildkite-compat.herokuapp.com
+steps:
+- label: ":circleci: build"
+  key: build
+  commands:
+  - sudo cp -R /buildkite-checkout /home/circleci/checkout
+  - sudo chown -R circleci:circleci /home/circleci/checkout
+  - cd /home/circleci/checkout
+  - pip install -r requirements/dev.txt
+  plugins:
+  - docker#v3.3.0:
+      image: circleci/python:3.6.2-stretch-browsers
+      workdir: "/buildkite-checkout"
+```
+
+The output can be piped directly into a `buildkite-agent pipeline upload` command:
+
+```shell
+$ curl -X POST -F 'file=@.circleci/config.yml' https://buildkite-compat.herokuapp.com | buildkite-agent pipeline upload
 ```
 
 ## Release
