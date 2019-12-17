@@ -79,21 +79,13 @@ module BK
 
       private
 
-      def run_command(x)
-        x = x.chomp
-        [
-          # "echo #{"\e[90m$\e[0m #{x}".inspect}",
-          x
-        ]
-      end
-
       def transform_circle_step_to_commands(step)
         if step == "checkout"
           return [
-            # "echo '~~~ :circleci: checkout'",
-            *run_command("sudo cp -R /buildkite-checkout /home/circleci/checkout"),
-            *run_command("sudo chown -R circleci:circleci /home/circleci/checkout"),
-            *run_command("cd /home/circleci/checkout")
+            "echo '~~~ :circleci: checkout'",
+            "sudo cp -R /buildkite-checkout /home/circleci/checkout",
+            "sudo chown -R circleci:circleci /home/circleci/checkout",
+            "cd /home/circleci/checkout"
           ]
         end
 
@@ -119,19 +111,19 @@ module BK
 
               if name = config["name"]
                 return [
-                  "echo #{"--- #{name}".inspect}",
-                  *run_command(command)
+                  "echo #{"--- :circleci: run (#{name.inspect})"}",
+                  command
                 ]
               else
                 return [
-                  # "echo #{"--- :terminal: #{command}".inspect}",
-                  *run_command(command)
+                  "echo #{"--- :circleci: run (#{command.inspect})"}",
+                  command
                 ]
               end
             else
               return [
-                # "echo #{"--- :terminal: #{config}".inspect}",
-                *run_command(config)
+                "echo #{"--- :circleci: run (#{config.inspect})"}",
+                config
               ]
             end
           when "restore_cache"
@@ -155,23 +147,23 @@ module BK
             [*config.fetch("paths")].map do |path|
               [
                 "echo '~~~ :circleci: persist_to_workspace (path: #{path.inspect})'",
-                *run_command("workspace_dir=$$(mktemp -d)"),
-                *run_command("sudo chown -R circleci:circleci $$workspace_dir"),
-                *run_command("mkdir $$workspace_dir/.workspace"),
-                *run_command("cp -R . $$workspace_dir/.workspace"),
-                *run_command("cd $$workspace_dir"),
-                *run_command("buildkite-agent artifact upload #{".workspace/#{path}".inspect}"),
-                *run_command("cd -")
+                "workspace_dir=$$(mktemp -d)",
+                "sudo chown -R circleci:circleci $$workspace_dir",
+                "mkdir $$workspace_dir/.workspace",
+                "cp -R . $$workspace_dir/.workspace",
+                "cd $$workspace_dir",
+                "buildkite-agent artifact upload #{".workspace/#{path}".inspect}",
+                "cd -"
               ]
             end.flatten
           when "attach_workspace"
             at = config.fetch("at")
             return [
               "echo '~~~ :circleci: attach_workspace (at: #{at.inspect})'",
-              *run_command("workspace_dir=$$(mktemp -d)"),
-              *run_command("sudo chown -R circleci:circleci $$workspace_dir"),
-              *run_command("buildkite-agent artifact download \".workspace/*\" $$workspace_dir"),
-              *run_command("mv $$workspace_dir/.workspace/* .")
+              "workspace_dir=$$(mktemp -d)",
+              "sudo chown -R circleci:circleci $$workspace_dir",
+              "buildkite-agent artifact download \".workspace/*\" $$workspace_dir",
+              "mv $$workspace_dir/.workspace/* ."
             ].flatten
           else
             "echo #{"???? #{action} ????".inspect}"
