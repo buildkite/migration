@@ -111,18 +111,18 @@ module BK
 
               if name = config["name"]
                 return [
-                  "echo #{"--- :circleci: run (#{name.inspect})"}",
+                  "echo '--- :circleci: run (#{name.inspect})'",
                   command
                 ]
               else
                 return [
-                  "echo #{"--- :circleci: run (#{command.inspect})"}",
+                  "echo '--- :circleci: run (#{command.inspect})'",
                   command
                 ]
               end
             else
               return [
-                "echo #{"--- :circleci: run (#{config.inspect})"}",
+                "echo '--- :circleci: run (#{config.inspect})'",
                 config
               ]
             end
