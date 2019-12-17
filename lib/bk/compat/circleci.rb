@@ -45,27 +45,33 @@ module BK
           hash[key] = bk_step
         end
 
-        workflows = @config.fetch("workflows")
-        version = workflows.delete("version")
+        if @config.has_key?("workflows")
+          workflows = @config.fetch("workflows")
+          version = workflows.delete("version")
 
-        workflows.fetch(workflows.keys.first).fetch("jobs").each do |j|
-          case j
-          when String
-            bk_pipeline.steps << steps_by_key.fetch(j)
-          when Hash
+          workflows.fetch(workflows.keys.first).fetch("jobs").each do |j|
+            case j
+            when String
+              bk_pipeline.steps << steps_by_key.fetch(j)
+            when Hash
 
-            key = j.keys.first
-            step = steps_by_key.fetch(key).dup
+              key = j.keys.first
+              step = steps_by_key.fetch(key).dup
 
-            if requires = j[key]["requires"]
-              step.depends_on = [*requires]
+              if requires = j[key]["requires"]
+                step.depends_on = [*requires]
+              end
+
+              bk_pipeline.steps << step
+
+            else
+              raise "Dunno what #{j.inspect} is"
             end
-
-            bk_pipeline.steps << step
-
-          else
-            raise "Dunno what #{j.inspect} is"
           end
+        else
+          # If no workflow is defined, it's expected that there's a `build` job
+          # defined
+          bk_pipeline.steps << steps_by_key.fetch("build")
         end
 
         bk_pipeline
