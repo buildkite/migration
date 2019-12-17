@@ -30,4 +30,4 @@ parsed = if file
            BK::Compat::CircleCI.parse_text(stdin)
          end
 
-puts JSON.parse(parsed.to_h.to_json).to_yaml
+puts parsed.render

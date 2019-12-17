@@ -52,22 +52,7 @@ module BK
       end
 
       def render
-        rendered_steps = steps.map(&:render).each_with_object([]) do |s, buffer|
-          x = []
-          s.split("\n").each_with_index do |line, index|
-            if index == 0
-              x << " - #{line}"
-            else
-              x << "   #{line}"
-            end
-          end
-          buffer << x.join("\n")
-        end
-
-        <<~YAML
-        steps:
-        #{rendered_steps.join("\n\n")}
-        YAML
+        JSON.parse(to_h.to_json).to_yaml
       end
 
       def to_h
