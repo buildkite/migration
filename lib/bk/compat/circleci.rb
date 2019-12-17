@@ -3,13 +3,16 @@ module BK
     class CircleCI
       require "yaml"
 
-      def self.parse_file(file_path, workflow:)
-        new(YAML.load_file(file_path), workflow: workflow).parse
+      def self.parse_file(file_path)
+        new(YAML.load_file(file_path)).parse
       end
 
-      def initialize(config, workflow:)
+      def self.parse_text(text)
+        new(YAML.safe_load(text)).parse
+      end
+
+      def initialize(config)
         @config = config
-        @workflow = workflow
       end
 
       def parse
@@ -42,7 +45,10 @@ module BK
           hash[key] = bk_step
         end
 
-        @config.fetch("workflows").fetch(@workflow).fetch("jobs").each do |j|
+        workflows = @config.fetch("workflows")
+        version = workflows.delete("version")
+
+        workflows.fetch(workflows.keys.first).fetch("jobs").each do |j|
           case j
           when String
             bk_pipeline.steps << steps_by_key.fetch(j)

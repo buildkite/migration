@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+
+file = ARGV[0]
+stdin = STDIN.tty? ? nil : $stdin.read
+
+# Both can't be nil, and both can't be present
+if (!file && !stdin) || (file && stdin)
+  puts "Usage: buildkite-compat [file] or pass text in via STDIN"
+  exit 1
+end
+
+require_relative "../lib/bk"
+
+parsed = if file
+           BK::Compat::CircleCI.parse_file(File.expand_path(file))
+         else
+           BK::Compat::CircleCI.parse_text(stdin)
+         end
+
+puts JSON.parse(parsed.to_h.to_json).to_yaml
