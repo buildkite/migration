@@ -159,10 +159,16 @@ module BK
                   command
                 ]
               else
-                return command
+                return [
+                  "echo '--- :circleci: run'",
+                  command
+                ]
               end
             else
-              return config
+              return [
+                "echo '--- :circleci: run'",
+                config
+              ]
             end
           when "persist_to_workspace"
             root = config.fetch("root")
@@ -188,23 +194,11 @@ module BK
               "buildkite-agent artifact download \".workspace/*\" $$workspace_dir",
               "mv $$workspace_dir/.workspace/* ."
             ].flatten
-          when "restore_cache"
-            return [
-              "echo '~~~ :circleci: restore_cache'",
-              "echo '⚠️ Not support yet'"
-            ]
-          when "save_cache"
-            return [
-              "echo '~~~ :circleci: save_cache'",
-              "echo '⚠️ Not support yet'"
-            ]
-          when "store_artifacts"
-            return [
-              "echo '~~~ :circleci: store_artifacts'",
-              "echo '⚠️ Not support yet'"
-            ]
           else
-            "echo #{"???? #{action} ????".inspect}"
+            return [
+              "echo '~~~ :circleci: #{action}'",
+              "echo '⚠️ Not support yet'"
+            ]
           end
         else
           "echo #{step.inspect}"
