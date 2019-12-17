@@ -25,19 +25,6 @@ module BK
           @depends_on = depends_on
         end
 
-        def render
-          to_h.each_with_object([]) do |(key, value), buffer|
-            if value.is_a?(Array)
-              buffer << <<~YAML.chomp
-              #{key}:
-              #{value.map { |v| "  - #{v.inspect}" }.join("\n")}
-              YAML
-            else
-              buffer << "#{key}: #{value.inspect}"
-            end
-          end.join("\n")
-        end
-
         def to_h
           { label: @label, key: @key, commands: @commands, plugins: @plugins.map(&:to_h) }.tap do |h|
             h[:depends_on] = @depends_on if @depends_on
