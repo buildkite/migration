@@ -6,7 +6,7 @@ module BK
 
         # Make sure the request looks legit
         return [405, {}, []] unless req.post?
-        return [404, {}, []] unless req.path == "/parse"
+        return [404, {}, []] unless req.path == "/"
         return [400, {}, []] if !req.form_data? || !req.params["file"].is_a?(Hash)
 
         # Read the file from the request
