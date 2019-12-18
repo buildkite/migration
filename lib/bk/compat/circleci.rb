@@ -39,24 +39,40 @@ module BK
               }
             )
           elsif docker.length > 1
-            primary_name = nil
+            docker_compose_services = {
+              # This is a dummy container which does nothing but provide a
+              # network stack for all the other containers to inherit so they
+              # can share a localhost and see each others ports.
+              #
+              # It's host-networking without the host.
+              "network" => {
+                "image" => "ubuntu",
+                "command" => "sleep infinity",
+              },
+            }
 
-            docker_compose_services = docker.each.with_index.with_object({}) do |(d, i), c|
+            docker.each.with_index do |d, i|
               d = d.dup
 
               image = d.delete("image")
 
-              name = image.gsub(/[^a-z0-9]/, "_")
+              # The first docker container is the primary container and is
+              # special - this is where commands will be run
+              name = if i == 0
+                       "primary"
+                     else
+                       image.gsub(/[^a-z0-9]/, "_")
+                     end
 
-              if i == 0
-                primary_name = name
-              end
+              docker_compose_services[name] = t = {
+                "image" => image,
 
-              t = c[name] = { "image" => image }
+                # Inherit the networkign stack of the dummy network container
+                "network_mode" => "service:network",
+              }
 
-              if ports = d.delete("ports")
-                t["ports"] = ports
-              end
+              # `ports` isn't actually supported and doesn't mean anything.
+              d.delete("ports")
 
               if env = d.delete("environment")
                 t["environment"] = env
@@ -64,10 +80,6 @@ module BK
 
               if i == 0
                 t["volumes"] = [".:/buildkite-checkout"]
-              end
-
-              if i != 0
-                t["network_mode"] = "service:#{primary_name}"
               end
 
               unless d.empty?
@@ -92,7 +104,7 @@ module BK
               path: "docker-compose#v3.1.0",
               config: {
                 config: ".buildkite-compat-docker-compose.yml",
-                run: docker_compose_services.keys.first
+                run: "primary"
               }
             )
           end
