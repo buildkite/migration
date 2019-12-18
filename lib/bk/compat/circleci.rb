@@ -39,13 +39,20 @@ module BK
               }
             )
           elsif docker.length > 1
+            primary_name = nil
 
-            docker_compose_services = docker.each_with_object({ }) do |d, c|
-              index = c.keys.length
-
+            docker_compose_services = docker.each.with_index.with_object({}) do |(d, i), c|
               d = d.dup
+
               image = d.delete("image")
-              t = c[image.gsub(/[^a-z0-9]/, "_")] = { "image" => image }
+
+              name = image.gsub(/[^a-z0-9]/, "_")
+
+              if i == 0
+                primary_name = name
+              end
+
+              t = c[name] = { "image" => image }
 
               if ports = d.delete("ports")
                 t["ports"] = ports
@@ -55,8 +62,12 @@ module BK
                 t["environment"] = env
               end
 
-              if index == 0
+              if i == 0
                 t["volumes"] = [".:/buildkite-checkout"]
+              end
+
+              if i != 0
+                t["network_mode"] = "service:#{primary_name}"
               end
 
               unless d.empty?
