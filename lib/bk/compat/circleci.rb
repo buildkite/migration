@@ -87,6 +87,10 @@ module BK
               end
             end
 
+            # The primary container should depend on all the other containers
+            # so they will be started before commands are run
+            docker_compose_services["primary"]["depends_on"] = docker_compose_services.keys - ["primary"]
+
             docker_compose_config = {
               "version" => "3.6" ,
               "services" => docker_compose_services
