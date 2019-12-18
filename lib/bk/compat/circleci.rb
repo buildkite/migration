@@ -221,6 +221,11 @@ module BK
               "buildkite-agent artifact download \".workspace/*\" $$workspace_dir",
               "mv $$workspace_dir/.workspace/* ."
             ].flatten
+          when "setup_remote_docker"
+            return [
+              "echo '~~~ :circleci: #{action}'",
+              "echo '⚠️ Your host docker is being used'"
+            ]
           else
             return [
               "echo '~~~ :circleci: #{action}'",
