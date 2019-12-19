@@ -1,3 +1,5 @@
+require "rack"
+
 module BK
   module Compat
     class Server

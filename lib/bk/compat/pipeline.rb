@@ -53,8 +53,8 @@ module BK
         @steps = steps
       end
 
-      def render
-        JSON.parse(to_h.to_json).to_yaml
+      def render(*args)
+        BK::Compat::Renderer.new(to_h).render(*args)
       end
 
       def to_h
