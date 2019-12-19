@@ -27,6 +27,7 @@ module BK
             end
           end
 
+          # Figure out which executor to use
           executors = job.slice("docker")
           if executors.length > 1
             raise "More than 1 executor found (#{executors.keys.length.inspect})"
@@ -166,8 +167,8 @@ module BK
         end
       end
 
-      def transform_circle_step_to_commands(step)
-        if step == "checkout"
+      def transform_circle_step_to_commands(circle_step)
+        if circle_step == "checkout"
           return [
             "echo '~~~ :circleci: checkout'",
             "sudo cp -R /buildkite-checkout /home/circleci/checkout",
@@ -176,9 +177,9 @@ module BK
           ]
         end
 
-        if step.is_a?(Hash)
-          action = step.keys.first
-          config = step[action]
+        if circle_step.is_a?(Hash)
+          action = circle_step.keys.first
+          config = circle_step[action]
 
           case action
           when "run"
@@ -249,7 +250,7 @@ module BK
             ]
           end
         else
-          "echo #{step.inspect}"
+          "echo #{circle_step.inspect}"
         end
       end
     end
