@@ -169,7 +169,7 @@ module BK
           docker_compose_filename = ".buildkite/#{@now.to_i}-#{bk_step.key}-docker-compose.yml"
 
           bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
-            path: "keithpitt/write-file#v0.1",
+            path: "keithpitt/write-file#v0.2",
             config: {
               path: docker_compose_filename,
               contents: docker_compose_config.to_yaml
