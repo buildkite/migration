@@ -1,21 +1,37 @@
-require "rouge"
-
 module BK
   module Compat
     class Renderer
+      require "rouge"
+      require "json"
+      require "yaml"
+
+      module Format
+        YAML = :yaml
+        JSON = :json
+      end
+
       def initialize(structure)
         @structure = structure
       end
 
-      def render(colors: true)
-        yaml = JSON.parse(@structure.to_json).to_yaml
+      def render(colors: true, format: Format::YAML)
+        case format
+        when Format::YAML
+          text = JSON.parse(@structure.to_json).to_yaml
+          lexer = Rouge::Lexers::YAML.new
+        when Format::JSON
+          # Add a new line so it outputs nicely in terminals
+          text = JSON.pretty_generate(@structure) + "\n"
+          lexer = Rouge::Lexers::JSON.new
+        else
+          raise ArgumentError.new("Unknown format `#{format.inspect}`")
+        end
 
         if colors
           formatter = Rouge::Formatters::Terminal256.new(Rouge::Themes::Base16.new)
-          lexer = Rouge::Lexers::YAML.new
-          formatter.format(lexer.lex(yaml))
+          formatter.format(lexer.lex(text))
         else
-          yaml
+          text
         end
       end
     end

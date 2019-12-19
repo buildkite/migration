@@ -1,8 +1,6 @@
 module BK
   module Compat
     class Pipeline
-      require "json"
-
       class Plugin
         def initialize(path:, config: nil)
           @path = path

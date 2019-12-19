@@ -13,6 +13,7 @@ module BK
 
       def initialize(config)
         @config = config
+        @now = Time.now
       end
 
       def parse
@@ -182,7 +183,7 @@ module BK
 
             # We only want to mount the checkout in the primary container
             if i == 0
-              t["volumes"] = [".:/buildkite-checkout"]
+              t["volumes"] = ["../:/buildkite-checkout"]
             end
 
             unless d.empty?
@@ -199,10 +200,12 @@ module BK
             "services" => docker_compose_services
           }
 
+          docker_compose_filename = ".buildkite/#{@now.to_i}-#{bk_step.key}-docker-compose.yml"
+
           bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
-            path: "keithpitt/write-file#v0.1",
+            path: "keithpitt/write-file#v0.2",
             config: {
-              path: ".buildkite-compat-docker-compose.yml",
+              path: docker_compose_filename,
               contents: docker_compose_config.to_yaml
             }
           )
@@ -217,7 +220,7 @@ module BK
           bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
             path: "docker-compose#v3.1.0",
             config: {
-              config: ".buildkite-compat-docker-compose.yml",
+              config: docker_compose_filename,
               run: "primary"
             }
           )
