@@ -53,8 +53,8 @@ module BK
         @steps = steps
       end
 
-      def render(*args)
-        BK::Compat::Renderer.new(to_h).render(*args)
+      def render(**args)
+        BK::Compat::Renderer.new(to_h).render(**args)
       end
 
       def to_h
