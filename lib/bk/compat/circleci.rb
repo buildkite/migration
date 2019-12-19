@@ -27,90 +27,19 @@ module BK
             end
           end
 
-          docker = job.fetch("docker")
-          if docker.length == 1
-            image = docker.first.fetch("image")
+          executors = job.slice("docker")
+          if executors.length > 1
+            raise "More than 1 executor found (#{executors.keys.length.inspect})"
+          elsif executors.length == 1
+            executor_name = executors.keys.first
+            executor_config = executors.values.first
 
-            bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
-              path: "docker#v3.3.0",
-              config: {
-                image: image,
-                workdir: "/buildkite-checkout"
-              }
-            )
-          elsif docker.length > 1
-            docker_compose_services = {
-              # This is a dummy container which does nothing but provide a
-              # network stack for all the other containers to inherit so they
-              # can share a localhost and see each others ports.
-              #
-              # It's host-networking without the host.
-              "network" => {
-                "image" => "ubuntu",
-                "command" => "sleep infinity",
-              },
-            }
-
-            docker.each.with_index do |d, i|
-              d = d.dup
-
-              image = d.delete("image")
-
-              # The first docker container is the primary container and is
-              # special - this is where commands will be run
-              name = if i == 0
-                       "primary"
-                     else
-                       image.gsub(/[^a-z0-9]/, "_")
-                     end
-
-              docker_compose_services[name] = t = {
-                "image" => image,
-
-                # Inherit the networkign stack of the dummy network container
-                "network_mode" => "service:network",
-              }
-
-              # `ports` isn't actually supported and doesn't mean anything.
-              d.delete("ports")
-
-              if env = d.delete("environment")
-                t["environment"] = env
-              end
-
-              if i == 0
-                t["volumes"] = [".:/buildkite-checkout"]
-              end
-
-              unless d.empty?
-                raise "Not sure what to do with these docker keys: #{d.keys.inspect}"
-              end
+            case executor_name
+            when "docker"
+              setup_docker_executor(bk_step, executor_config)
+            else
+              raise "Unsupported executor #{executor_name}"
             end
-
-            # The primary container should depend on all the other containers
-            # so they will be started before commands are run
-            docker_compose_services["primary"]["depends_on"] = docker_compose_services.keys - ["primary"]
-
-            docker_compose_config = {
-              "version" => "3.6" ,
-              "services" => docker_compose_services
-            }
-
-            bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
-              path: "keithpitt/write-file#v0.1",
-              config: {
-                path: ".buildkite-compat-docker-compose.yml",
-                contents: docker_compose_config.to_yaml
-              }
-            )
-
-            bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
-              path: "docker-compose#v3.1.0",
-              config: {
-                config: ".buildkite-compat-docker-compose.yml",
-                run: "primary"
-              }
-            )
           end
 
           hash[key] = bk_step
@@ -149,6 +78,93 @@ module BK
       end
 
       private
+
+      def setup_docker_executor(bk_step, executor_config)
+        if executor_config.length == 1
+          image = executor_config.first.fetch("image")
+
+          bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
+            path: "docker#v3.3.0",
+            config: {
+              image: image,
+              workdir: "/buildkite-checkout"
+            }
+          )
+        elsif executor_config.length > 1
+          docker_compose_services = {
+            # This is a dummy container which does nothing but provide a
+            # network stack for all the other containers to inherit so they
+            # can share a localhost and see each others ports.
+            #
+            # It's host-networking without the host.
+            "network" => {
+              "image" => "ubuntu",
+              "command" => "sleep infinity",
+            },
+          }
+
+          executor_config.each.with_index do |d, i|
+            d = d.dup
+
+            image = d.delete("image")
+
+            # The first docker container is the primary container and is
+            # special - this is where commands will be run
+            name = if i == 0
+                     "primary"
+                   else
+                     image.gsub(/[^a-z0-9]/, "_")
+                   end
+
+            docker_compose_services[name] = t = {
+              "image" => image,
+
+              # Inherit the networkign stack of the dummy network container
+              "network_mode" => "service:network",
+            }
+
+            # `ports` isn't actually supported and doesn't mean anything.
+            d.delete("ports")
+
+            if env = d.delete("environment")
+              t["environment"] = env
+            end
+
+            if i == 0
+              t["volumes"] = [".:/buildkite-checkout"]
+            end
+
+            unless d.empty?
+              raise "Not sure what to do with these docker keys: #{d.keys.inspect}"
+            end
+          end
+
+          # The primary container should depend on all the other containers
+          # so they will be started before commands are run
+          docker_compose_services["primary"]["depends_on"] = docker_compose_services.keys - ["primary"]
+
+          docker_compose_config = {
+            "version" => "3.6" ,
+            "services" => docker_compose_services
+          }
+
+          bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
+            path: "keithpitt/write-file#v0.1",
+            config: {
+              path: ".buildkite-compat-docker-compose.yml",
+              contents: docker_compose_config.to_yaml
+            }
+          )
+
+          bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
+            path: "docker-compose#v3.1.0",
+            config: {
+              config: ".buildkite-compat-docker-compose.yml",
+              run: "primary"
+            }
+          )
+        end
+      end
 
       def transform_circle_step_to_commands(step)
         if step == "checkout"

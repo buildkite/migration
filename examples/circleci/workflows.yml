@@ -1,0 +1,17 @@
+version: 2
+jobs:
+  hello:
+    steps:
+      - run: echo "Hello World, this is Circle"
+  hello2:
+    steps:
+      - run: echo "Oh, hi there again"
+workflows:
+  version: 2
+  workflow_1:
+    jobs:
+      - hello
+  workflow_2:
+    jobs:
+      - hello
+      - hello2
