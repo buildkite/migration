@@ -14,7 +14,7 @@ module BK
         end
       end
 
-      class Step
+      class CommandStep
         attr_accessor :label, :key, :commands, :plugins, :depends_on
 
         def initialize(label: nil, key: nil, commands: [], plugins: [], depends_on: nil)

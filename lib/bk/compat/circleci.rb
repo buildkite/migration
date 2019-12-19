@@ -19,7 +19,7 @@ module BK
         bk_pipeline = Pipeline.new
 
         steps_by_key = @config.fetch("jobs").each_with_object({}) do |(key, job), hash|
-          bk_step = BK::Compat::Pipeline::Step.new(key: key, label: ":circleci: #{key}")
+          bk_step = BK::Compat::Pipeline::CommandStep.new(key: key, label: ":circleci: #{key}")
 
           job.fetch("steps").each do |circle_step|
             [*transform_circle_step_to_commands(circle_step)].each do |s|
