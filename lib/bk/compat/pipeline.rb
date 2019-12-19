@@ -26,8 +26,9 @@ module BK
         end
 
         def to_h
-          { label: @label, key: @key, commands: @commands, plugins: @plugins.map(&:to_h) }.tap do |h|
+          { label: @label, key: @key, commands: @commands }.tap do |h|
             h[:depends_on] = @depends_on if @depends_on
+            h[:plugins] = @plugins.map(&:to_h) if @plugins && !@plugins.empty?
           end
         end
       end
