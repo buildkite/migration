@@ -109,6 +109,9 @@ module BK
             }
           )
         elsif executor_config.length > 1
+          docker_logins = []
+          ecr_logins = []
+
           docker_compose_services = {
             # This is a dummy container which does nothing but provide a
             # network stack for all the other containers to inherit so they
@@ -122,8 +125,11 @@ module BK
           }
 
           executor_config.each.with_index do |d, i|
+            # We'll be deleting config from it as we go, so get a copy of it so
+            # we're not mutating the original value
             d = d.dup
 
+            # First, let's get the image it'll be using
             image = d.delete("image")
 
             # The first docker container is the primary container and is
@@ -148,6 +154,54 @@ module BK
               t["environment"] = env
             end
 
+            if entrypoint = d.delete("command")
+              t["entrypoint"] = entrypoint
+            end
+
+            # Do we need a `docker login` for this image?
+            if auth = d.delete("auth")
+              login = {}
+
+              if username = auth["username"]
+                login[:username] = username.chomp
+              end
+
+              if password = auth["password"]
+                chompped_password = password.chomp
+                if chompped_password.start_with?("$")
+                  login[:password_env] = chompped_password.sub(/\A\$/, "")
+                else
+                  login[:password] = chompped_password
+                end
+              end
+
+              docker_logins << login unless login.empty?
+            end
+
+            # What about an ECR login?
+            if aws_auth = d.delete("aws_auth")
+              ecr_login = {
+                # The account id is the first part of the image, so we'll exract that as well
+                account_ids: image.match(/\A(\d+)\./)[1]
+              }
+
+              if access_key_id = aws_auth["aws_access_key_id"]
+                ecr_login[:access_key_id] = access_key_id.chomp
+              end
+
+              if secret_access_key = aws_auth["aws_secret_access_key"]
+                chompped_secret_access_key = secret_access_key.chomp
+                if chompped_secret_access_key.start_with?("$")
+                  ecr_login[:secret_access_key_env] = chompped_secret_access_key.sub(/\A\$/, "")
+                else
+                  raise "AWS secret access key needs to be an env"
+                end
+              end
+
+              ecr_logins << ecr_login unless ecr_login.empty?
+            end
+
+            # We only want to mount the checkout in the primary container
             if i == 0
               t["volumes"] = ["../:/buildkite-checkout"]
             end
@@ -175,6 +229,22 @@ module BK
               contents: docker_compose_config.to_yaml
             }
           )
+
+          if docker_logins.length > 0
+            bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
+              path: "docker-login#v2.0.1",
+              config: docker_logins.uniq
+            )
+          end
+
+          if ecr_logins.length > 0
+            ecr_logins.uniq.each do |ecr_auth|
+              bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
+                path: "ecr#pass-through-creds",
+                config: { login: true }.merge(ecr_auth)
+              )
+            end
+          end
 
           bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
             path: "docker-compose#v3.1.0",
