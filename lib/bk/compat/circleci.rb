@@ -231,10 +231,12 @@ module BK
           )
 
           if docker_logins.length > 0
-            bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
-              path: "docker-login#v2.0.1",
-              config: docker_logins.uniq
-            )
+            docker_logins.uniq.each do |login|
+              bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
+                path: "docker-login#v2.0.1",
+                config: login
+              )
+            end
           end
 
           if ecr_logins.length > 0
