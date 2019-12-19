@@ -33,6 +33,20 @@ module BK
         end
       end
 
+      class GroupStep
+        attr_accessor :label, :key, :steps
+
+        def initialize(label: nil, key: nil, steps: [])
+          @label = label
+          @key = key
+          @steps = steps
+        end
+
+        def to_h
+          { group: @label, key: @key, steps: @steps.map(&:to_h) }
+        end
+      end
+
       attr_accessor :steps
 
       def initialize(steps: [])

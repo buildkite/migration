@@ -50,24 +50,40 @@ module BK
           workflows = @config.fetch("workflows")
           version = workflows.delete("version")
 
-          workflows.fetch(workflows.keys.first).fetch("jobs").each do |j|
-            case j
-            when String
-              bk_pipeline.steps << steps_by_key.fetch(j)
-            when Hash
+          # Turn each work flow into a step group
+          bk_groups = workflows.map do |(workflow_name, workflow_config)|
+            bk_steps = workflow_config.fetch("jobs").map do |j|
+              case j
+              when String
+                steps_by_key.fetch(j)
+              when Hash
+                key = j.keys.first
+                step = steps_by_key.fetch(key).dup
 
-              key = j.keys.first
-              step = steps_by_key.fetch(key).dup
+                if requires = j[key]["requires"]
+                  step.depends_on = [*requires]
+                end
 
-              if requires = j[key]["requires"]
-                step.depends_on = [*requires]
+                step
+              else
+                raise "Dunno what #{j.inspect} is"
               end
-
-              bk_pipeline.steps << step
-
-            else
-              raise "Dunno what #{j.inspect} is"
             end
+
+            Pipeline::GroupStep.new(
+              label: ":circleci: #{workflow_name}",
+              key: workflow_name,
+              steps: bk_steps
+            )
+          end
+
+          # If there ended up being only 1 workflow, skip the group and just
+          # pull the steps out. If there were multiple groups, make sure
+          # they're all part of the pipeline.
+          if bk_groups.length == 1
+            bk_pipeline.steps = bk_pipeline.steps.concat(bk_groups.first.steps)
+          elsif bk_groups.length > 1
+            bk_pipeline.steps = bk_pipeline.steps.concat(bk_groups)
           end
         else
           # If no workflow is defined, it's expected that there's a `build` job
