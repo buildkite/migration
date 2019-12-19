@@ -110,6 +110,8 @@ module BK
           )
         elsif executor_config.length > 1
           docker_logins = []
+          ecr_logins = []
+
           docker_compose_services = {
             # This is a dummy container which does nothing but provide a
             # network stack for all the other containers to inherit so they
@@ -178,7 +180,25 @@ module BK
 
             # What about an ECR login?
             if aws_auth = d.delete("aws_auth")
-              # TODO: aws_access_key_id, aws_secret_access_key
+              ecr_login = {
+                # The account id is the first part of the image, so we'll exract that as well
+                account_ids: image.match(/\A(\d+)\./)[1]
+              }
+
+              if access_key_id = aws_auth["aws_access_key_id"]
+                ecr_login[:access_key_id] = access_key_id.chomp
+              end
+
+              if secret_access_key = aws_auth["aws_secret_access_key"]
+                chompped_secret_access_key = secret_access_key.chomp
+                if chompped_secret_access_key.start_with?("$")
+                  ecr_login[:secret_access_key_env] = chompped_secret_access_key.sub(/\A\$/, "")
+                else
+                  raise "AWS secret access key needs to be an env"
+                end
+              end
+
+              ecr_logins << ecr_login unless ecr_login.empty?
             end
 
             # We only want to mount the checkout in the primary container
@@ -215,6 +235,15 @@ module BK
               path: "docker-login#v2.0.1",
               config: docker_logins.uniq
             )
+          end
+
+          if ecr_logins.length > 0
+            ecr_logins.uniq.each do |ecr_auth|
+              bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
+                path: "ecr#pass-through-creds",
+                config: { login: true }.merge(ecr_auth)
+              )
+            end
           end
 
           bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
