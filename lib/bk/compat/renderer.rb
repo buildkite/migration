@@ -1,8 +1,10 @@
-require "rouge"
-
 module BK
   module Compat
     class Renderer
+      require "rouge"
+      require "json"
+      require "yaml"
+
       module Format
         YAML = :yaml
         JSON = :json
