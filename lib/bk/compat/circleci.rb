@@ -149,7 +149,7 @@ module BK
             end
 
             if i == 0
-              t["volumes"] = [".:/buildkite-checkout"]
+              t["volumes"] = ["../:/buildkite-checkout"]
             end
 
             unless d.empty?
