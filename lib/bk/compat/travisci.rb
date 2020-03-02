@@ -51,7 +51,7 @@ module BK
 
         if before_install = @config["before_install"]
           [*before_install].each do |cmd|
-            script << cmd
+            script << escape_travis_env(cmd)
           end
         end
 
@@ -63,7 +63,10 @@ module BK
           if docker_image
             bk_step = BK::Compat::Pipeline::CommandStep.new(
               label: ":travisci: #{rvm}",
-              commands: script
+              commands: script,
+              env: {
+                TRAVIS_RUBY_VERSION: rvm
+              }
             )
 
             if soft_fails.include?(rvm)
@@ -88,6 +91,10 @@ module BK
         end
 
         bk_pipeline
+      end
+
+      def escape_travis_env(cmd)
+        cmd.gsub(/\$TRAVIS_/, "$$TRAVIS_")
       end
 
       def rvm_docker_image_name(version)

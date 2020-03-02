@@ -13,15 +13,16 @@ module BK
       end
 
       class CommandStep
-        attr_accessor :label, :key, :commands, :plugins, :depends_on, :soft_fail
+        attr_accessor :label, :key, :commands, :plugins, :depends_on, :soft_fail, :env
 
-        def initialize(label: nil, key: nil, commands: [], plugins: [], depends_on: nil, soft_fail: nil)
+        def initialize(label: nil, key: nil, commands: [], plugins: [], depends_on: nil, soft_fail: nil, env: nil)
           self.label = label
           self.commands = commands
           self.key = key
           self.plugins = plugins
           self.depends_on = depends_on
           self.soft_fail = soft_fail
+          self.env = env
         end
 
         def commands=(value)
@@ -39,6 +40,7 @@ module BK
                 h[:commands] = @commands
               end
             end
+            h[:env] = @env unless @env.nil?
             h[:depends_on] = @depends_on if @depends_on
             h[:plugins] = @plugins.map(&:to_h) if @plugins && !@plugins.empty?
             h[:soft_fail] = @soft_fail unless @soft_fail.nil?
