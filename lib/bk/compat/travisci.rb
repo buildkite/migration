@@ -36,14 +36,19 @@ module BK
         script = []
 
         if apt = @config.dig("addons", "apt")
+          script << "apt-get update"
+
           if sources = apt["sources"]
-            script << "apt-get update"
-            script << "apt-get install -y software-properties-common"
-            sources.each do |s|
+            sources_to_add = sources.map do |s|
               next if IGNORE_SOURCES.include?(s)
-              script << "add-apt-repository -y #{SOURCES.fetch(s)}"
-            end
+              "add-apt-repository -y #{SOURCES.fetch(s)}"
+            end.compact
+
+            if sources_to_add.any?
+            script << "apt-get install -y software-properties-common"
+            sources_to_add.each { |s| script << s }
             script << "apt-get update"
+            end
           end
 
           if packages = apt["packages"]
