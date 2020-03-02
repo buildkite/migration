@@ -58,22 +58,31 @@ module BK
         script << @config.fetch("script")
 
         @config.fetch("rvm").each do |rvm|
-          bk_step = BK::Compat::Pipeline::CommandStep.new(
-            label: ":travisci: #{rvm}",
-            commands: script
-          )
+          docker_image = rvm_docker_image_name(rvm)
 
-          if soft_fails.include?(rvm)
-            bk_step.soft_fail = true
+          if docker_image
+            bk_step = BK::Compat::Pipeline::CommandStep.new(
+              label: ":travisci: #{rvm}",
+              commands: script
+            )
+
+            if soft_fails.include?(rvm)
+              bk_step.soft_fail = true
+            end
+
+            bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
+              path: "docker#v3.3.0",
+              config: {
+                image: docker_image,
+                workdir: "/buildkite-checkout"
+              }
+            )
+          else
+            bk_step = BK::Compat::Pipeline::CommandStep.new(
+              label: ":travisci: #{rvm} (no docker image)",
+              commands: "exit 1"
+            )
           end
-
-          bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
-            path: "docker#v3.3.0",
-            config: {
-              image: "ruby:#{rvm}",
-              workdir: "/buildkite-checkout"
-            }
-          )
 
           bk_pipeline.steps << bk_step
         end
@@ -81,6 +90,20 @@ module BK
         bk_pipeline
       end
 
+      def rvm_docker_image_name(version)
+        case version
+        when "jruby-head"
+          nil
+        when /^jruby-(.+)/
+          "jruby:#{$1}"
+        when /^rbx-/
+          nil
+        when "ruby-head"
+          "rubocophq:ruby-snapshot"
+        else
+          "ruby:#{version}"
+        end
+      end
     end
   end
 end

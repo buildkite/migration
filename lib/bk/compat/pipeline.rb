@@ -16,12 +16,16 @@ module BK
         attr_accessor :label, :key, :commands, :plugins, :depends_on, :soft_fail
 
         def initialize(label: nil, key: nil, commands: [], plugins: [], depends_on: nil, soft_fail: nil)
-          @label = label
-          @commands = commands
-          @key = key
-          @plugins = plugins
-          @depends_on = depends_on
-          @soft_fail = soft_fail
+          self.label = label
+          self.commands = commands
+          self.key = key
+          self.plugins = plugins
+          self.depends_on = depends_on
+          self.soft_fail = soft_fail
+        end
+
+        def commands=(value)
+          @commands = [*value]
         end
 
         def to_h
