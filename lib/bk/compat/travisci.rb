@@ -17,8 +17,11 @@ module BK
       end
 
       SOURCES = {
-        "ubuntu-toolchain-r-test" => "ppa:ubuntu-toolchain-r/test"
       }
+
+      IGNORE_SOURCES = [
+        "ubuntu-toolchain-r-test"
+      ]
 
       def parse
         bk_pipeline = Pipeline.new
@@ -37,6 +40,7 @@ module BK
             script << "apt-get update"
             script << "apt-get install -y software-properties-common"
             sources.each do |s|
+              next if IGNORE_SOURCES.include?(s)
               script << "add-apt-repository -y #{SOURCES.fetch(s)}"
             end
             script << "apt-get update"
