@@ -37,7 +37,7 @@ module BK
             script << "apt-get update"
             script << "apt-get install -y software-properties-common"
             sources.each do |s|
-              script << "add-apt-repository #{SOURCES.fetch(s)}"
+              script << "add-apt-repository -y #{SOURCES.fetch(s)}"
             end
             script << "apt-get update"
           end
