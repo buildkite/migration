@@ -25,8 +25,11 @@ module BK
         # Read the file from the request
         contents = req.params["file"][:tempfile].read
 
+        # Figure out which parser to use
+        parser_klass = BK::Compat.guess(contents)
+
         # Parse it and render it as YAML
-        body = BK::Compat::CircleCI.parse_text(contents).render(colors: false, format: format)
+        body = parser_klass.new(contents).parse.render(colors: false, format: format)
 
         # Yay, return it as YAML
         [200, { "Content-Type" => content_type }, StringIO.new(body)]
