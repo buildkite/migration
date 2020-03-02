@@ -2,27 +2,34 @@ module BK
   module Compat
     class CLI
       require_relative "../compat"
-
-      BANNER = "Usage: buildkite-compat [file] or pass text in via STDIN"
+      require "optparse"
 
       def self.run(command_line)
-        file = command_line[0]
+        options = {}
 
-        # Really hacky option parsing
-        if file == "--version"
-          puts "buildkite-compat version #{BK::Compat::VERSION}"
-          exit 0
-        end
-        if file == "--help"
-          puts BANNER
-          exit 0
+        option_parser = OptionParser.new do |opts|
+          opts.program_name = "buildkite-compat"
+          opts.version = BK::Compat::VERSION
+          opts.banner = <<~BANNER
+          Usage:
+
+              $ buildkite-compat [file] [options]
+
+          Or pass text in via STDIN:
+
+              $ cat [file] > buildkite-compat [options]
+
+          BANNER
         end
 
+        option_parser.parse!
+
+        file = ARGV.pop
         stdin = STDIN.tty? ? nil : $stdin.read
 
         # Both can't be nil, and both can't be present
         if (!file && !stdin) || (file && stdin)
-          puts BANNER
+          puts option_parser
           exit 1
         end
 
