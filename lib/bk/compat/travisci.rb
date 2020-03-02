@@ -32,14 +32,14 @@ module BK
           if sources = apt["sources"]
             sources.each do |s|
               ppa = "ppa:#{s}"
-              script << "sudo add-apt-repository #{s.inspect}"
+              script << "add-apt-repository #{s.inspect}"
             end
-            script << "sudo apt-get update"
+            script << "apt-get update"
           end
 
           if packages = apt["packages"]
             packages.each do |pkg|
-              script << "sudo apt-get -q -y install #{pkg.inspect}"
+              script << "apt-get -q -y install #{pkg.inspect}"
             end
           end
         end
