@@ -5,8 +5,6 @@ module BK
       require "optparse"
 
       def self.run(command_line)
-        options = {}
-
         option_parser = OptionParser.new do |opts|
           opts.program_name = "buildkite-compat"
           opts.version = BK::Compat::VERSION
@@ -24,6 +22,7 @@ module BK
 
         option_parser.parse!
 
+        # Either get the file from the arguments, or read STDIN
         file = ARGV.pop
         text = STDIN.tty? ? nil : $stdin.read
 
@@ -35,11 +34,11 @@ module BK
           text = File.read(file)
         end
 
+        # Figure out which parser to use
         parser_klass = BK::Compat.guess(text)
 
-        if parser_klass
-          puts parser_klass.new(text).parse.render
-        else
+        # Show a nice error message if we couldn't find a parser to use
+        if !parser_klass
           puts <<~TEXT
           Not sure which parser to use. Compatible parsers are:
 
@@ -48,6 +47,9 @@ module BK
 
           exit 1
         end
+
+        # Now we can finally parse and render the thing
+        puts parser_klass.new(text).parse.render
       end
     end
   end
