@@ -3,16 +3,17 @@ module BK
     class CircleCI
       require "yaml"
 
-      def self.parse_file(file_path)
-        new(YAML.load_file(file_path)).parse
+      def self.matches?(text)
+        keys = YAML.safe_load(text).keys
+        keys.include?("jobs") && keys.include?("jobs")
       end
 
-      def self.parse_text(text)
-        new(YAML.safe_load(text)).parse
+      def self.name
+        "CircleCI"
       end
 
-      def initialize(config)
-        @config = config
+      def initialize(text)
+        @config = YAML.safe_load(text)
         @now = Time.now
       end
 

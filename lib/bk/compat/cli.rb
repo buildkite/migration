@@ -25,21 +25,29 @@ module BK
         option_parser.parse!
 
         file = ARGV.pop
-        stdin = STDIN.tty? ? nil : $stdin.read
+        text = STDIN.tty? ? nil : $stdin.read
 
         # Both can't be nil, and both can't be present
-        if (!file && !stdin) || (file && stdin)
+        if (!file && !text) || (file && text)
           puts option_parser
           exit 1
+        elsif file && !text
+          text = File.read(file)
         end
 
-        parsed = if file
-                   BK::Compat::CircleCI.parse_file(file)
-                 else
-                   BK::Compat::CircleCI.parse_text(stdin)
-                 end
+        parser_klass = BK::Compat.guess(text)
 
-        puts parsed.render
+        if parser_klass
+          puts parser_klass.new(text).parse.render
+        else
+          puts <<~TEXT
+          Not sure which parser to use. Compatible parsers are:
+
+          #{BK::Compat::PARSERS.map { |parser_klass| " - #{parser_klass.name}" }.join("\n")}
+          TEXT
+
+          exit 1
+        end
       end
     end
   end
