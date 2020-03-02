@@ -3,13 +3,13 @@ module BK
     class CircleCI
       require "yaml"
 
-      def self.matches?(text)
-        keys = YAML.safe_load(text).keys
-        keys.include?("jobs") && keys.include?("jobs")
+      def self.name
+        "Circle CI"
       end
 
-      def self.name
-        "CircleCI"
+      def self.matches?(text)
+        keys = YAML.safe_load(text).keys
+        keys.include?("version") && keys.include?("jobs")
       end
 
       def initialize(text)
