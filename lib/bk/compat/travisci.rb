@@ -16,6 +16,10 @@ module BK
         @config = YAML.safe_load(text)
       end
 
+      SOURCES = {
+        "ubuntu-toolchain-r-test" => "ppa:ubuntu-toolchain-r/test"
+      }
+
       def parse
         bk_pipeline = Pipeline.new
 
@@ -30,9 +34,10 @@ module BK
 
         if apt = @config.dig("addons", "apt")
           if sources = apt["sources"]
+            script << "apt-get update"
+            script << "apt-get install -y software-properties-common"
             sources.each do |s|
-              ppa = "ppa:#{s}"
-              script << "add-apt-repository #{s.inspect}"
+              script << "add-apt-repository #{SOURCES.fetch(s)}"
             end
             script << "apt-get update"
           end
