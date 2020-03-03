@@ -1,6 +1,6 @@
 module BK
   module Compat
-    class TravsiCI
+    class TravisCI
       require "yaml"
 
       def self.name
@@ -25,7 +25,14 @@ module BK
 
       def parse
         bk_pipeline = Pipeline.new
+        language = @config.fetch("language")
 
+        # Parse out global travis environment variables
+        if global_env = @config.dig("env", "global")
+          bk_pipeline.env = BK::Compat::Environment.new(global_env)
+        end
+
+        # Pull out any soft-fails we should know about
         soft_fails = []
         if allow_failures = @config.dig("matrix", "allow_failures")
           allow_failures.each do |fc|
@@ -58,66 +65,127 @@ module BK
           end
         end
 
+        # Include `before_install` hooks
         if before_install = @config["before_install"]
           [*before_install].each do |cmd|
-            script << escape_travis_env(cmd)
+            script << double_escape_env(cmd)
           end
         end
 
-        script << @config.fetch("script")
+        # Include `before_script` hooks
+        if before_script = @config["before_script"]
+          [*before_script].each do |cmd|
+            script << double_escape_env(cmd)
+          end
+        end
 
-        @config.fetch("rvm").each do |rvm|
-          docker_image = rvm_docker_image_name(rvm)
+        env_matrix = parse_env_matrix(
+          @config.dig("env", "matrix") || @config.dig("env", "jobs")
+        )
+
+        # Finally add the main script
+        script << double_escape_env(@config.fetch("script"))
+
+        config_key = case language
+                     when "go" then "go"
+                     when "ruby" then "rvm"
+                     else
+                       BK::Compat::Error::NotSupportedError.new("#{language.inspect} isn't supported yet")
+                     end
+
+        [*@config.fetch(config_key)].each do |version|
+          docker_image = docker_image_name(language, version)
+
+          language_env_key = "TRAVIS_#{language.upcase}_VERSION"
 
           if docker_image
             bk_step = BK::Compat::Pipeline::CommandStep.new(
-              label: ":travisci: #{rvm}",
+              label: ":travisci: #{language} #{version}",
               commands: script,
               env: {
-                TRAVIS_RUBY_VERSION: rvm
+                "#{language_env_key}": version
               }
             )
 
-            if soft_fails.include?(rvm)
+            if soft_fails.include?(version)
               bk_step.soft_fail = true
             end
+
+            bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
+              path: "keithpitt/compat-env#v0.1",
+              config: {
+                travisci: true
+              }
+            )
 
             bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
               path: "docker#v3.3.0",
               config: {
                 image: docker_image,
-                workdir: "/buildkite-checkout"
+                workdir: "/buildkite-checkout",
+                "propagate-environment": true
               }
             )
           else
             bk_step = BK::Compat::Pipeline::CommandStep.new(
-              label: ":travisci: #{rvm} (no docker image)",
+              label: ":travisci: #{version} (no docker image)",
               commands: "exit 1"
             )
           end
 
-          bk_pipeline.steps << bk_step
+          if !env_matrix || env_matrix.empty?
+            bk_pipeline.steps << bk_step
+          else
+            env_matrix.each do |this_env|
+              duped_bk_step = bk_step.dup
+              duped_bk_step.label = "#{duped_bk_step.label} (#{this_env.to_s})"
+              duped_bk_step.env = this_env.merge(duped_bk_step.env)
+
+              bk_pipeline.steps << duped_bk_step
+            end
+          end
         end
 
         bk_pipeline
       end
 
-      def escape_travis_env(cmd)
-        cmd.gsub(/\$TRAVIS_/, "$$TRAVIS_")
+      def double_escape_env(cmd)
+        cmd.gsub(/\$([A-Z])/, '$$\1')
       end
 
-      def rvm_docker_image_name(version)
-        case version
-        when "jruby-head"
-          nil
-        when /^jruby-(.+)/
-          "jruby:#{$1}"
-        when /^rbx-/
-          nil
-        when "ruby-head"
-          "rubocophq:ruby-snapshot"
+      def docker_image_name(language, version)
+        case language
+        when "go"
+          "golang:#{version.sub(/\.x$/, "")}"
+        when "ruby"
+          case version
+          when "jruby-head"
+            nil
+          when /^jruby-(.+)/
+            "jruby:#{$1}"
+          when /^rbx-/
+            nil
+          when "ruby-head"
+            "rubocophq:ruby-snapshot"
+          else
+            "ruby:#{version}"
+          end
+        end
+      end
+
+      def parse_env_matrix(env)
+        return nil if env.nil?
+
+        if env.is_a?(Array)
+          env.map do |v|
+            if v.is_a?(String)
+              BK::Compat::Environment.new(double_escape_env(v))
+            else
+              raise BK::Compat::Error::NotSupportedError.new("Can't parse env.matrix as a non-string")
+            end
+          end
         else
-          "ruby:#{version}"
+          raise BK::Compat::Error::NotSupportedError.new("env.matrix needs to be an array")
         end
       end
     end

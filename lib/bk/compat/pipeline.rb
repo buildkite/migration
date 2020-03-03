@@ -1,3 +1,6 @@
+require_relative "renderer"
+require_relative "environment"
+
 module BK
   module Compat
     class Pipeline
@@ -40,7 +43,7 @@ module BK
                 h[:commands] = @commands
               end
             end
-            h[:env] = @env unless @env.nil?
+            h[:env] = @env.to_h unless @env.nil?
             h[:depends_on] = @depends_on if @depends_on
             h[:plugins] = @plugins.map(&:to_h) if @plugins && !@plugins.empty?
             h[:soft_fail] = @soft_fail unless @soft_fail.nil?
@@ -62,10 +65,11 @@ module BK
         end
       end
 
-      attr_accessor :steps
+      attr_accessor :steps, :env
 
-      def initialize(steps: [])
+      def initialize(steps: [], env: nil)
         @steps = steps
+        @env = env
       end
 
       def render(**args)
@@ -73,7 +77,12 @@ module BK
       end
 
       def to_h
-        { steps: steps.map(&:to_h) }
+        {}.tap do |h|
+          if @env
+            h[:env] = @env.to_h
+          end
+          h[:steps] = steps.map(&:to_h)
+        end
       end
     end
   end
