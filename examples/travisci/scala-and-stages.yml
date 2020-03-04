@@ -1,0 +1,89 @@
+dist: trusty
+
+language: scala
+
+sudo: required
+
+services:
+ - mysql
+
+scala:
+  - 2.12.10
+
+branches:
+  only:
+    - master
+    - /^v[0-9]+\.[0-9]+/
+
+jdk:
+  - openjdk8
+
+env:
+  global:
+    - SCALA_ENV=travis
+    - KAFKA_HOSTS=localhost
+    - KAFKA_PORT=9092
+
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.m2/repository
+    - $HOME/.sbt/boot/scala-$TRAVIS_SCALA_VERSION
+    - $HOME/.sbt/launchers
+
+# Tricks to avoid unnecessary cache updates.
+# see: http://www.scala-sbt.org/0.13/docs/Travis-CI-with-sbt.html
+#      https://github.com/spray/spray/blob/master/.travis.yml
+before_cache:
+  - find $HOME/.ivy2 -name "ivydata-*.properties" -delete
+  - find $HOME/.ivy2 -name ".*.lock" -delete
+  - find $HOME/.sbt -name "*.lock" -delete
+
+before_script:
+  - mysql -e "set GLOBAL innodb_large_prefix = true"
+  - mysql -e "set GLOBAL innodb_file_format = 'barracuda'"
+  - sudo chmod +x /usr/local/bin/sbt
+
+stages:
+  - test
+  - name: doTheThing
+    if: branch = master AND type = push
+
+jobs:
+  fast_finish: true
+  allow_failures:
+    - env: TASK=pact
+  include:
+    - stage: test
+      name: "First Thing"
+      # If build.sbt fails to load, SBT will wait for user input (retry, quit,
+      # etc) until Travis-CI kills the job after 10 minutes of no activity.
+      # Piping stdin from /dev/null fixes this.
+      script:
+        - sbt clean coverage                  < /dev/null
+        - sbt "testOnly * -- -l tags.Pact"    < /dev/null
+        - sbt scalastyle                      < /dev/null
+        - sbt coverageReport                  < /dev/null
+      env: TASK=main
+    - stage: test
+      name: "Second Thing"
+      script:
+        - sbt clean                           < /dev/null
+        - sbt "testOnly * -- -n tags.Pact"    < /dev/null
+      env: TASK=pact
+    - stage: doTheThing
+      script:
+        - sbt clean                           < /dev/null
+        - sbt "testOnly * -- -n tags.Pact"    < /dev/null
+        - sbt pactPack pactPush pactPush      < /dev/null
+      env: TASK=pact
+
+notifications:
+  webhooks:
+    urls:
+      - https://XXXX.text.com/XXXX
+    on_success: always
+    on_failure: never
+
+after_failure:
+  - cat log/test.log || echo "Failed to find test.log"

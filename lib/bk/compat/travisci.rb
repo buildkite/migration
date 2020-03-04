@@ -32,14 +32,6 @@ module BK
           bk_pipeline.env = BK::Compat::Environment.new(global_env)
         end
 
-        # Pull out any soft-fails we should know about
-        soft_fails = []
-        if allow_failures = @config.dig("matrix", "allow_failures")
-          allow_failures.each do |fc|
-            soft_fails << fc["rvm"]
-          end
-        end
-
         script = []
 
         if apt = @config.dig("addons", "apt")
@@ -76,6 +68,20 @@ module BK
         if before_script = @config["before_script"]
           [*before_script].each do |cmd|
             script << double_escape_env(cmd)
+          end
+        end
+
+        if @config.has_key?("jobs")
+          configure_stages(bk_pipeline, script)
+
+          return bk_pipeline
+        end
+
+        # Pull out any soft-fails we should know about
+        soft_fails = []
+        if allow_failures = @config.dig("matrix", "allow_failures")
+          allow_failures.each do |fc|
+            soft_fails << fc["rvm"]
           end
         end
 
@@ -186,6 +192,78 @@ module BK
           end
         else
           raise BK::Compat::Error::NotSupportedError.new("env.matrix needs to be an array")
+        end
+      end
+
+      def prepare_step(label: nil, commands:, env:, conditional: nil)
+        BK::Compat::Pipeline::CommandStep.new(
+          label: label,
+          commands: commands,
+          env: env,
+          conditional: conditional
+        )
+      end
+
+      def configure_stages(bk_pipeline, before_script)
+        jobs = {}
+        last_stage_name = nil
+        if job_configs = @config.dig("jobs", "include")
+          job_configs.each do |jc|
+            name = jc.fetch("stage", "test")
+            name = last_stage_name if name.nil?
+
+            jobs[name] ||= []
+            jobs[name] << jc
+
+            last_stage_name = name
+          end
+        end
+
+        stages = @config.fetch("stages", [ "test" ])
+
+        case stages
+        when String
+        when Hash
+        when Array
+          stages.each.with_index do |stage, index|
+            job_name = case stage
+                       when String
+                         stage
+                       when Hash
+                         stage.fetch("name")
+                       else
+                         raise BK::Compat::Error::NotSupportedError.new("A stage must either be a string or a hash")
+                       end
+
+            if job_name.nil? || job_name.chomp.empty?
+              raise BK::Compat::Error::NotSupportedError.new("Couldn't find a job name in one of the stages")
+            elsif !jobs.has_key?(job_name)
+              raise BK::Compat::Error::NotSupportedError.new("Couldn't find a job with name #{job_name.inspect}")
+            end
+
+            these_steps = jobs[job_name].map do |j|
+              prepare_step(
+                commands: [*before_script, j["script"]],
+                env: j["env"],
+                label: j["name"]
+              )
+            end
+
+            conditional = stage["if"] if stage.is_a?(Hash)
+
+            if index > 0
+              bk_pipeline.steps << Pipeline::WaitStep.new
+            end
+
+            bk_pipeline.steps << Pipeline::GroupStep.new(
+              label: ":travisci: #{job_name.capitalize}",
+              key: job_name,
+              steps: these_steps,
+              conditional: conditional
+            )
+          end
+        else
+          raise BK::Compat::Error::NotSupportedError.new("stages needs to be either a string, an array or a hash")
         end
       end
     end
