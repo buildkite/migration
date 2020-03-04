@@ -6,9 +6,38 @@ module BK
       def call(env)
         req = Rack::Request.new(env)
 
+        # We have only one url at the moment
+        if req.path == "/"
+          if req.get?
+            return handle_index
+          elsif req.post?
+            return handle_parse
+          else
+            return [405, {}, []]
+          end
+        end
+
+        # If we've gotten here, then the path isn't supported
+        return [404, {}, []]
+      end
+
+      private
+
+      INDEX_HTML_PATH = File.expand_path(File.join(__FILE__, "..", "..", "..", "..", "public", "index.html"))
+
+      def handle_index
+        # Read once in production mode, otherwise - read each time.
+        html = if ENV["RACK_ENV"] == "production"
+                 @@html ||= File.read(INDEX_HTML_PATH)
+               else
+                 File.read(INDEX_HTML_PATH)
+               end
+
+        return [200, { "Content-Type" => "text/html" }, StringIO.new(html)]
+      end
+
+      def handle_parse
         # Make sure the request looks legit
-        return [405, {}, []] unless req.post?
-        return [404, {}, []] unless req.path == "/"
         return [400, {}, []] if !req.form_data? || !req.params["file"].is_a?(Hash)
 
         case req.get_header("HTTP_ACCEPT")
@@ -38,8 +67,6 @@ module BK
           error_message(501, "Whoops! You found a bug! Please email keith@buildkite.com with a copy of the file you're trying to convert.")
         end
       end
-
-      private
 
       def error_message(code, message)
         [code, { "Content-Type" => "text/plain" }, StringIO.new("👎 #{message}\n")]
