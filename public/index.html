@@ -1,6 +1,7 @@
 <html>
   <head>
     <meta charset="UTF-8">
+    <title>Buildkite-ification!</title>
     <style>
       body {
         font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Helvetica, sans-serif;
@@ -67,6 +68,7 @@
         background-image: none;
         border: 1px solid #ccc;
         border-radius: .3em;
+        resize: none;
         -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
                 box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
 
@@ -88,8 +90,8 @@
     <div class="flex items-stretch justify-center" style="min-height: 100%">
       <form onSubmit="return transform(event)" class="flex items-stretch center flex-column" style="width: 100%; padding: 5%;">
         <div class="flex flex-auto" style="margin-bottom: 20px;">
-          <textarea rows="20" style="width: 50%; margin-right: 20px" placeholder="👋 Paste a config in here!" id="config" class="flex-auto"></textarea>
-          <textarea rows="20" style="width: 50%" readonly="true" id="results" placeholder="👈 Paste config over there" class="flex-auto"></textarea>
+          <textarea rows="20" style="width: 50%; margin-right: 20px" placeholder="👋 Paste or drag a config file here!" id="config" class="flex-auto"></textarea>
+          <textarea rows="20" style="width: 50%" readonly="true" id="results" placeholder="👈 Look over there" class="flex-auto"></textarea>
         </div>
         <div>
           <input type="submit" value="Buildkite-ify!" id="button" />
