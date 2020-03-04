@@ -9,9 +9,9 @@ module BK
         # We have only one url at the moment
         if req.path == "/"
           if req.get?
-            return handle_index
+            return handle_index(req)
           elsif req.post?
-            return handle_parse
+            return handle_parse(req)
           else
             return [405, {}, []]
           end
@@ -25,7 +25,7 @@ module BK
 
       INDEX_HTML_PATH = File.expand_path(File.join(__FILE__, "..", "..", "..", "..", "public", "index.html"))
 
-      def handle_index
+      def handle_index(req)
         # Read once in production mode, otherwise - read each time.
         html = if ENV["RACK_ENV"] == "production"
                  @@html ||= File.read(INDEX_HTML_PATH)
@@ -36,7 +36,7 @@ module BK
         return [200, { "Content-Type" => "text/html" }, StringIO.new(html)]
       end
 
-      def handle_parse
+      def handle_parse(req)
         # Make sure the request looks legit
         return [400, {}, []] if !req.form_data? || !req.params["file"].is_a?(Hash)
 
