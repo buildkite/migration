@@ -1,0 +1,27 @@
+sudo: false
+cache: bundler
+rvm:
+  - 2.4
+  - 2.5
+  - 2.6
+  - ruby-head
+gemfile:
+  - gemfiles/rails4.2.gemfile
+  - gemfiles/rails5.0.gemfile
+  - gemfiles/rails5.1.gemfile
+  - gemfiles/rails5.2.gemfile
+bundler_args: --without debug
+script: "bundle exec rake $TASK"
+branches:
+  only: master
+env:
+  matrix:
+    - TASK="spec"
+    - TASK="spec_in_isolation"
+matrix:
+  include:
+    - rvm: 2.6
+      env:
+        - TASK=rubocop
+  allow_failures:
+    - rvm: ruby-head

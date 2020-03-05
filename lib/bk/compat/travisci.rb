@@ -9,7 +9,7 @@ module BK
 
       def self.matches?(text)
         keys = YAML.safe_load(text).keys
-        keys.include?("language")
+        keys.include?("language") || keys.include?("rvm")
       end
 
       def initialize(text)
@@ -25,7 +25,9 @@ module BK
 
       def parse
         bk_pipeline = Pipeline.new
-        language = @config.fetch("language")
+
+        # Travis defaults to ruby
+        language = @config.fetch("language", "ruby")
 
         # Parse out global travis environment variables
         if global_env = @config.dig("env", "global")
