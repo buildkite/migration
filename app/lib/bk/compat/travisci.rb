@@ -106,7 +106,7 @@ module BK
                      when "go" then "go"
                      when "ruby" then "rvm"
                      else
-                       BK::Compat::Error::NotSupportedError.new("#{language.inspect} isn't supported yet")
+                       raise BK::Compat::Error::NotSupportedError.new("#{language.inspect} isn't supported yet")
                      end
 
         [*@config.fetch(config_key)].each do |version|
