@@ -67,7 +67,7 @@ module BK
       private
 
       def parse(text)
-        return nil if text.nil? || text.empty?
+        return {} if text.nil? || text.empty?
         return text if text.is_a?(Hash)
 
         lines = Shellwords.split(if text.is_a?(Array)

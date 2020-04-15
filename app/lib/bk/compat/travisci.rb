@@ -160,7 +160,11 @@ module BK
             matrix_env.each do |this_env|
               duped_bk_step = bk_step.dup
               duped_bk_step.label = "#{duped_bk_step.label} (#{this_env.to_s})"
-              duped_bk_step.env = this_env.merge(duped_bk_step.env)
+
+              env = BK::Compat::Environment.new("")
+              env.merge(this_env)
+              env.merge(bk_step.env)
+              duped_bk_step.env = env
 
               bk_pipeline.steps << duped_bk_step
             end
