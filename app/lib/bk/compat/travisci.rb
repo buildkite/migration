@@ -114,7 +114,7 @@ module BK
                        raise BK::Compat::Error::NotSupportedError.new("#{language.inspect} isn't supported yet")
                      end
 
-        [*@config.fetch(config_key)].each do |version|
+        Array(@config.fetch(config_key)).each do |version|
           docker_image = docker_image_name(language, version)
 
           language_env_key = "TRAVIS_#{language.upcase}_VERSION"
