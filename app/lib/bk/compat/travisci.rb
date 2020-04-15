@@ -100,7 +100,11 @@ module BK
         end
 
         # Finally add the main script
-        script << double_escape_env(@config.fetch("script"))
+        main_script = @config.fetch("script")
+        if main_script.is_a?(Array)
+          main_script = main_script.join(' && ')
+        end
+        script << double_escape_env(main_script)
 
         config_key = case language
                      when "go" then "go"
