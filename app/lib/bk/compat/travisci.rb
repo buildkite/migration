@@ -196,7 +196,7 @@ module BK
           when "stable"
             "rust:latest"
           when "beta"
-            raise BK::Compat::Error::NotSupportedError.new("rust doesn't have a beta image")
+            nil
           when "nightly"
             "rustlang/rust:nightly"
           else
