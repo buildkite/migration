@@ -29,9 +29,21 @@ module BK
         # Travis defaults to ruby
         language = @config.fetch("language", "ruby")
 
-        # Parse out global travis environment variables
-        if global_env = @config.dig("env", "global")
-          bk_pipeline.env = BK::Compat::Environment.new(global_env)
+        # Parse out global, and matrix environment variables
+        env = @config.dig("env")
+
+        matrix_env, global_env = nil, nil
+
+        if env.is_a?(Hash)
+          if global_env = env.dig("global")
+            bk_pipeline.env = BK::Compat::Environment.new(global_env)
+          end
+
+          matrix_env = parse_env_matrix(
+            env.dig("matrix") || env.dig("jobs")
+          )
+        elsif env.is_a?(Array)
+          matrix_env = parse_env_matrix(env)
         end
 
         script = []
@@ -87,10 +99,6 @@ module BK
           end
         end
 
-        env_matrix = parse_env_matrix(
-          @config.dig("env", "matrix") || @config.dig("env", "jobs")
-        )
-
         # Finally add the main script
         script << double_escape_env(@config.fetch("script"))
 
@@ -141,10 +149,10 @@ module BK
             )
           end
 
-          if !env_matrix || env_matrix.empty?
+          if !matrix_env || matrix_env.empty?
             bk_pipeline.steps << bk_step
           else
-            env_matrix.each do |this_env|
+            matrix_env.each do |this_env|
               duped_bk_step = bk_step.dup
               duped_bk_step.label = "#{duped_bk_step.label} (#{this_env.to_s})"
               duped_bk_step.env = this_env.merge(duped_bk_step.env)
