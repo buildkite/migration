@@ -109,6 +109,7 @@ module BK
         config_key = case language
                      when "go" then "go"
                      when "ruby" then "rvm"
+                     when "rust" then "rust"
                      else
                        raise BK::Compat::Error::NotSupportedError.new("#{language.inspect} isn't supported yet")
                      end
@@ -189,6 +190,17 @@ module BK
             "rubocophq:ruby-snapshot"
           else
             "ruby:#{version}"
+          end
+        when "rust"
+          case version
+          when "stable"
+            "rust:latest"
+          when "beta"
+            raise BK::Compat::Error::NotSupportedError.new("rust doesn't have a beta image")
+          when "nightly"
+            "rustlang/rust:nightly"
+          else
+            "rust:#{version}"
           end
         end
       end
