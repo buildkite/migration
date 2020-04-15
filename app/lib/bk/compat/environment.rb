@@ -1,10 +1,9 @@
+require 'shellwords'
 
 module BK
   module Compat
     class Environment
       EMPTY = ""
-
-      SPLIT_REGEX = /\r?\n/
 
       ENV_LINE_REGEX = /([^=]+)=(.*)/
 
@@ -71,11 +70,11 @@ module BK
         return nil if text.nil? || text.empty?
         return text if text.is_a?(Hash)
 
-        lines = if text.is_a?(Array)
+        lines = Shellwords.split(if text.is_a?(Array)
                   text.join("\n\n")
                 else
                   text
-                end.split(SPLIT_REGEX)
+                end)
 
         lines.inject({}) do |env, line|
           parts = line.match(ENV_LINE_REGEX)
