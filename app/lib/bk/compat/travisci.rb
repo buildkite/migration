@@ -208,16 +208,12 @@ module BK
       def parse_env_matrix(env)
         return nil if env.nil?
 
-        if env.is_a?(Array)
-          env.map do |v|
-            if v.is_a?(String)
-              BK::Compat::Environment.new(double_escape_env(v))
-            else
-              raise BK::Compat::Error::NotSupportedError.new("Can't parse env.matrix as a non-string")
-            end
-          end
-        else
-          raise BK::Compat::Error::NotSupportedError.new("env.matrix needs to be an array")
+        raise BK::Compat::Error::NotSupportedError.new("env.matrix needs to be an array") unless env.is_a?(Array)
+
+        env.map do |v|
+          raise BK::Compat::Error::NotSupportedError.new("Can't parse env.matrix as a non-string") unless v.is_a?(String)
+          
+          BK::Compat::Environment.new(double_escape_env(v))
         end
       end
 
