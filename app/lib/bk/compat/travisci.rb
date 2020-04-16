@@ -29,9 +29,21 @@ module BK
         # Travis defaults to ruby
         language = @config.fetch("language", "ruby")
 
-        # Parse out global travis environment variables
-        if global_env = @config.dig("env", "global")
-          bk_pipeline.env = BK::Compat::Environment.new(global_env)
+        # Parse out global, and matrix environment variables
+        env = @config.dig("env")
+
+        matrix_env, global_env = nil, nil
+
+        if env.is_a?(Hash)
+          if global_env = env.dig("global")
+            bk_pipeline.env = BK::Compat::Environment.new(global_env)
+          end
+
+          matrix_env = parse_env_matrix(
+            env.dig("matrix") || env.dig("jobs")
+          )
+        elsif env.is_a?(Array)
+          matrix_env = parse_env_matrix(env)
         end
 
         script = []
@@ -87,21 +99,22 @@ module BK
           end
         end
 
-        env_matrix = parse_env_matrix(
-          @config.dig("env", "matrix") || @config.dig("env", "jobs")
-        )
-
         # Finally add the main script
-        script << double_escape_env(@config.fetch("script"))
+        main_script = @config.fetch("script")
+        if main_script.is_a?(Array)
+          main_script = main_script.join(' && ')
+        end
+        script << double_escape_env(main_script)
 
         config_key = case language
                      when "go" then "go"
                      when "ruby" then "rvm"
+                     when "rust" then "rust"
                      else
-                       BK::Compat::Error::NotSupportedError.new("#{language.inspect} isn't supported yet")
+                       raise BK::Compat::Error::NotSupportedError.new("#{language.inspect} isn't supported yet")
                      end
 
-        [*@config.fetch(config_key)].each do |version|
+        Array(@config.fetch(config_key)).each do |version|
           docker_image = docker_image_name(language, version)
 
           language_env_key = "TRAVIS_#{language.upcase}_VERSION"
@@ -141,13 +154,17 @@ module BK
             )
           end
 
-          if !env_matrix || env_matrix.empty?
+          if !matrix_env || matrix_env.empty?
             bk_pipeline.steps << bk_step
           else
-            env_matrix.each do |this_env|
+            matrix_env.each do |this_env|
               duped_bk_step = bk_step.dup
               duped_bk_step.label = "#{duped_bk_step.label} (#{this_env.to_s})"
-              duped_bk_step.env = this_env.merge(duped_bk_step.env)
+
+              env = BK::Compat::Environment.new("")
+              env.merge(this_env)
+              env.merge(bk_step.env)
+              duped_bk_step.env = env
 
               bk_pipeline.steps << duped_bk_step
             end
@@ -178,22 +195,29 @@ module BK
           else
             "ruby:#{version}"
           end
+        when "rust"
+          case version
+          when "stable"
+            "rust:latest"
+          when "beta"
+            nil
+          when "nightly"
+            "rustlang/rust:nightly"
+          else
+            "rust:#{version}"
+          end
         end
       end
 
       def parse_env_matrix(env)
         return nil if env.nil?
 
-        if env.is_a?(Array)
-          env.map do |v|
-            if v.is_a?(String)
-              BK::Compat::Environment.new(double_escape_env(v))
-            else
-              raise BK::Compat::Error::NotSupportedError.new("Can't parse env.matrix as a non-string")
-            end
-          end
-        else
-          raise BK::Compat::Error::NotSupportedError.new("env.matrix needs to be an array")
+        raise BK::Compat::Error::NotSupportedError.new("env.matrix needs to be an array") unless env.is_a?(Array)
+
+        env.map do |v|
+          raise BK::Compat::Error::NotSupportedError.new("Can't parse env.matrix as a non-string") unless v.is_a?(String)
+          
+          BK::Compat::Environment.new(double_escape_env(v))
         end
       end
 
