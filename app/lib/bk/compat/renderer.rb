@@ -14,7 +14,7 @@ module BK
         @structure = structure
       end
 
-      def render(colors: true, format: Format::YAML)
+      def render(colors: STDOUT.tty?, format: Format::YAML)
         case format
         when Format::YAML
           text = JSON.parse(@structure.to_json).to_yaml
