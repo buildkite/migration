@@ -12,9 +12,10 @@ module BK
         keys.include?("version") && keys.include?("jobs")
       end
 
-      def initialize(text)
+      def initialize(text, options)
         @config = YAML.safe_load(text)
         @now = Time.now
+        @options = options
       end
 
       def parse

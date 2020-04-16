@@ -5,6 +5,10 @@ module BK
       require "optparse"
 
       def self.run(command_line)
+        options = {
+          runner: "ELASTIC_CI",
+        }
+
         option_parser = OptionParser.new do |opts|
           opts.program_name = "buildkite-compat"
           opts.version = BK::Compat::VERSION
@@ -18,6 +22,9 @@ module BK
               $ cat [file] > buildkite-compat [options]
 
           BANNER
+          opts.on("-r", "--runner=", "Which runner to target, ELASTIC_CI or ON_DEMAND") do |r|
+            options[:runner] = r
+          end
         end
 
         option_parser.parse!
@@ -49,7 +56,7 @@ module BK
         end
 
         # Now we can finally parse and render the thing
-        puts parser_klass.new(text).parse.render
+        puts parser_klass.new(text, options).parse.render
       end
     end
   end
