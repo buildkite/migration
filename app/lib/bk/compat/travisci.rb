@@ -140,7 +140,7 @@ module BK
               }
             )
 
-            case @options[:runner]
+            case @options.fetch(:runner, "ELASTIC_CI")
             when "ELASTIC_CI"
               bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
                 path: "docker#v3.3.0",
