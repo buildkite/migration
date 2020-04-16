@@ -140,14 +140,21 @@ module BK
               }
             )
 
-            bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
-              path: "docker#v3.3.0",
-              config: {
-                image: docker_image,
-                workdir: "/buildkite-checkout",
-                "propagate-environment": true
-              }
-            )
+            case @options[:runner]
+            when "ELASTIC_CI"
+              bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
+                path: "docker#v3.3.0",
+                config: {
+                  image: docker_image,
+                  workdir: "/buildkite-checkout",
+                  "propagate-environment": true
+                }
+              )
+            when "ON_DEMAND"
+              bk_step.agents << "image=#{docker_image}"
+            else
+              raise BK::Compat::Error::NotSupportedError.new("runner: #{@options[:runner]} is not supported")
+            end
           else
             bk_step = BK::Compat::Pipeline::CommandStep.new(
               label: ":travisci: #{version} (no docker image)",
