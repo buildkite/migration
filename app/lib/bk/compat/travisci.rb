@@ -12,7 +12,7 @@ module BK
         keys.include?("language") || keys.include?("rvm")
       end
 
-      def initialize(text, options)
+      def initialize(text, options = {})
         @config = YAML.safe_load(text)
         @options = options
       end
