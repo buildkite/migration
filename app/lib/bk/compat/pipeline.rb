@@ -22,11 +22,12 @@ module BK
       end
 
       class CommandStep
-        attr_accessor :label, :key, :commands, :plugins, :depends_on, :soft_fail, :env, :conditional
+        attr_accessor :label, :key, :commands, :agents, :plugins, :depends_on, :soft_fail, :env, :conditional
 
-        def initialize(label: nil, key: nil, commands: [], plugins: [], depends_on: nil, soft_fail: nil, env: nil, conditional: nil)
+        def initialize(label: nil, key: nil, agents: [], commands: [], plugins: [], depends_on: nil, soft_fail: nil, env: nil, conditional: nil)
           self.label = label
           self.commands = commands
+          self.agents = agents
           self.key = key
           self.plugins = plugins
           self.depends_on = depends_on
@@ -51,6 +52,7 @@ module BK
           {}.tap do |h|
             h[:key] = @key if @key
             h[:label] = @label if @label
+            h[:agents] = @agents unless @agents.empty?
             if @commands.is_a?(Array)
               if @commands.length == 1
                 h[:command] = @commands.first
