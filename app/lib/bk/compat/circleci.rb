@@ -8,12 +8,12 @@ module BK
       end
 
       def self.matches?(text)
-        keys = YAML.safe_load(text).keys
+        keys = YAML.safe_load(text, aliases: true).keys
         keys.include?("version") && keys.include?("jobs")
       end
 
       def initialize(text, options = {})
-        @config = YAML.safe_load(text)
+        @config = YAML.safe_load(text, aliases: true)
         @now = Time.now
         @options = options
       end
