@@ -22,22 +22,23 @@ module BK
               $ cat [file] > buildkite-compat [options]
 
           BANNER
-          opts.on("-r", "--runner=", "Which runner to target, ELASTIC_CI or ON_DEMAND") do |r|
-            options[:runner] = r
-          end
+          opts.on("-r RUNNNER", "--runner", "Which runner to target, ELASTIC_CI or ON_DEMAND")
+          opts.on("-p PARSER", "--parser", "Parser for original pipeline")
         end
 
-        option_parser.parse!
+        option_parser.parse!(into: options)
 
         # Either get the file from the arguments, or read STDIN
         file = ARGV.pop
         text = STDIN.tty? ? nil : $stdin.read
 
-        # Both can't be nil, and both can't be present
-        if (!file && !text) || (file && text)
+        # Ensure only one is present
+        if !(file.nil? ^ text.nil?)
           puts option_parser
           exit 1
-        elsif file && !text
+        end
+
+        if file
           text = File.read(file)
         end
 
