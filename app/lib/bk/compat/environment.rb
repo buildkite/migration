@@ -81,8 +81,8 @@ module BK
         lines.each_with_object({}) do |line, env|
           parts = line.match(ENV_LINE_REGEX)
 
-          key = $1.to_s.strip
-          value = $2.to_s.strip
+          key = ::Regexp.last_match(1).to_s.strip
+          value = ::Regexp.last_match(2).to_s.strip
 
           # Skip if the key is blank
           next env if key.empty?
@@ -97,9 +97,7 @@ module BK
               env[key] = EMPTY
             else
               # Filter out surrounding quotes
-              if value =~ DOUBLE_QUOTE_REGEX || value =~ SINGLE_QUOTE_REGEX
-                value = $1
-              end
+              value = ::Regexp.last_match(1) if value =~ DOUBLE_QUOTE_REGEX || value =~ SINGLE_QUOTE_REGEX
 
               # Replace \\n with real lines
               value.gsub!('\\n', "\n")
