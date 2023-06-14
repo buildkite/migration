@@ -4,7 +4,7 @@ module BK
       require_relative "../compat"
       require "optparse"
 
-      def self.run(command_line)
+      def self.run()
         options = {
           runner: "ELASTIC_CI",
         }
@@ -15,7 +15,7 @@ module BK
           opts.banner = <<~BANNER
           Usage:
 
-              $ buildkite-compat [file] [options]
+              $ buildkite-compat [options] [file(s)]
 
           Or pass text in via STDIN:
 
@@ -23,27 +23,22 @@ module BK
 
           BANNER
           opts.on("-r RUNNNER", "--runner", "Which runner to target, ELASTIC_CI or ON_DEMAND")
-          opts.on("-p PARSER", "--parser", "Parser for original pipeline")
+          opts.on("-p PARSER", "--parser", {circleci: BK::Compat::CircleCI, travisci: BK::Compat::TravisCI},"Parser for original pipeline")
         end
 
         option_parser.parse!(into: options)
 
-        # Either get the file from the arguments, or read STDIN
-        file = ARGV.pop
-        text = STDIN.tty? ? nil : $stdin.read
+        # treat rest of parameters as files (or stdin if none)
+        text = ARGF.read
 
-        # Ensure only one is present
-        if !(file.nil? ^ text.nil?)
-          puts option_parser
+        if text.empty? then
+          $stderr.puts 'ERROR: Missing file or input'
+          $stderr.puts option_parser
           exit 1
         end
 
-        if file
-          text = File.read(file)
-        end
-
         # Figure out which parser to use
-        parser_klass = BK::Compat.guess(text)
+        parser_klass = options[:parser] || BK::Compat.guess(text)
 
         # Show a nice error message if we couldn't find a parser to use
         if !parser_klass
