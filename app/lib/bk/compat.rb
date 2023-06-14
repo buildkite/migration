@@ -1,5 +1,3 @@
-require_relative "compat/pipeline"
-require_relative "compat/error"
 require_relative "compat/circleci"
 require_relative "compat/travisci"
 

@@ -1,3 +1,6 @@
+require_relative "error"
+require_relative "pipeline"
+
 module BK
   module Compat
     class TravisCI
