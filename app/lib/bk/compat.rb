@@ -1,9 +1,9 @@
-require_relative "compat/circleci"
-require_relative "compat/travisci"
+require_relative 'compat/circleci'
+require_relative 'compat/travisci'
 
 module BK
   module Compat
-    VERSION = "0.1"
+    VERSION = '0.1'
 
     PARSERS = [
       BK::Compat::CircleCI,

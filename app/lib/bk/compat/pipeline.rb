@@ -1,5 +1,5 @@
-require_relative "renderer"
-require_relative "environment"
+require_relative 'renderer'
+require_relative 'environment'
 
 module BK
   module Compat
@@ -17,14 +17,15 @@ module BK
 
       class WaitStep
         def to_h
-          "wait"
+          'wait'
         end
       end
 
       class CommandStep
         attr_accessor :label, :key, :commands, :agents, :plugins, :depends_on, :soft_fail, :env, :conditional
 
-        def initialize(label: nil, key: nil, agents: [], commands: [], plugins: [], depends_on: nil, soft_fail: nil, env: nil, conditional: nil)
+        def initialize(label: nil, key: nil, agents: [], commands: [], plugins: [], depends_on: nil, soft_fail: nil,
+                       env: nil, conditional: nil)
           self.label = label
           self.commands = commands
           self.agents = agents
@@ -99,9 +100,7 @@ module BK
 
       def to_h
         {}.tap do |h|
-          if @env
-            h[:env] = @env.to_h
-          end
+          h[:env] = @env.to_h if @env
           h[:steps] = steps.map(&:to_h)
         end
       end

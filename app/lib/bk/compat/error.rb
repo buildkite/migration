@@ -1,4 +1,3 @@
-
 module BK
   module Compat
     module Error

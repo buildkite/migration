@@ -1,18 +1,18 @@
-require_relative "error"
-require_relative "pipeline"
+require_relative 'error'
+require_relative 'pipeline'
 
 module BK
   module Compat
     class TravisCI
-      require "yaml"
+      require 'yaml'
 
       def self.name
-        "Travis CI"
+        'Travis CI'
       end
 
       def self.matches?(text)
         keys = YAML.safe_load(text).keys
-        keys.include?("language") || keys.include?("rvm")
+        keys.include?('language') || keys.include?('rvm')
       end
 
       def initialize(text, options = {})
@@ -20,31 +20,31 @@ module BK
         @options = options
       end
 
-      SOURCES = {
-      }
+      SOURCES = {}
 
       IGNORE_SOURCES = [
-        "ubuntu-toolchain-r-test"
+        'ubuntu-toolchain-r-test'
       ]
 
       def parse
         bk_pipeline = Pipeline.new
 
         # Travis defaults to ruby
-        language = @config.fetch("language", "ruby")
+        language = @config.fetch('language', 'ruby')
 
         # Parse out global, and matrix environment variables
-        env = @config.dig("env")
+        env = @config.dig('env')
 
-        matrix_env, global_env = nil, nil
+        matrix_env = nil
+        global_env = nil
 
         if env.is_a?(Hash)
-          if global_env = env.dig("global")
+          if global_env = env.dig('global')
             bk_pipeline.env = BK::Compat::Environment.new(global_env)
           end
 
           matrix_env = parse_env_matrix(
-            env.dig("matrix") || env.dig("jobs")
+            env.dig('matrix') || env.dig('jobs')
           )
         elsif env.is_a?(Array)
           matrix_env = parse_env_matrix(env)
@@ -52,23 +52,24 @@ module BK
 
         script = []
 
-        if apt = @config.dig("addons", "apt")
-          script << "apt-get update"
+        if apt = @config.dig('addons', 'apt')
+          script << 'apt-get update'
 
-          if sources = apt["sources"]
+          if sources = apt['sources']
             sources_to_add = sources.map do |s|
               next if IGNORE_SOURCES.include?(s)
+
               "add-apt-repository -y #{SOURCES.fetch(s)}"
             end.compact
 
             if sources_to_add.any?
-            script << "apt-get install -y software-properties-common"
-            sources_to_add.each { |s| script << s }
-            script << "apt-get update"
+              script << 'apt-get install -y software-properties-common'
+              sources_to_add.each { |s| script << s }
+              script << 'apt-get update'
             end
           end
 
-          if packages = apt["packages"]
+          if packages = apt['packages']
             packages.each do |pkg|
               script << "apt-get -q -y install #{pkg.inspect}"
             end
@@ -76,20 +77,20 @@ module BK
         end
 
         # Include `before_install` hooks
-        if before_install = @config["before_install"]
+        if before_install = @config['before_install']
           [*before_install].each do |cmd|
             script << double_escape_env(cmd)
           end
         end
 
         # Include `before_script` hooks
-        if before_script = @config["before_script"]
+        if before_script = @config['before_script']
           [*before_script].each do |cmd|
             script << double_escape_env(cmd)
           end
         end
 
-        if @config.has_key?("jobs")
+        if @config.has_key?('jobs')
           configure_stages(bk_pipeline, script)
 
           return bk_pipeline
@@ -97,25 +98,23 @@ module BK
 
         # Pull out any soft-fails we should know about
         soft_fails = []
-        if allow_failures = @config.dig("matrix", "allow_failures")
+        if allow_failures = @config.dig('matrix', 'allow_failures')
           allow_failures.each do |fc|
-            soft_fails << fc["rvm"]
+            soft_fails << fc['rvm']
           end
         end
 
         # Finally add the main script
-        main_script = @config.fetch("script")
-        if main_script.is_a?(Array)
-          main_script = main_script.join(' && ')
-        end
+        main_script = @config.fetch('script')
+        main_script = main_script.join(' && ') if main_script.is_a?(Array)
         script << double_escape_env(main_script)
 
         config_key = case language
-                     when "go" then "go"
-                     when "ruby" then "rvm"
-                     when "rust" then "rust"
+                     when 'go' then 'go'
+                     when 'ruby' then 'rvm'
+                     when 'rust' then 'rust'
                      else
-                       raise BK::Compat::Error::NotSupportedError.new("#{language.inspect} isn't supported yet")
+                       raise BK::Compat::Error::NotSupportedError, "#{language.inspect} isn't supported yet"
                      end
 
         Array(@config.fetch(config_key)).each do |version|
@@ -132,36 +131,34 @@ module BK
               }
             )
 
-            if soft_fails.include?(version)
-              bk_step.soft_fail = true
-            end
+            bk_step.soft_fail = true if soft_fails.include?(version)
 
             bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
-              path: "keithpitt/compat-env#v0.1",
+              path: 'keithpitt/compat-env#v0.1',
               config: {
                 travisci: true
               }
             )
 
-            case @options.fetch(:runner, "ELASTIC_CI")
-            when "ELASTIC_CI"
+            case @options.fetch(:runner, 'ELASTIC_CI')
+            when 'ELASTIC_CI'
               bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
-                path: "docker#v3.3.0",
+                path: 'docker#v3.3.0',
                 config: {
                   image: docker_image,
-                  workdir: "/buildkite-checkout",
+                  workdir: '/buildkite-checkout',
                   "propagate-environment": true
                 }
               )
-            when "ON_DEMAND"
+            when 'ON_DEMAND'
               bk_step.agents << "image=#{docker_image}"
             else
-              raise BK::Compat::Error::NotSupportedError.new("runner: #{@options[:runner]} is not supported")
+              raise BK::Compat::Error::NotSupportedError, "runner: #{@options[:runner]} is not supported"
             end
           else
             bk_step = BK::Compat::Pipeline::CommandStep.new(
               label: ":travisci: #{version} (no docker image)",
-              commands: "exit 1"
+              commands: 'exit 1'
             )
           end
 
@@ -170,9 +167,9 @@ module BK
           else
             matrix_env.each do |this_env|
               duped_bk_step = bk_step.dup
-              duped_bk_step.label = "#{duped_bk_step.label} (#{this_env.to_s})"
+              duped_bk_step.label = "#{duped_bk_step.label} (#{this_env})"
 
-              env = BK::Compat::Environment.new("")
+              env = BK::Compat::Environment.new('')
               env.merge(this_env)
               env.merge(bk_step.env)
               duped_bk_step.env = env
@@ -191,29 +188,29 @@ module BK
 
       def docker_image_name(language, version)
         case language
-        when "go"
-          "golang:#{version.sub(/\.x$/, "")}"
-        when "ruby"
+        when 'go'
+          "golang:#{version.sub(/\.x$/, '')}"
+        when 'ruby'
           case version
-          when "jruby-head"
+          when 'jruby-head'
             nil
           when /^jruby-(.+)/
-            "jruby:#{$1}"
+            "jruby:#{::Regexp.last_match(1)}"
           when /^rbx-/
             nil
-          when "ruby-head"
-            "rubocophq:ruby-snapshot"
+          when 'ruby-head'
+            'rubocophq:ruby-snapshot'
           else
             "ruby:#{version}"
           end
-        when "rust"
+        when 'rust'
           case version
-          when "stable"
-            "rust:latest"
-          when "beta"
+          when 'stable'
+            'rust:latest'
+          when 'beta'
             nil
-          when "nightly"
-            "rustlang/rust:nightly"
+          when 'nightly'
+            'rustlang/rust:nightly'
           else
             "rust:#{version}"
           end
@@ -223,16 +220,16 @@ module BK
       def parse_env_matrix(env)
         return nil if env.nil?
 
-        raise BK::Compat::Error::NotSupportedError.new("env.matrix needs to be an array") unless env.is_a?(Array)
+        raise BK::Compat::Error::NotSupportedError, 'env.matrix needs to be an array' unless env.is_a?(Array)
 
         env.map do |v|
-          raise BK::Compat::Error::NotSupportedError.new("Can't parse env.matrix as a non-string") unless v.is_a?(String)
-          
+          raise BK::Compat::Error::NotSupportedError, "Can't parse env.matrix as a non-string" unless v.is_a?(String)
+
           BK::Compat::Environment.new(double_escape_env(v))
         end
       end
 
-      def prepare_step(label: nil, commands:, env:, conditional: nil)
+      def prepare_step(commands:, env:, label: nil, conditional: nil)
         BK::Compat::Pipeline::CommandStep.new(
           label: label,
           commands: commands,
@@ -244,9 +241,9 @@ module BK
       def configure_stages(bk_pipeline, before_script)
         jobs = {}
         last_stage_name = nil
-        if job_configs = @config.dig("jobs", "include")
+        if job_configs = @config.dig('jobs', 'include')
           job_configs.each do |jc|
-            name = jc.fetch("stage", "test")
+            name = jc.fetch('stage', 'test')
             name = last_stage_name if name.nil?
 
             jobs[name] ||= []
@@ -256,7 +253,7 @@ module BK
           end
         end
 
-        stages = @config.fetch("stages", [ "test" ])
+        stages = @config.fetch('stages', ['test'])
 
         case stages
         when String
@@ -267,30 +264,28 @@ module BK
                        when String
                          stage
                        when Hash
-                         stage.fetch("name")
+                         stage.fetch('name')
                        else
-                         raise BK::Compat::Error::NotSupportedError.new("A stage must either be a string or a hash")
+                         raise BK::Compat::Error::NotSupportedError, 'A stage must either be a string or a hash'
                        end
 
             if job_name.nil? || job_name.chomp.empty?
-              raise BK::Compat::Error::NotSupportedError.new("Couldn't find a job name in one of the stages")
+              raise BK::Compat::Error::NotSupportedError, "Couldn't find a job name in one of the stages"
             elsif !jobs.has_key?(job_name)
-              raise BK::Compat::Error::NotSupportedError.new("Couldn't find a job with name #{job_name.inspect}")
+              raise BK::Compat::Error::NotSupportedError, "Couldn't find a job with name #{job_name.inspect}"
             end
 
             these_steps = jobs[job_name].map do |j|
               prepare_step(
-                commands: [*before_script, j["script"]],
-                env: j["env"],
-                label: j["name"]
+                commands: [*before_script, j['script']],
+                env: j['env'],
+                label: j['name']
               )
             end
 
-            conditional = stage["if"] if stage.is_a?(Hash)
+            conditional = stage['if'] if stage.is_a?(Hash)
 
-            if index > 0
-              bk_pipeline.steps << Pipeline::WaitStep.new
-            end
+            bk_pipeline.steps << Pipeline::WaitStep.new if index > 0
 
             bk_pipeline.steps << Pipeline::GroupStep.new(
               label: ":travisci: #{job_name.capitalize}",
@@ -300,7 +295,7 @@ module BK
             )
           end
         else
-          raise BK::Compat::Error::NotSupportedError.new("stages needs to be either a string, an array or a hash")
+          raise BK::Compat::Error::NotSupportedError, 'stages needs to be either a string, an array or a hash'
         end
       end
     end

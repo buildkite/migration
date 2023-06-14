@@ -1,9 +1,9 @@
 module BK
   module Compat
     class Renderer
-      require "rouge"
-      require "json"
-      require "yaml"
+      require 'rouge'
+      require 'json'
+      require 'yaml'
 
       module Format
         YAML = :yaml
@@ -24,7 +24,7 @@ module BK
           text = JSON.pretty_generate(@structure) + "\n"
           lexer = Rouge::Lexers::JSON.new
         else
-          raise ArgumentError.new("Unknown format `#{format.inspect}`")
+          raise ArgumentError, "Unknown format `#{format.inspect}`"
         end
 
         if colors

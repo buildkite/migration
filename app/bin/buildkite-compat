@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require_relative "../lib/bk/compat/cli"
+require_relative '../lib/bk/compat/cli'
 
-BK::Compat::CLI.run()
+BK::Compat::CLI.run
