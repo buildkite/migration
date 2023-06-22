@@ -20,7 +20,6 @@ module BK
       def plugins
         @@plugins
       end
-
     end
   end
 end

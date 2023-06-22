@@ -7,7 +7,7 @@ module BK
   module Compat
     VERSION = '0.1'
 
-    PARSERS = BK::Compat::Parsers.new().plugins
+    PARSERS = BK::Compat::Parsers.new.plugins
 
     def self.guess(text)
       PARSERS.find do |parser|
