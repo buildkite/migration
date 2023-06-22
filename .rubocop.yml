@@ -1,0 +1,9 @@
+AllCops:
+  TargetRubyVersion: 3.2
+  NewCops: enable
+
+Style/HashSyntax:
+  EnforcedShorthandSyntax: never
+
+Naming/BlockForwarding:
+  EnforcedStyle: explicit
