@@ -68,7 +68,7 @@ module BK
                 key = j.keys.first
                 step = steps_by_key.fetch(key).dup
 
-                if requires = j[key]['requires']
+                if (requires = j[key]['requires'])
                   step.depends_on = [*requires]
                 end
 
@@ -157,23 +157,23 @@ module BK
             # `ports` isn't actually supported and doesn't mean anything.
             d.delete('ports')
 
-            if env = d.delete('environment')
+            if (env = d.delete('environment'))
               t['environment'] = env
             end
 
-            if entrypoint = d.delete('command')
+            if (entrypoint = d.delete('command'))
               t['entrypoint'] = entrypoint
             end
 
             # Do we need a `docker login` for this image?
-            if auth = d.delete('auth')
+            if (auth = d.delete('auth'))
               login = {}
 
-              if username = auth['username']
+              if (username = auth['username'])
                 login[:username] = username.chomp
               end
 
-              if password = auth['password']
+              if (password = auth['password'])
                 chompped_password = password.chomp
                 if chompped_password.start_with?('$')
                   login[:password_env] = chompped_password.sub(/\A\$/, '')
@@ -186,17 +186,17 @@ module BK
             end
 
             # What about an ECR login?
-            if aws_auth = d.delete('aws_auth')
+            if (aws_auth = d.delete('aws_auth'))
               ecr_login = {
                 # The account id is the first part of the image, so we'll exract that as well
                 account_ids: image.match(/\A(\d+)\./)[1]
               }
 
-              if access_key_id = aws_auth['aws_access_key_id']
+              if (access_key_id = aws_auth['aws_access_key_id'])
                 ecr_login[:access_key_id] = access_key_id.chomp
               end
 
-              if secret_access_key = aws_auth['aws_secret_access_key']
+              if (secret_access_key = aws_auth['aws_secret_access_key'])
                 chompped_secret_access_key = secret_access_key.chomp
                 raise 'AWS secret access key needs to be an env' unless chompped_secret_access_key.start_with?('$')
 
@@ -278,7 +278,7 @@ module BK
           when 'run'
             if config.is_a?(Hash)
               env_prefix = []
-              if env = config['environment']
+              if (env = config['environment'])
                 env.each do |(key, value)|
                   env_prefix << "#{key}=#{value.inspect}"
                 end
@@ -290,7 +290,7 @@ module BK
                           config.fetch('command')
                         end
 
-              if name = config['name']
+              if (name = config['name'])
                 [
                   "echo #{"--- #{name}".inspect}",
                   command

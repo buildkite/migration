@@ -40,7 +40,7 @@ module BK
         global_env = nil
 
         if env.is_a?(Hash)
-          if global_env = env.dig('global')
+          if (global_env = env.fetch('global'))
             bk_pipeline.env = BK::Compat::Environment.new(global_env)
           end
 
@@ -53,10 +53,10 @@ module BK
 
         script = []
 
-        if apt = @config.dig('addons', 'apt')
+        if (apt = @config.dig('addons', 'apt'))
           script << 'apt-get update'
 
-          if sources = apt['sources']
+          if (sources = apt['sources'])
             sources_to_add = sources.map do |s|
               next if IGNORE_SOURCES.include?(s)
 
@@ -70,7 +70,7 @@ module BK
             end
           end
 
-          if packages = apt['packages']
+          if (packages = apt['packages'])
             packages.each do |pkg|
               script << "apt-get -q -y install #{pkg.inspect}"
             end
@@ -78,14 +78,14 @@ module BK
         end
 
         # Include `before_install` hooks
-        if before_install = @config['before_install']
+        if (before_install = @config['before_install'])
           [*before_install].each do |cmd|
             script << double_escape_env(cmd)
           end
         end
 
         # Include `before_script` hooks
-        if before_script = @config['before_script']
+        if (before_script = @config['before_script'])
           [*before_script].each do |cmd|
             script << double_escape_env(cmd)
           end
@@ -99,7 +99,7 @@ module BK
 
         # Pull out any soft-fails we should know about
         soft_fails = []
-        if allow_failures = @config.dig('matrix', 'allow_failures')
+        if (allow_failures = @config.dig('matrix', 'allow_failures'))
           allow_failures.each do |fc|
             soft_fails << fc['rvm']
           end
@@ -242,7 +242,7 @@ module BK
       def configure_stages(bk_pipeline, before_script)
         jobs = {}
         last_stage_name = nil
-        if job_configs = @config.dig('jobs', 'include')
+        if (job_configs = @config.dig('jobs', 'include'))
           job_configs.each do |jc|
             name = jc.fetch('stage', 'test')
             name = last_stage_name if name.nil?
