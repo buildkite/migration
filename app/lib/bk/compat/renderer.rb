@@ -24,7 +24,8 @@ module BK
           lexer = Rouge::Lexers::YAML.new
         when Format::JSON
           # Add a new line so it outputs nicely in terminals
-          text = JSON.pretty_generate(@structure) + "\n"
+          text = JSON.pretty_generate(@structure)
+          text += "\n"
           lexer = Rouge::Lexers::JSON.new
         else
           raise ArgumentError, "Unknown format `#{format.inspect}`"

@@ -285,7 +285,7 @@ module BK
               end
 
               command = if env_prefix.any?
-                          env_prefix.join(' ') + ' ' + config.fetch('command')
+                          "#{env_prefix.join(' ')} #{config.fetch('command')}"
                         else
                           config.fetch('command')
                         end

@@ -148,7 +148,7 @@ module BK
                 config: {
                   image: docker_image,
                   workdir: '/buildkite-checkout',
-                  "propagate-environment": true
+                  'propagate-environment': true
                 }
               )
             when 'ON_DEMAND'
