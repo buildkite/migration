@@ -193,12 +193,10 @@ module BK
           "golang:#{version.sub(/\.x$/, '')}"
         when 'ruby'
           case version
-          when 'jruby-head'
+          when 'jruby-head', /^rbx-/
             nil
           when /^jruby-(.+)/
             "jruby:#{::Regexp.last_match(1)}"
-          when /^rbx-/
-            nil
           when 'ruby-head'
             'rubocophq:ruby-snapshot'
           else
@@ -257,9 +255,7 @@ module BK
         stages = @config.fetch('stages', ['test'])
 
         case stages
-        when String
-        when Hash
-        when Array
+        when String, Hash, Array
           stages.each.with_index do |stage, index|
             job_name = case stage
                        when String
