@@ -84,8 +84,8 @@ module BK
         lines.each_with_object({}) do |line, env|
           parts = line.match(ENV_LINE_REGEX)
 
-          key = ::Regexp.last_match(1).to_s.strip
-          value = ::Regexp.last_match(2).to_s.strip
+          key = parts[0].to_s.strip
+          value = parts[2].to_s.strip
 
           # Skip if the key is blank
           next env if key.empty?
