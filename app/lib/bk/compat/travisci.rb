@@ -34,7 +34,7 @@ module BK
         language = @config.fetch('language', 'ruby')
 
         # Parse out global, and matrix environment variables
-        env = @config.dig('env')
+        env = @config.fetch('env')
 
         matrix_env = nil
         global_env = nil
@@ -45,7 +45,7 @@ module BK
           end
 
           matrix_env = parse_env_matrix(
-            env.dig('matrix') || env.dig('jobs')
+            env.fetch('matrix') || env.fetch('jobs')
           )
         elsif env.is_a?(Array)
           matrix_env = parse_env_matrix(env)
