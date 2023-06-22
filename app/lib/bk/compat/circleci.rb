@@ -54,7 +54,7 @@ module BK
           hash[key] = bk_step
         end
 
-        if @config.has_key?('workflows')
+        if @config.key?('workflows')
           workflows = @config.fetch('workflows')
           version = workflows.delete('version')
 
@@ -141,7 +141,7 @@ module BK
 
             # The first docker container is the primary container and is
             # special - this is where commands will be run
-            name = if i == 0
+            name = if i.zero?
                      'primary'
                    else
                      image.gsub(/[^a-z0-9]/, '_')
@@ -208,7 +208,7 @@ module BK
             end
 
             # We only want to mount the checkout in the primary container
-            t['volumes'] = ['../:/buildkite-checkout'] if i == 0
+            t['volumes'] = ['../:/buildkite-checkout'] if i.zero?
 
             raise "Not sure what to do with these docker keys: #{d.keys.inspect}" unless d.empty?
           end
@@ -232,7 +232,7 @@ module BK
             }
           )
 
-          if docker_logins.length > 0
+          unless docker_logins.empty?
             docker_logins.uniq.each do |login|
               bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
                 path: 'docker-login#v2.0.1',
@@ -241,7 +241,7 @@ module BK
             end
           end
 
-          if ecr_logins.length > 0
+          unless ecr_logins.empty?
             ecr_logins.uniq.each do |ecr_auth|
               bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
                 path: 'ecr#pass-through-creds',

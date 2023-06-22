@@ -91,7 +91,7 @@ module BK
           end
         end
 
-        if @config.has_key?('jobs')
+        if @config.key?('jobs')
           configure_stages(bk_pipeline, script)
 
           return bk_pipeline
@@ -272,7 +272,7 @@ module BK
 
             if job_name.nil? || job_name.chomp.empty?
               raise BK::Compat::Error::NotSupportedError, "Couldn't find a job name in one of the stages"
-            elsif !jobs.has_key?(job_name)
+            elsif !jobs.key?(job_name)
               raise BK::Compat::Error::NotSupportedError, "Couldn't find a job with name #{job_name.inspect}"
             end
 
@@ -286,7 +286,7 @@ module BK
 
             conditional = stage['if'] if stage.is_a?(Hash)
 
-            bk_pipeline.steps << Pipeline::WaitStep.new if index > 0
+            bk_pipeline.steps << Pipeline::WaitStep.new if index.positive?
 
             bk_pipeline.steps << Pipeline::GroupStep.new(
               label: ":travisci: #{job_name.capitalize}",
