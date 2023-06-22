@@ -23,11 +23,9 @@ module BK
         @options = options
       end
 
-      SOURCES = {}
-
       IGNORE_SOURCES = [
         'ubuntu-toolchain-r-test'
-      ]
+      ].freeze
 
       def parse
         bk_pipeline = Pipeline.new
@@ -62,7 +60,7 @@ module BK
             sources_to_add = sources.map do |s|
               next if IGNORE_SOURCES.include?(s)
 
-              "add-apt-repository -y #{SOURCES.fetch(s)}"
+              "add-apt-repository -y #{s}"
             end.compact
 
             if sources_to_add.any?

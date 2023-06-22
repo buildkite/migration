@@ -12,7 +12,7 @@ module BK
     PARSERS = [
       BK::Compat::CircleCI,
       BK::Compat::TravisCI
-    ]
+    ].freeze
 
     def self.guess(text)
       PARSERS.find do |parser|
