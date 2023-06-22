@@ -56,7 +56,7 @@ module BK
 
         if @config.key?('workflows')
           workflows = @config.fetch('workflows')
-          version = workflows.delete('version')
+          workflows.delete('version')
 
           # Turn each work flow into a step group
           bk_groups = workflows.map do |(workflow_name, workflow_config)|
@@ -89,9 +89,9 @@ module BK
           # pull the steps out. If there were multiple groups, make sure
           # they're all part of the pipeline.
           if bk_groups.length == 1
-            bk_pipeline.steps = bk_pipeline.steps.concat(bk_groups.first.steps)
+            bk_pipeline.steps.concat(bk_groups.first.steps)
           elsif bk_groups.length > 1
-            bk_pipeline.steps = bk_pipeline.steps.concat(bk_groups)
+            bk_pipeline.steps.concat(bk_groups)
           end
         else
           # If no workflow is defined, it's expected that there's a `build` job
@@ -308,8 +308,6 @@ module BK
               ]
             end
           when 'persist_to_workspace'
-            root = config.fetch('root')
-
             [*config.fetch('paths')].map do |path|
               [
                 "echo '~~~ :circleci: persist_to_workspace (path: #{path.inspect})'",

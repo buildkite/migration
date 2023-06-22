@@ -31,7 +31,7 @@ module BK
       def handle_index(_req)
         # Read once in production mode, otherwise - read each time.
         html = if ENV['RACK_ENV'] == 'production'
-                 @@html ||= File.read(INDEX_HTML_PATH)
+                 @html ||= File.read(INDEX_HTML_PATH)
                else
                  File.read(INDEX_HTML_PATH)
                end
@@ -66,7 +66,7 @@ module BK
           [200, { 'Content-Type' => content_type }, StringIO.new(body)]
         rescue BK::Compat::Error::NotSupportedError => e
           error_message(500, e.message)
-        rescue StandardError => e
+        rescue StandardError
           error_message(501,
                         "Whoops! You found a bug! Please email keith@buildkite.com with a copy of the file you're trying to convert.")
         end
