@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require_relative 'error'
-require_relative 'pipeline'
+require_relative '../error'
+require_relative '../pipeline'
 
 module BK
   module Compat
@@ -298,3 +298,7 @@ module BK
     end
   end
 end
+
+require_relative '../parsers'
+
+BK::Compat::Parsers.register_plugin(BK::Compat::TravisCI)
