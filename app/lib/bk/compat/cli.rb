@@ -7,7 +7,7 @@ module BK
       require_relative '../compat'
       require 'optparse'
 
-      def self.run
+      def self.parse_options
         options = {
           runner: 'ELASTIC_CI'
         }
@@ -33,30 +33,36 @@ module BK
         option_parser.parse!(into: options)
 
         # treat rest of parameters as files (or stdin if none)
-        text = ARGF.read
+        options[:text] = ARGF.read
 
-        if text.empty?
+        if options[:text].empty?
           warn 'ERROR: Missing file or input'
           warn option_parser
           exit 1
         end
 
+        options
+      end
+
+      def self.run
+        options = parse_options
+
         # Figure out which parser to use
-        parser_klass = options[:parser] || BK::Compat.guess(text)
+        parser_klass = options[:parser] || BK::Compat.guess(options[:text])
 
         # Show a nice error message if we couldn't find a parser to use
         unless parser_klass
           puts <<~TEXT
             Not sure which parser to use. Compatible parsers are:
 
-            #{BK::Compat::PARSERS.map { |parser_klass| " - #{parser_klass.name}" }.join("\n")}
+            #{BK::Compat::PARSERS.map { |klass| " - #{klass.name}" }.join("\n")}
           TEXT
 
           exit 1
         end
 
         # Now we can finally parse and render the thing
-        puts parser_klass.new(text, options).parse.render
+        puts parser_klass.new(options[:text], options).parse.render
       end
     end
   end
