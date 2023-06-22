@@ -5,6 +5,7 @@ require_relative 'pipeline'
 
 module BK
   module Compat
+    # travisCI converter
     class TravisCI
       require 'yaml'
 

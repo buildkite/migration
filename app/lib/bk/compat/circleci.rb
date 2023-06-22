@@ -4,6 +4,7 @@ require_relative 'pipeline'
 
 module BK
   module Compat
+    # CircleCI translation scaffolding
     class CircleCI
       require 'yaml'
 

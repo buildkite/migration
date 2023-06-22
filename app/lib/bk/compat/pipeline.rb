@@ -5,7 +5,9 @@ require_relative 'environment'
 
 module BK
   module Compat
+    # Base BuildKite pipeline
     class Pipeline
+      # Plugin to use in a step
       class Plugin
         def initialize(path:, config: nil)
           @path = path
@@ -17,12 +19,14 @@ module BK
         end
       end
 
+      # simple waiting step
       class WaitStep
         def to_h
           'wait'
         end
       end
 
+      # basic command step
       class CommandStep
         attr_accessor :label, :key, :commands, :agents, :plugins, :depends_on, :soft_fail, :env, :conditional
 
@@ -72,6 +76,7 @@ module BK
         end
       end
 
+      # group step
       class GroupStep
         attr_accessor :label, :key, :steps, :conditional
 

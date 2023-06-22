@@ -2,6 +2,7 @@
 
 module BK
   module Compat
+    # Main executable processor
     class CLI
       require_relative '../compat'
       require 'optparse'

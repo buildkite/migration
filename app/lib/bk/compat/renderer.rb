@@ -2,6 +2,7 @@
 
 module BK
   module Compat
+    # wrapper to render text with colors when appropriate
     class Renderer
       require 'rouge'
       require 'json'

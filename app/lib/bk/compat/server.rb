@@ -4,6 +4,7 @@ require 'rack'
 
 module BK
   module Compat
+    # serve compat tool through HTTP
     class Server
       def call(env)
         req = Rack::Request.new(env)

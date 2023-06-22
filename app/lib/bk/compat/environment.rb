@@ -4,6 +4,7 @@ require 'shellwords'
 
 module BK
   module Compat
+    # parse and generate environment blocks
     class Environment
       EMPTY = ''
 
