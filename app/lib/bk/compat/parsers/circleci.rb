@@ -12,6 +12,10 @@ module BK
         'Circle CI'
       end
 
+      def self.option
+        'circleci'
+      end
+
       def self.matches?(text)
         keys = YAML.safe_load(text, aliases: true).keys
         keys.include?('version') && keys.include?('jobs')

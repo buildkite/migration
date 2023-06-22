@@ -13,6 +13,10 @@ module BK
         'Travis CI'
       end
 
+      def self.option
+        'travisci'
+      end
+
       def self.matches?(text)
         keys = YAML.safe_load(text).keys
         keys.include?('language') || keys.include?('rvm')
