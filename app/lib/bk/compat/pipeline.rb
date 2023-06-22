@@ -28,7 +28,7 @@ module BK
 
       # basic command step
       class CommandStep
-        attr_accessor :label, :key, :commands, :agents, :plugins, :depends_on, :soft_fail, :env, :conditional
+        attr_accessor :label, :key, :agents, :plugins, :depends_on, :soft_fail, :conditional
 
         def initialize(label: nil, key: nil, agents: [], commands: [], plugins: [], depends_on: nil, soft_fail: nil,
                        env: nil, conditional: nil)
