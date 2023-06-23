@@ -12,7 +12,7 @@ module BK
           runner: 'ELASTIC_CI'
         }
 
-        parsers = BK::Compat::PARSERS.collect { |v| [v.option, v] }.to_h
+        parsers = BK::Compat::PARSERS.to_h { |v| [v.option, v] }
 
         option_parser = OptionParser.new do |opts|
           opts.program_name = 'buildkite-compat'
