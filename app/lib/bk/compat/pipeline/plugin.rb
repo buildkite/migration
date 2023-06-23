@@ -19,8 +19,8 @@ module BK
 
       def path
         base = @name
-        version = @version || !DEFAULT_VERSIONS.fetch(@name, nil)
-        base += "##{@version}" unless version.nil?
+        version = @version || DEFAULT_VERSIONS.fetch(@name, nil)
+        base += "##{version}" unless version.nil?
 
         base
       end
