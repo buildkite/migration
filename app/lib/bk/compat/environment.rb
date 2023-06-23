@@ -1,9 +1,12 @@
+# frozen_string_literal: true
+
 require 'shellwords'
 
 module BK
   module Compat
+    # parse and generate environment blocks
     class Environment
-      EMPTY = ""
+      EMPTY = ''
 
       ENV_LINE_REGEX = /([^=]+)=(.*)/
 
@@ -48,10 +51,10 @@ module BK
       end
 
       def to_s
-        (+"").tap do |env_as_text|
+        (+'').tap do |env_as_text|
           to_h.each.with_index do |(key, value), index|
             env_as_text << "\n" unless index.zero?
-            env_as_text << key.to_s << "=" << value.to_s.gsub("\n", "\\n").inspect
+            env_as_text << key.to_s << '=' << value.to_s.gsub("\n", '\\n').inspect
           end
         end
       end
@@ -70,23 +73,25 @@ module BK
         return {} if text.nil? || text.empty?
         return text if text.is_a?(Hash)
 
-        lines = Shellwords.split(if text.is_a?(Array)
-                  text.join("\n\n")
-                else
-                  text
-                end)
+        lines = Shellwords.split(
+          if text.is_a?(Array)
+            text.join("\n\n")
+          else
+            text
+          end
+        )
 
-        lines.inject({}) do |env, line|
+        lines.each_with_object({}) do |line, env|
           parts = line.match(ENV_LINE_REGEX)
 
-          key = $1.to_s.strip
-          value = $2.to_s.strip
+          key = parts[0].to_s.strip
+          value = parts[2].to_s.strip
 
           # Skip if the key is blank
           next env if key.empty?
 
           # Filter out any export in "export FOO=bar"
-          key = key.gsub(EXPORT_REGEX, "")
+          key = key.gsub(EXPORT_REGEX, '')
 
           # Only if the key looks like something we expect
           if key.match?(KEY_REGX)
@@ -95,19 +100,15 @@ module BK
               env[key] = EMPTY
             else
               # Filter out surrounding quotes
-              if value =~ DOUBLE_QUOTE_REGEX || value =~ SINGLE_QUOTE_REGEX
-                value = $1
-              end
+              value = ::Regexp.last_match(1) if value =~ DOUBLE_QUOTE_REGEX || value =~ SINGLE_QUOTE_REGEX
 
               # Replace \\n with real lines
-              value.gsub!("\\n", "\n")
+              value.gsub!('\\n', "\n")
 
               # Finally set the value
               env[key] = value
             end
           end
-
-          env
         end
       end
     end

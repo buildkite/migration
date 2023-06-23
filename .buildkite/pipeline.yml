@@ -1,0 +1,11 @@
+steps:
+  - label: ":hammer: Testing"
+    command: gem install rubocop && rubocop -l app
+    plugins:
+      - docker#v5.7.0:
+          image: ruby:3.2
+
+  - wait: ~
+
+  - label: ":docker: Build image"
+    command: docker build . -t migration

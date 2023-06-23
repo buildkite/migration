@@ -1,9 +1,13 @@
-require_relative "renderer"
-require_relative "environment"
+# frozen_string_literal: true
+
+require_relative 'renderer'
+require_relative 'environment'
 
 module BK
   module Compat
+    # Base BuildKite pipeline
     class Pipeline
+      # Plugin to use in a step
       class Plugin
         def initialize(path:, config: nil)
           @path = path
@@ -15,16 +19,20 @@ module BK
         end
       end
 
+      # simple waiting step
       class WaitStep
         def to_h
-          "wait"
+          'wait'
         end
       end
 
+      # basic command step
       class CommandStep
-        attr_accessor :label, :key, :commands, :agents, :plugins, :depends_on, :soft_fail, :env, :conditional
+        attr_accessor :label, :key, :agents, :plugins, :depends_on, :soft_fail, :conditional
+        attr_reader :commands, :env # we define special writers
 
-        def initialize(label: nil, key: nil, agents: [], commands: [], plugins: [], depends_on: nil, soft_fail: nil, env: nil, conditional: nil)
+        def initialize(label: nil, key: nil, agents: [], commands: [], plugins: [], depends_on: nil, soft_fail: nil,
+                       env: nil, conditional: nil)
           self.label = label
           self.commands = commands
           self.agents = agents
@@ -69,6 +77,7 @@ module BK
         end
       end
 
+      # group step
       class GroupStep
         attr_accessor :label, :key, :steps, :conditional
 
@@ -99,9 +108,7 @@ module BK
 
       def to_h
         {}.tap do |h|
-          if @env
-            h[:env] = @env.to_h
-          end
+          h[:env] = @env.to_h if @env
           h[:steps] = steps.map(&:to_h)
         end
       end
