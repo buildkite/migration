@@ -138,8 +138,10 @@ module BK
 
             bk_step.soft_fail = true if soft_fails.include?(version)
 
+            # TODO: review if this is still necessary
             bk_step.plugins << BK::Compat::Plugin.new(
-              path: 'keithpitt/compat-env#v0.1',
+              name: 'keithpitt/compat-env',
+              version: 'v0.1',
               config: {
                 travisci: true
               }
@@ -148,7 +150,7 @@ module BK
             case @options.fetch(:runner, 'ELASTIC_CI')
             when 'ELASTIC_CI'
               bk_step.plugins << BK::Compat::Plugin.new(
-                path: 'docker#v3.3.0',
+                name: 'docker',
                 config: {
                   image: docker_image,
                   workdir: '/buildkite-checkout',

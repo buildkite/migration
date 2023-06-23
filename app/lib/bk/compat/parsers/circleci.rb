@@ -113,7 +113,7 @@ module BK
           image = executor_config.first.fetch('image')
 
           bk_step.plugins << BK::Compat::Plugin.new(
-            path: 'docker#v3.3.0',
+            name: 'docker',
             config: {
               image: image,
               workdir: '/buildkite-checkout'
@@ -228,8 +228,10 @@ module BK
 
           docker_compose_filename = ".buildkite/#{@now.to_i}-#{bk_step.key}-docker-compose.yml"
 
+          # TODO: remove this if possible
           bk_step.plugins << BK::Compat::Plugin.new(
-            path: 'keithpitt/write-file#v0.2',
+            name: 'keithpitt/write-file',
+            version: 'v0.2',
             config: {
               path: docker_compose_filename,
               contents: docker_compose_config.to_yaml
@@ -239,7 +241,7 @@ module BK
           unless docker_logins.empty?
             docker_logins.uniq.each do |login|
               bk_step.plugins << BK::Compat::Plugin.new(
-                path: 'docker-login#v2.0.1',
+                name: 'docker-login',
                 config: login
               )
             end
@@ -248,14 +250,15 @@ module BK
           unless ecr_logins.empty?
             ecr_logins.uniq.each do |ecr_auth|
               bk_step.plugins << BK::Compat::Plugin.new(
-                path: 'ecr#pass-through-creds',
+                name: 'ecr',
+                version: 'pass-through-creds', # TODO: remove this branch
                 config: { login: true }.merge(ecr_auth)
               )
             end
           end
 
           bk_step.plugins << BK::Compat::Plugin.new(
-            path: 'docker-compose#v3.1.0',
+            name: 'docker-compose',
             config: {
               config: docker_compose_filename,
               run: 'primary'
