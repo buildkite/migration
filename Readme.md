@@ -1,6 +1,6 @@
-# Buildkite Compat
+# Buildkite Migration tool
 
-A tool to transform pipelines from other CI providers to Buildkite
+A tool to transform pipelines from other CI providers to Buildkite.
 
 ```shell
 $ cat examples/circleci/basic.yml
@@ -27,6 +27,26 @@ steps:
       image: "circleci/python:3.6.2-stretch-browsers"
       workdir: "/buildkite-checkout"
 ```
+
+Note that setting the environment variable `BUILDKITE_PLUGIN_<UPPERCASE_NAME>_VERSION` will override the default version of the plugins used. For example:
+
+```
+$ BUILDKITE_PLUGIN_DOCKER_VERSION=testing-branch buildkite-compat examples/circleci/basic.yml
+steps:
+- label: ":circleci: build"
+  key: "build"
+  commands:
+    - "sudo cp -R /buildkite-checkout /home/circleci/checkout"
+    - "sudo chown -R circleci:circleci /home/circleci/checkout"
+    - "cd /home/circleci/checkout"
+    - "pip install -r requirements/dev.txt"
+  plugins:
+  - docker#testing-branch:
+      image: "circleci/python:3.6.2-stretch-browsers"
+      workdir: "/buildkite-checkout"
+```
+
+## API Service
 
 Buildkite Compat can also be used via a HTTP API:
 
