@@ -2,13 +2,18 @@ GEM
   remote: https://rubygems.org/
   specs:
     rack (3.0.7)
+    rackup (2.1.0)
+      rack (>= 3)
+      webrick (~> 1.8)
     rouge (4.1.2)
+    webrick (1.8.1)
 
 PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
   rack
+  rackup
   rouge
 
 BUNDLED WITH
