@@ -12,6 +12,8 @@ module BK
           runner: 'ELASTIC_CI'
         }
 
+        parsers = BK::Compat::PARSERS.to_h { |v| [v.option, v] }
+
         option_parser = OptionParser.new do |opts|
           opts.program_name = 'buildkite-compat'
           opts.version = BK::Compat::VERSION
@@ -26,8 +28,7 @@ module BK
 
           BANNER
           opts.on('-r RUNNNER', '--runner', 'Which runner to target, ELASTIC_CI or ON_DEMAND')
-          opts.on('-p PARSER', '--parser', { circleci: BK::Compat::CircleCI, travisci: BK::Compat::TravisCI },
-                  'Parser for original pipeline')
+          opts.on('-p PARSER', '--parser', parsers, "Parser for original pipeline (#{parsers.keys.join(', ')})")
         end
 
         option_parser.parse!(into: options)
