@@ -7,10 +7,10 @@ module BK
       'docker-compose' => 'v4.14.0',
       'docker-login' => 'v2.1.0',
       'ecr' => 'v2.7.0'
-    }.map do |p, v|
+    }.to_h do |p, v|
       env_friendly = p.upcase.tr('^A-Z0-9', '_')
       [p, ENV.fetch("BUILDKITE_PLUGIN_#{env_friendly}_VERSION", v)]
-    end.to_h.freeze
+    end.freeze
 
     # Plugin to use in a step
     class Plugin
