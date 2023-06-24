@@ -36,7 +36,7 @@ module BK
                  File.read(INDEX_HTML_PATH)
                end
 
-        [200, { 'Content-Type' => 'text/html' }, StringIO.new(html)]
+        [200, { 'content-type' => 'text/html' }, StringIO.new(html)]
       end
 
       def handle_parse(req)
@@ -63,7 +63,7 @@ module BK
         # Parse it and render it as YAML
         begin
           body = parser_klass.new(contents).parse.render(colors: false, format: format)
-          [200, { 'Content-Type' => content_type }, StringIO.new(body)]
+          [200, { 'content-type' => content_type }, StringIO.new(body)]
         rescue BK::Compat::Error::NotSupportedError => e
           error_message(500, e.message)
         rescue StandardError
@@ -77,7 +77,7 @@ module BK
       end
 
       def error_message(code, message)
-        [code, { 'Content-Type' => 'text/plain' }, StringIO.new("👎 #{message}\n")]
+        [code, { 'content-type' => 'text/plain' }, StringIO.new("👎 #{message}\n")]
       end
     end
   end
