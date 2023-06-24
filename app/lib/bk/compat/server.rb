@@ -67,8 +67,12 @@ module BK
         rescue BK::Compat::Error::NotSupportedError => e
           error_message(500, e.message)
         rescue StandardError
-          error_message(501,
-                        "Whoops! You found a bug! Please email keith@buildkite.com with a copy of the file you're trying to convert.")
+          error_message(
+            501,
+            'Whoops! You found a bug! ' \
+            'Please email support@buildkite.com about this ' \
+            '(with a copy of the file you are trying to convert if possible).'
+          )
         end
       end
 
