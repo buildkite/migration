@@ -55,7 +55,11 @@ Note that if you are using the docker image you will have to override the entryp
 $ docker run --rm -ti -p 9292 --entrypoint '' --workdir /app $IMAGE:$TAG rackup --port 9292
 ```
 
-After that you should be able to access a very simple web interface at http://localhost:9292 or programatically interact with it (maybe even pipe the output directly to `buildkite-agent pipeline upload`!):
+After that you should be able to access a very simple web interface at http://localhost:9292 
+
+![Web UI](docs/images/web-ui.png)
+
+You could also programatically interact with it (maybe even pipe the output directly to `buildkite-agent pipeline upload`!):
 
 ```shell
 $ curl -X POST -F 'file=@app/examples/circleci/basic.yml' http://localhost:9292
