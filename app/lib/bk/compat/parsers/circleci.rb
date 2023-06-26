@@ -31,7 +31,7 @@ module BK
         bk_pipeline = Pipeline.new
 
         steps_by_key = @config.fetch('jobs').each_with_object({}) do |(key, job), hash|
-          bk_step = BK::Compat::Pipeline::CommandStep.new(key: key, label: ":circleci: #{key}")
+          bk_step = BK::Compat::CommandStep.new(key: key, label: ":circleci: #{key}")
 
           job.fetch('steps').each do |circle_step|
             [*transform_circle_step_to_commands(circle_step)].each do |s|
@@ -82,7 +82,7 @@ module BK
               end
             end
 
-            Pipeline::GroupStep.new(
+            BK::Compat::GroupStep.new(
               label: ":circleci: #{workflow_name}",
               key: workflow_name,
               steps: bk_steps
@@ -112,8 +112,8 @@ module BK
         if executor_config.length == 1
           image = executor_config.first.fetch('image')
 
-          bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
-            path: 'docker#v3.3.0',
+          bk_step.plugins << BK::Compat::Plugin.new(
+            name: 'docker',
             config: {
               image: image,
               workdir: '/buildkite-checkout'
@@ -228,8 +228,10 @@ module BK
 
           docker_compose_filename = ".buildkite/#{@now.to_i}-#{bk_step.key}-docker-compose.yml"
 
-          bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
-            path: 'keithpitt/write-file#v0.2',
+          # TODO: remove this if possible
+          bk_step.plugins << BK::Compat::Plugin.new(
+            name: 'keithpitt/write-file',
+            version: 'v0.2',
             config: {
               path: docker_compose_filename,
               contents: docker_compose_config.to_yaml
@@ -238,8 +240,8 @@ module BK
 
           unless docker_logins.empty?
             docker_logins.uniq.each do |login|
-              bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
-                path: 'docker-login#v2.0.1',
+              bk_step.plugins << BK::Compat::Plugin.new(
+                name: 'docker-login',
                 config: login
               )
             end
@@ -247,15 +249,16 @@ module BK
 
           unless ecr_logins.empty?
             ecr_logins.uniq.each do |ecr_auth|
-              bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
-                path: 'ecr#pass-through-creds',
+              bk_step.plugins << BK::Compat::Plugin.new(
+                name: 'ecr',
+                version: 'pass-through-creds', # TODO: remove this branch
                 config: { login: true }.merge(ecr_auth)
               )
             end
           end
 
-          bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
-            path: 'docker-compose#v3.1.0',
+          bk_step.plugins << BK::Compat::Plugin.new(
+            name: 'docker-compose',
             config: {
               config: docker_compose_filename,
               run: 'primary'

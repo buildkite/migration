@@ -128,7 +128,7 @@ module BK
           language_env_key = "TRAVIS_#{language.upcase}_VERSION"
 
           if docker_image
-            bk_step = BK::Compat::Pipeline::CommandStep.new(
+            bk_step = BK::Compat::CommandStep.new(
               label: ":travisci: #{language} #{version}",
               commands: script,
               env: {
@@ -138,8 +138,10 @@ module BK
 
             bk_step.soft_fail = true if soft_fails.include?(version)
 
-            bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
-              path: 'keithpitt/compat-env#v0.1',
+            # TODO: review if this is still necessary
+            bk_step.plugins << BK::Compat::Plugin.new(
+              name: 'keithpitt/compat-env',
+              version: 'v0.1',
               config: {
                 travisci: true
               }
@@ -147,8 +149,8 @@ module BK
 
             case @options.fetch(:runner, 'ELASTIC_CI')
             when 'ELASTIC_CI'
-              bk_step.plugins << BK::Compat::Pipeline::Plugin.new(
-                path: 'docker#v3.3.0',
+              bk_step.plugins << BK::Compat::Plugin.new(
+                name: 'docker',
                 config: {
                   image: docker_image,
                   workdir: '/buildkite-checkout',
@@ -161,7 +163,7 @@ module BK
               raise BK::Compat::Error::NotSupportedError, "runner: #{@options[:runner]} is not supported"
             end
           else
-            bk_step = BK::Compat::Pipeline::CommandStep.new(
+            bk_step = BK::Compat::CommandStep.new(
               label: ":travisci: #{version} (no docker image)",
               commands: 'exit 1'
             )
@@ -233,7 +235,7 @@ module BK
       end
 
       def prepare_step(commands:, env:, label: nil, conditional: nil)
-        BK::Compat::Pipeline::CommandStep.new(
+        BK::Compat::CommandStep.new(
           label: label,
           commands: commands,
           env: env,
