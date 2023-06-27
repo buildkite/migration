@@ -30,7 +30,7 @@ steps:
 
 Note that setting the environment variable `BUILDKITE_PLUGIN_<UPPERCASE_NAME>_VERSION` will override the default version of the plugins used. For example:
 
-```
+```shell
 $ BUILDKITE_PLUGIN_DOCKER_VERSION=testing-branch buildkite-compat examples/circleci/basic.yml
 steps:
 - label: ":circleci: build"
@@ -46,12 +46,23 @@ steps:
       workdir: "/buildkite-checkout"
 ```
 
-## API Service
+## Web Service/API
 
-Buildkite Compat can also be used via a HTTP API:
+Buildkite Compat can also be used via a HTTP API using `rackup` from the `app` folder of this repository.
+
+Note that if you are using the docker image you will have to override the entrypoint:
+```shell
+$ docker run --rm -ti -p 9292 --entrypoint '' --workdir /app $IMAGE:$TAG rackup --port 9292
+```
+
+After that you should be able to access a very simple web interface at http://localhost:9292 
+
+![Web UI](docs/images/web-ui.png)
+
+You could also programatically interact with it (maybe even pipe the output directly to `buildkite-agent pipeline upload`!):
 
 ```shell
-$ curl -X POST -F 'file=@examples/circleci/basic.yml' https://buildkite-compat.herokuapp.com
+$ curl -X POST -F 'file=@app/examples/circleci/basic.yml' http://localhost:9292
 steps:
 - label: ":circleci: build"
   key: build
@@ -64,24 +75,4 @@ steps:
   - docker#v3.3.0:
       image: circleci/python:3.6.2-stretch-browsers
       workdir: "/buildkite-checkout"
-```
-
-The output can be piped directly into a `buildkite-agent pipeline upload` command:
-
-```shell
-$ curl -X POST -F 'file=@.circleci/config.yml' https://buildkite-compat.herokuapp.com | buildkite-agent pipeline upload
-```
-
-## Release
-
-```bash
-# This needs to be installed first https://github.com/pmq20/ruby-packer
-curl -L http://enclose.io/rubyc/rubyc-darwin-x64.gz | gunzip > rubyc
-chmod +x rubyc
-mv /usr/local/bin
-
-# Prepare release folders
-rm -rf dist
-mkdir dist
-rubyc bin/buildkite-compat -o dist/buildkite-compat
 ```
