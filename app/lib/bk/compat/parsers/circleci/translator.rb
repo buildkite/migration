@@ -19,7 +19,7 @@ module BK
         if translator
           translator.call(config, *args)
         else
-          " # #{step_key} not supported (yet)"
+          [" # #{step_key} not supported (yet)"]
         end
       end
     end

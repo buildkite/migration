@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
 require_relative '../pipeline'
+require_relative 'circleci/translator'
 
 module BK
   module Compat
     # CircleCI translation scaffolding
     class CircleCI
+      include StepTranslator
       require 'yaml'
 
       def self.name
@@ -268,6 +270,19 @@ module BK
       end
 
       def transform_circle_step_to_commands(circle_step)
+        if circle_step.is_a?(Hash)
+          # TODO: make sure that a step is a single-key action
+          action = circle_step.keys.first
+          config = circle_step[action]
+        else
+          action = circle_step
+          config = nil
+        end
+
+        translate_step(action, config) + transform_circle_step_to_commands_old(circle_step)
+      end
+
+      def transform_circle_step_to_commands_old(circle_step)
         if circle_step == 'checkout'
           return [
             "echo '~~~ :circleci: checkout'",
