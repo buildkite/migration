@@ -2,6 +2,7 @@
 
 require_relative '../pipeline'
 require_relative 'circleci/translator'
+require_relative 'circleci/steps'
 
 module BK
   module Compat
@@ -27,6 +28,10 @@ module BK
         @config = YAML.safe_load(text, aliases: true)
         @now = Time.now
         @options = options
+
+        BK::Compat::CircleCISteps::MAPPING.each do |step, translator|
+          register_step(step, translator)
+        end
       end
 
       def parse
@@ -363,7 +368,7 @@ module BK
             ]
           end
         else
-          "echo #{circle_step.inspect}"
+          ["echo #{circle_step.inspect}"]
         end
       end
     end
