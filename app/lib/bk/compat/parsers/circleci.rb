@@ -29,9 +29,8 @@ module BK
         @now = Time.now
         @options = options
 
-        BK::Compat::CircleCISteps::MAPPING.each do |step, translator|
-          register_step(step, translator)
-        end
+        builtin_steps = BK::Compat::CircleCISteps::Builtins.new
+        register_translator(*builtin_steps.register)
       end
 
       def parse
