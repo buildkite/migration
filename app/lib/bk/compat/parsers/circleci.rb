@@ -287,15 +287,6 @@ module BK
       end
 
       def transform_circle_step_to_commands_old(circle_step)
-        if circle_step == 'checkout'
-          return [
-            "echo '~~~ :circleci: checkout'",
-            'sudo cp -R /buildkite-checkout /home/circleci/checkout',
-            'sudo chown -R circleci:circleci /home/circleci/checkout',
-            'cd /home/circleci/checkout'
-          ]
-        end
-
         if circle_step.is_a?(Hash)
           action = circle_step.keys.first
           config = circle_step[action]
@@ -355,11 +346,6 @@ module BK
               'buildkite-agent artifact download ".workspace/*" $$workspace_dir',
               'mv $$workspace_dir/.workspace/* .'
             ].flatten
-          when 'setup_remote_docker'
-            [
-              "echo '~~~ :circleci: #{action}'",
-              "echo '⚠️ Your host docker is being used'"
-            ]
           else
             [
               "echo '~~~ :circleci: #{action}'",
