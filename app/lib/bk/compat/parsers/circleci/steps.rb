@@ -31,27 +31,28 @@ module BK
           send("translate_#{action.gsub('-', '_')}", config)
         end
 
-        def translate_run(_config)
+        def translate_add_ssh_keys(_config)
           # TODO
-          ['# `run` not implemented yet']
+          ['# `add_ssh_keys` has no translation, your agent should have the keys to connect where it needs to']
         end
 
-        def translate_when(_config)
+        def translate_attach_workspace(_config)
           # TODO
-          ['# `when` not implemented yet']
+          ['# `attach_workspace` not implemented yet']
         end
 
         def translate_checkout(*_args)
           ['# No need for checkout, the agent takes care of that']
         end
 
-        def translate_setup_remote_docker(_config)
-          ['#  No need to setup remote docker, use the host docker']
+        def translate_deploy(_config)
+          # TODO
+          ['# `deploy` not implemented yet (and it has been deprecated)']
         end
 
-        def translate_save_cache(_config)
+        def translate_persist_to_workspace(_config)
           # TODO
-          ['# `save_cache` not implemented yet']
+          ['# `persist_to_workspace` not implemented yet']
         end
 
         def translate_restore_cache(_config)
@@ -59,9 +60,18 @@ module BK
           ['# `restore_cache` not implemented yet']
         end
 
-        def translate_deploy(_config)
+        def translate_run(_config)
           # TODO
-          ['# `deploy` not implemented yet (and it has been deprecated)']
+          ['# `run` not implemented yet']
+        end
+
+        def translate_save_cache(_config)
+          # TODO
+          ['# `save_cache` not implemented yet']
+        end
+
+        def translate_setup_remote_docker(_config)
+          ['#  No need to setup remote docker, use the host docker']
         end
 
         def translate_store_artifacts(_config)
@@ -74,19 +84,9 @@ module BK
           ['# `store_test_results` has no direct translation (you should try Test Analytics!)']
         end
 
-        def translate_persist_to_workspace(_config)
+        def translate_when(_config)
           # TODO
-          ['# `persist_to_workspace` not implemented yet']
-        end
-
-        def translate_attach_workspace(_config)
-          # TODO
-          ['# `attach_workspace` not implemented yet']
-        end
-
-        def translate_add_ssh_keys(_config)
-          # TODO
-          ['# `add_ssh_keys` has no translation, your agent should have the keys to connect where it needs to']
+          ['# `when` not implemented yet']
         end
       end
     end
