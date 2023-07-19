@@ -8,18 +8,8 @@ module BK
         def register
           [
             %w[
-              add-ssh-keys
-              attach-workspace
-              checkout
-              deploy
-              persist-to-workspace
-              restore-cache
-              run
-              save-cache
-              setup-remote-docker
-              store-artifacts
-              store-test-results
-              when
+              add-ssh-keys attach-workspace checkout deploy persist-to-workspace restore-cache
+              run save-cache setup-remote-docker store-artifacts store-test-results when
             ].freeze,
             method(:translator)
           ]
