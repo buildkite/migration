@@ -7,6 +7,10 @@ module BK
       def to_h
         'wait'
       end
+
+      def <<(_obj)
+        raise 'Can not add to a wait step'
+      end
     end
 
     # basic command step
@@ -56,6 +60,21 @@ module BK
           h[:plugins] = @plugins.map(&:to_h) if @plugins && !@plugins.empty?
           h[:soft_fail] = @soft_fail unless @soft_fail.nil?
           h[:if] = @conditional unless @conditional.nil?
+        end
+      end
+
+      def <<(new_step)
+        if new_step.is_a?(self.class)
+          env.merge(new_step.env)
+          @commands.concat(new_step.commands)
+          @plugins.merge(new_step.plugins)
+
+          # TODO: add soft_fail, depends and ifs
+          @depends_on.concat(new_step.commands)
+        elsif new_step.is_a?(BK::Compat::WaitStep)
+          raise 'Can not add a wait step to another step'
+        else
+          @commands.concat(new_step)
         end
       end
     end

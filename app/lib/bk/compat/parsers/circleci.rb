@@ -40,9 +40,7 @@ module BK
           bk_step = BK::Compat::CommandStep.new(key: key, label: ":circleci: #{key}")
 
           job.fetch('steps').each do |circle_step|
-            [*transform_circle_step_to_commands(circle_step)].each do |s|
-              bk_step.commands << s if s
-            end
+            bk_step << transform_circle_step_to_commands(circle_step)
           end
 
           # Figure out which executor to use
