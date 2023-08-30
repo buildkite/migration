@@ -62,6 +62,22 @@ module BK
 
       private
 
+      def process_executors(executors, bk_step)
+        if executors.length > 1
+          raise "More than 1 executor found (#{executors.keys.length.inspect})"
+        elsif executors.length == 1
+          executor_name = executors.keys.first
+          executor_config = executors.values.first
+
+          case executor_name
+          when 'docker'
+            setup_docker_executor(bk_step, executor_config)
+          else
+            raise "Unsupported executor #{executor_name}"
+          end
+        end
+      end
+
       def setup_docker_executor(bk_step, executor_config)
         if executor_config.length == 1
           image = executor_config.first.fetch('image')
@@ -228,21 +244,7 @@ module BK
           bk_step << transform_circle_step_to_commands(circle_step)
         end
 
-        # Figure out which executor to use
-        executors = config.slice('docker')
-        if executors.length > 1
-          raise "More than 1 executor found (#{executors.keys.length.inspect})"
-        elsif executors.length == 1
-          executor_name = executors.keys.first
-          executor_config = executors.values.first
-
-          case executor_name
-          when 'docker'
-            setup_docker_executor(bk_step, executor_config)
-          else
-            raise "Unsupported executor #{executor_name}"
-          end
-        end
+        process_executors(config.fetch('docker', []), bk_step)
 
         @steps_by_key[key] = bk_step
       end
