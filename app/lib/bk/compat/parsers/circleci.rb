@@ -21,7 +21,8 @@ module BK
 
       def self.matches?(text)
         keys = YAML.safe_load(text, aliases: true).keys
-        keys.include?('version') && keys.include?('jobs')
+        mandatory_keys = ['version', 'jobs', 'workflows']
+        keys & mandatory_keys == mandatory_keys
       end
 
       def initialize(text, options = {})
@@ -61,22 +62,6 @@ module BK
       end
 
       private
-
-      def process_executors(executors, bk_step)
-        if executors.length > 1
-          raise "More than 1 executor found (#{executors.keys.length.inspect})"
-        elsif executors.length == 1
-          executor_name = executors.keys.first
-          executor_config = executors.values.first
-
-          case executor_name
-          when 'docker'
-            setup_docker_executor(bk_step, executor_config)
-          else
-            raise "Unsupported executor #{executor_name}"
-          end
-        end
-      end
 
       def setup_docker_executor(bk_step, executor_config)
         if executor_config.length == 1
@@ -244,8 +229,8 @@ module BK
           bk_step << transform_circle_step_to_commands(circle_step)
         end
 
-        process_executors(config.fetch('docker', []), bk_step)
-
+        setup_docker_executor(bk_step, config.fetch('docker', []))
+        bk_step.env = config.fetch('environment', {})
         @steps_by_key[key] = bk_step
       end
 
