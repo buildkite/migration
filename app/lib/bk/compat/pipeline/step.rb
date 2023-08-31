@@ -55,8 +55,8 @@ module BK
               h[:commands] = @commands
             end
           end
-          h[:env] = @env.to_h unless @env.nil?
-          h[:depends_on] = @depends_on if @depends_on
+          h[:env] = @env.to_h if @env && !@env.empty?
+          h[:depends_on] = @depends_on if @depends_on && !@depends_on.empty?
           h[:plugins] = @plugins.map(&:to_h) if @plugins && !@plugins.empty?
           h[:soft_fail] = @soft_fail unless @soft_fail.nil?
           h[:if] = @conditional unless @conditional.nil?
