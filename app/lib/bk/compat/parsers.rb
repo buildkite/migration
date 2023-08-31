@@ -8,7 +8,7 @@ module BK
 
       def initialize
         current_folder = File.dirname(__FILE__)
-        Dir.glob(File.join(current_folder, 'parsers', '*.rb')).each do |file|
+        Dir.glob(File.join(current_folder, 'parsers', '*.rb')).sort.each do |file|
           require_relative file
         end
       end

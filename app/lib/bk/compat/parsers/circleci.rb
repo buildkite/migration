@@ -21,7 +21,7 @@ module BK
 
       def self.matches?(text)
         keys = YAML.safe_load(text, aliases: true).keys
-        mandatory_keys = ['version', 'jobs', 'workflows']
+        mandatory_keys = %w[version jobs workflows].freeze
         keys & mandatory_keys == mandatory_keys
       end
 
