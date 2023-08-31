@@ -244,11 +244,14 @@ module BK
             key = job.keys.first
             config = job[key]
           else
-            raise "Dunno what #{job.inspect} is"
+            raise "Job is not a hash or string! What could #{job.inspect} be!?"
           end
 
-          step = @steps_by_key.fetch(key)
+          step = @steps_by_key.fetch(key).dup
           step.depends_on = config.fetch('requires', [])
+
+          # rename step (to respect dependencies and avoid clashes)
+          step.key = config.fetch('name', key)
 
           step
         end
