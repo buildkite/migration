@@ -8,8 +8,8 @@ module BK
         def register
           [
             %w[
-              add-ssh-keys attach-workspace checkout deploy persist-to-workspace restore-cache
-              run save-cache setup-remote-docker store-artifacts store-test-results when
+              add_ssh_keys attach_workspace checkout deploy persist_to_workspace restore_cache
+              run save_cache setup_remote_docker store_artifacts store_test_results when
             ].freeze,
             method(:translator)
           ]
@@ -22,13 +22,17 @@ module BK
         end
 
         def translate_add_ssh_keys(_config)
-          # TODO
           ['# `add_ssh_keys` has no translation, your agent should have the keys to connect where it needs to']
         end
 
-        def translate_attach_workspace(_config)
-          # TODO
-          ['# `attach_workspace` not implemented yet']
+        def translate_attach_workspace(config)
+          # TODO: it may be a good idea to use a prefix for workspace artifacts
+          [
+            '# :circleci: attach_workspace ',
+            "if [ ! -d '#{config[at]}' ]; then mkdir '#{config[at]}'",
+            "cd '#{config[at]}'",
+            'buildkite agent artifact download *'
+          ]
         end
 
         def translate_checkout(*_args)
@@ -40,9 +44,14 @@ module BK
           ['# `deploy` not implemented yet (and it has been deprecated)']
         end
 
-        def translate_persist_to_workspace(_config)
-          # TODO
-          ['# `persist_to_workspace` not implemented yet']
+        def translate_persist_to_workspace(config)
+          # TODO: it may be a good idea to use a prefix for workspace artifacts
+          # possibily with a tempdir and a symlink
+          [
+            "cd #{config['root']}",
+            "buildkite-agent artifact upload '#{config['paths'].join(';')}'",
+            'cd -'
+          ]
         end
 
         def translate_restore_cache(_config)
@@ -50,9 +59,21 @@ module BK
           ['# `restore_cache` not implemented yet']
         end
 
-        def translate_run(_config)
-          # TODO
-          ['# `run` not implemented yet']
+        def translate_run(config)
+          return [config] if config.is_a?(String)
+
+          cmd = []
+          cmd << "echo '~~~ #{config['name']}'" if config.include?('name')
+          cmd += ['OLD_DIR="$PWD"', "cd #{config['working_directory']}"] if config.include?('working_directory')
+          cmd << "# no_output_timeout option has no translation" if config.include?('no_output_timeout')
+          cmd << "# shell is environment-dependent and should be configured in the agent" if config.include?('shell')
+
+          vars = config.fetch('environment', {}).map { |k, v| "#{k}='#{v}'" }.join(' ')
+          bg = config.fetch('background', false) ? '&' : ''
+          cmd << "#{vars} (#{config['command'].lines(chomp: true).join('; ')}) #{bg}".strip
+          cmd << 'cd "$OLD_DIR"' if config.include?('working_directory')
+
+          cmd
         end
 
         def translate_save_cache(_config)
