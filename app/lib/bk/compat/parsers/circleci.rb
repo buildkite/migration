@@ -270,78 +270,7 @@ module BK
           config = nil
         end
 
-        translate_step(action, config) + transform_circle_step_to_commands_old(circle_step)
-      end
-
-      def transform_circle_step_to_commands_old(circle_step)
-        if circle_step.is_a?(Hash)
-          action = circle_step.keys.first
-          config = circle_step[action]
-
-          case action
-          when 'run'
-            if config.is_a?(Hash)
-              env_prefix = []
-              if (env = config['environment'])
-                env.each do |(key, value)|
-                  env_prefix << "#{key}=#{value.inspect}"
-                end
-              end
-
-              command = if env_prefix.any?
-                          "#{env_prefix.join(' ')} #{config.fetch('command')}"
-                        else
-                          config.fetch('command')
-                        end
-
-              if (name = config['name'])
-                [
-                  "echo #{"--- #{name}".inspect}",
-                  command
-                ]
-              else
-                [
-                  "echo '--- :circleci: run'",
-                  command
-                ]
-              end
-            else
-              [
-                "echo '--- :circleci: run'",
-                config
-              ]
-            end
-          when 'persist_to_workspace'
-            [*config.fetch('paths')].map do |path|
-              [
-                "echo '~~~ :circleci: persist_to_workspace (path: #{path.inspect})'",
-                'workspace_dir=$$(mktemp -d)',
-                'sudo chown -R circleci:circleci $$workspace_dir',
-                'mkdir $$workspace_dir/.workspace',
-                'cp -R . $$workspace_dir/.workspace',
-                'cd $$workspace_dir',
-                "buildkite-agent artifact upload #{".workspace/#{path}".inspect}",
-                'cd -'
-              ]
-            end.flatten
-          when 'attach_workspace'
-            at = config.fetch('at')
-            [
-              "echo '~~~ :circleci: attach_workspace (at: #{at.inspect})'",
-              'workspace_dir=$$(mktemp -d)',
-              'sudo chown -R circleci:circleci $$workspace_dir',
-              'buildkite-agent artifact download ".workspace/*" $$workspace_dir',
-              'mv $$workspace_dir/.workspace/* .'
-            ].flatten
-          else
-            [
-              "echo '~~~ :circleci: #{action}'",
-              "echo '⚠️ Not support yet'"
-            ]
-          end
-        else
-          ["echo #{circle_step.inspect}"]
-        end
+        translate_step(action, config)
       end
     end
   end
