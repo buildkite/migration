@@ -62,18 +62,17 @@ module BK
         def translate_run(config)
           return [config] if config.is_a?(String)
 
-          cmd = []
-          cmd << "echo '~~~ #{config['name']}'" if config.include?('name')
-          cmd += ['OLD_DIR="$PWD"', "cd #{config['working_directory']}"] if config.include?('working_directory')
-          cmd << '# no_output_timeout option has no translation' if config.include?('no_output_timeout')
-          cmd << '# shell is environment-dependent and should be configured in the agent' if config.include?('shell')
+          [].tap do |cmd|
+            cmd << "echo '~~~ #{config['name']}'" if config.include?('name')
+            cmd += ['OLD_DIR="$PWD"', "cd #{config['working_directory']}"] if config.include?('working_directory')
+            cmd << '# no_output_timeout option has no translation' if config.include?('no_output_timeout')
+            cmd << '# shell is environment-dependent and should be configured in the agent' if config.include?('shell')
 
-          vars = config.fetch('environment', {}).map { |k, v| "#{k}='#{v}'" }.join(' ')
-          bg = config.fetch('background', false) ? '&' : ''
-          cmd << "#{vars} (#{config['command'].lines(chomp: true).join('; ')}) #{bg}".strip
-          cmd << 'cd "$OLD_DIR"' if config.include?('working_directory')
-
-          cmd
+            vars = config.fetch('environment', {}).map { |k, v| "#{k}='#{v}'" }.join(' ')
+            bg = config.fetch('background', false) ? '&' : ''
+            cmd << "#{vars} (#{config['command'].lines(chomp: true).join('; ')}) #{bg}".strip
+            cmd << 'cd "$OLD_DIR"' if config.include?('working_directory')
+          end
         end
 
         def translate_save_cache(_config)
