@@ -29,8 +29,8 @@ module BK
           # TODO: it may be a good idea to use a prefix for workspace artifacts
           [
             '# :circleci: attach_workspace ',
-            "if [ ! -d '#{config[at]}' ]; then mkdir '#{config[at]}'",
-            "cd '#{config[at]}'",
+            "if [ ! -d '#{config["at"]}' ]; then mkdir '#{config["at"]}'",
+            "cd '#{config["at"]}'",
             'buildkite agent artifact download *'
           ]
         end

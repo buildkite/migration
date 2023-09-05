@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
 require_relative '../pipeline'
-require_relative 'circleci/translator'
+require_relative 'circleci/jobs'
 require_relative 'circleci/steps'
+require_relative 'circleci/translator'
+require_relative 'circleci/workflows'
 
 module BK
   module Compat
@@ -220,47 +222,6 @@ module BK
             }
           )
         end
-      end
-
-      def parse_job(key, config)
-        bk_step = BK::Compat::CommandStep.new(key: key, label: ":circleci: #{key}")
-
-        config.fetch('steps').each do |circle_step|
-          bk_step << transform_circle_step_to_commands(circle_step)
-        end
-
-        setup_docker_executor(bk_step, config.fetch('docker', []))
-        bk_step.env = config.fetch('environment', {})
-        @steps_by_key[key] = bk_step
-      end
-
-      def parse_workflow(wf_name, wf_config)
-        bk_steps = wf_config.fetch('jobs').map do |job|
-          case job
-          when String
-            key = job
-            config = {}
-          when Hash
-            key = job.keys.first
-            config = job[key]
-          else
-            raise "Job is not a hash or string! What could #{job.inspect} be!?"
-          end
-
-          step = @steps_by_key.fetch(key).dup
-          step.depends_on = config.fetch('requires', [])
-
-          # rename step (to respect dependencies and avoid clashes)
-          step.key = config.fetch('name', key)
-
-          step
-        end
-
-        BK::Compat::GroupStep.new(
-          label: ":circleci: #{wf_name}",
-          key: wf_name,
-          steps: bk_steps
-        )
       end
 
       def transform_circle_step_to_commands(circle_step)
