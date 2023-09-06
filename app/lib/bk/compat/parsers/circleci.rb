@@ -5,6 +5,7 @@ require_relative 'circleci/jobs'
 require_relative 'circleci/orbs'
 require_relative 'circleci/steps'
 require_relative 'circleci/translator'
+require_relative 'circleci/util'
 require_relative 'circleci/workflows'
 
 module BK
@@ -222,19 +223,6 @@ module BK
             }
           )
         end
-      end
-
-      def transform_circle_step_to_commands(circle_step)
-        if circle_step.is_a?(Hash)
-          # TODO: make sure that a step is a single-key action
-          action = circle_step.keys.first
-          config = circle_step[action]
-        else
-          action = circle_step
-          config = nil
-        end
-
-        translate_step(action, config)
       end
     end
   end
