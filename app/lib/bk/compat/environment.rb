@@ -8,13 +8,13 @@ module BK
     class Environment
       EMPTY = ''
 
-      ENV_LINE_REGEX = /([^=]+)=(.*)/
+      ENV_LINE_REGEX = /([^=]+)=(.*)/.freeze
 
-      EXPORT_REGEX = /\Aexport /
-      KEY_REGX = /\A[a-zA-Z0-9_]+\z/
+      EXPORT_REGEX = /\Aexport /.freeze
+      KEY_REGX = /\A[a-zA-Z0-9_]+\z/.freeze
 
-      DOUBLE_QUOTE_REGEX = /\A"([.\s\S]*)"\z/
-      SINGLE_QUOTE_REGEX = /\A'([.\s\S]*)'\z/
+      DOUBLE_QUOTE_REGEX = /\A"([.\s\S]*)"\z/.freeze
+      SINGLE_QUOTE_REGEX = /\A'([.\s\S]*)'\z/.freeze
 
       def initialize(value)
         @value = value
