@@ -2,6 +2,7 @@
 
 require_relative '../pipeline'
 require_relative 'circleci/jobs'
+require_relative 'circleci/orbs'
 require_relative 'circleci/steps'
 require_relative 'circleci/translator'
 require_relative 'circleci/workflows'
@@ -40,9 +41,8 @@ module BK
       def parse
         bk_pipeline = Pipeline.new
 
-        @config.fetch('jobs').each do |key, config|
-          parse_job(key, config)
-        end
+        @config.fetch('orbs', {}).map { |key, config| parse_orb(key, config) }
+        @config.fetch('jobs', {}).map { |key, config| parse_job(key, config) }
 
         workflows = @config.fetch('workflows', {})
         workflows.delete('version')
