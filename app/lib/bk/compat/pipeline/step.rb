@@ -18,7 +18,7 @@ module BK
       attr_accessor :label, :key, :agents, :plugins, :depends_on, :soft_fail, :conditional
       attr_reader :commands, :env # we define special writers
 
-      def initialize(label: nil, key: nil, agents: [], commands: [], plugins: [], depends_on: nil, soft_fail: nil,
+      def initialize(label: nil, key: nil, agents: {}, commands: [], plugins: [], depends_on: nil, soft_fail: nil,
                      env: nil, conditional: nil)
         self.label = label
         self.commands = commands
@@ -66,6 +66,7 @@ module BK
       def <<(new_step)
         if new_step.is_a?(self.class)
           env.merge(new_step.env)
+          agents.merge(new_step.agents)
           @commands.concat(new_step.commands)
           @plugins.merge(new_step.plugins)
 
