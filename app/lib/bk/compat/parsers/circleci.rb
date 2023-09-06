@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative '../pipeline'
+require_relative 'circleci/executors'
 require_relative 'circleci/jobs'
 require_relative 'circleci/orbs'
 require_relative 'circleci/steps'
@@ -34,6 +35,7 @@ module BK
         @now = Time.now
         @options = options
         @steps_by_key = {}
+        @executors = {}
 
         builtin_steps = BK::Compat::CircleCISteps::Builtins.new
         register_translator(*builtin_steps.register)
@@ -44,6 +46,7 @@ module BK
 
         @config.fetch('orbs', {}).map { |key, config| parse_orb(key, config) }
         @config.fetch('jobs', {}).map { |key, config| parse_job(key, config) }
+        @config.fetch('executors', {}).map { |key, config| parse_executor(key, config) }
 
         workflows = @config.fetch('workflows', {})
         workflows.delete('version')
