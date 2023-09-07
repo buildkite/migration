@@ -42,16 +42,9 @@ module BK
 
         BK::Compat::CommandStep.new.tap do |step|
           step.agents['executor_type'] = 'docker'
-          plugin_config = {}.tap do |pgc|
-            pgc['image'] = config['image']
-            pgc['hostname'] = config['name'] if config.include?('name')
-            pgc['entrypoint'] = config['entrypoint'] if config.include?('entrypoint')
-            pgc['user'] = config['user'] if config.include?('user')
+          plugin_config = config.slice('image', 'entrypoint', 'user', 'command', 'environment')
+          plugin_config['add-host'] = "${config['name']}:127.0.0.1" if config.include?('name')
 
-            # TODO: use translate_run instead for this
-            pgc['command'] = config['command'] if config.include?('command')
-            pgc['environment'] = config['environment'] if config.include?('environment')
-          end
           step.plugins << BK::Compat::Plugin.new(
             name: 'docker',
             config: plugin_config
@@ -68,14 +61,24 @@ module BK
           end
 
           if config.include?('aws-auth')
+            url_regex = '^(?:[^/]+//)?(\d+).dkr.ecr.([^.]+).amazonaws.com'
+            account_id, region = config['image'].match(url_regex).captures
+            cfg = {
+              'login' => true,
+              'account-ids' => account_id,
+              'region' => region
+            }
+
+            cfg['assume-role'] = {'role-arn' => config['oidc_role_arn']} if config.include?('oidc_role_arn')
+
             step.plugins << BK::Compat::Plugin.new(
               name: 'ecr',
-              config: {
-                'login' => true,
-                'account-ids': config['image'].match(/^(\d+)\./)[1]
-              }
+              config: cfg
             )
-            # TODO: handle OIDC or AWS credentials
+
+            if cfg['aws-auth'].include('aws_access_key_id')
+              step.commands << '# Configure the agent to have the appropriate credentials for ECR auth'
+            end
           end
         end
       end
