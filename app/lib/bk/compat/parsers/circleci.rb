@@ -44,9 +44,9 @@ module BK
       def parse
         bk_pipeline = Pipeline.new
 
-        @config.fetch('orbs', {}).map { |key, config| parse_orb(key, config) }
-        @config.fetch('jobs', {}).map { |key, config| parse_job(key, config) }
-        @config.fetch('executors', {}).map { |key, config| parse_executor(key, config) }
+        @config.fetch('orbs', {}).map { |key, config| load_orb(key, config) }
+        @config.fetch('executors', {}).map { |key, config| load_executor(key, config) }
+        @config.fetch('jobs', {}).map { |key, config| load_job(key, config) }
 
         workflows = @config.fetch('workflows', {})
         workflows.delete('version')

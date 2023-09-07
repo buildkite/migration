@@ -6,7 +6,7 @@ module BK
     class CircleCI
       private
 
-      def parse_orb(key, _conf)
+      def load_orb(key, _conf)
         translator = CircleCISteps::GenericOrb.new(key)
         register_translator(*translator.register)
       end

@@ -1,21 +1,35 @@
 # frozen_string_literal: true
 
+require_relative './executors'
+
 module BK
   module Compat
     # CircleCI translation scaffolding
     class CircleCI
       private
 
-      def parse_job(key, config)
-        bk_step = BK::Compat::CommandStep.new(key: key, label: ":circleci: #{key}")
+      def load_job(name, config)
+        raise "Duplicate job name: #{name}" if @steps_by_key.include?(name)
+
+        @steps_by_key[name] = parse_job(name, config)
+      end
+
+      def parse_job(name, config)
+        bk_step = BK::Compat::CommandStep.new(key: name, label: ":circleci: #{name}")
 
         config.fetch('steps').each do |circle_step|
           bk_step << translate_step(*string_or_key(circle_step))
         end
 
-        setup_docker_executor(bk_step, config.fetch('docker', []))
+        if config.include?('executor')
+          bk_step << @executors[config['executor']]
+        else
+          type, exc_conf = get_executor(config)
+          bk_step << parse_executor(type, exc_conf) unless type.nil?
+        end
+
         bk_step.env = config.fetch('environment', {})
-        @steps_by_key[key] = bk_step
+        bk_step
       end
     end
   end
