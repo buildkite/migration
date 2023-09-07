@@ -28,7 +28,7 @@ module BK
         variables[key] = value
       end
 
-      def merge(other)
+      def merge!(other)
         other_env = if other.is_a?(self.class)
                       other
                     else

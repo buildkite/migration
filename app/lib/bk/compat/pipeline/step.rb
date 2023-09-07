@@ -65,8 +65,8 @@ module BK
 
       def <<(new_step)
         if new_step.is_a?(self.class)
-          env.merge(new_step.env)
-          agents.merge(new_step.agents)
+          env.merge!(new_step.env)
+          @agents.merge!(new_step.agents)
           @commands.concat(new_step.commands)
           @plugins.concat(new_step.plugins)
 
