@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative './executors'
+require_relative 'executors'
 
 module BK
   module Compat
@@ -24,7 +24,7 @@ module BK
             bk_step << @executors[config['executor']]
           else
             type, exc_conf = get_executor(config)
-            bk_step << parse_executor(type, exc_conf) unless type.nil?
+            bk_step << parse_executor(type, {}, exc_conf) unless type.nil?
           end
 
           bk_step.env = config.fetch('environment', {})

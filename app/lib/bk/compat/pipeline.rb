@@ -13,18 +13,18 @@ module BK
     class Pipeline
       attr_accessor :steps, :env
 
-      def initialize(steps: [], env: nil)
+      def initialize(steps: [], env: {})
         @steps = steps
         @env = env
       end
 
-      def render(**args)
-        BK::Compat::Renderer.new(to_h).render(**args)
+      def render(**)
+        BK::Compat::Renderer.new(to_h).render(**)
       end
 
       def to_h
         {}.tap do |h|
-          h[:env] = @env.to_h if @env && !@env.empty?
+          h[:env] = @env.to_h unless @env.empty?
           h[:steps] = steps.map(&:to_h)
         end
       end

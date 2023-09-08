@@ -51,7 +51,7 @@ module BK
         bk_groups = workflows.map { |wf, config| parse_workflow(wf, config) }
 
         # If no workflow is defined, it's expected that there's a `build` job
-        bk_groups = [@steps_by_key.fetch('build')] if bk_groups.empty?
+        bk_groups = [BK::Compat::GroupStep.new(steps: [@steps_by_key.fetch('build')])] if bk_groups.empty?
         # If there ended up being only 1 workflow, skip the group and just
         # pull the steps out.
         bk_groups = bk_groups.first.steps if bk_groups.length == 1

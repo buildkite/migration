@@ -25,7 +25,7 @@ module BK
         options
       end
 
-      def cli_parser
+      def self.cli_parser
         parsers = BK::Compat::PARSERS.to_h { |v| [v.option, v] }
 
         OptionParser.new do |opts|

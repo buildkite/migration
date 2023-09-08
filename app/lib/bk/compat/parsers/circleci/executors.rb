@@ -12,19 +12,19 @@ module BK
         type, ex_conf = get_executor(config)
         raise "Invalid executor configuration #{config}" if key.nil?
 
-        @executors[name] = parse_executor(type, ex_conf)
+        @executors[name] = parse_executor(type, config, ex_conf)
       end
 
       def get_executor(config)
         existing = config.slice('docker', 'machine', 'macos', 'windows')
 
         # only one of these must exist
-        key = existing.length != 1 ? nil : existing.keys.first
+        key = existing.length == 1 ? existing.keys.first : nil
         # Hash[nil] == nil :)
         [key, config[key]]
       end
 
-      def parse_executor(type, config)
+      def parse_executor(type, config, exc_conf)
         BK::Compat::CommandStep.new(key: "Executor #{type}").tap do |step|
           step.env = config.fetch('environment', {})
           step.commands.concat(
@@ -34,7 +34,7 @@ module BK
             ].compact
           )
           step.agents.merge(config.slice('resource_class'))
-          step << send("executor_#{type}", config)
+          step << send("executor_#{type}", exc_conf)
         end
       end
 
