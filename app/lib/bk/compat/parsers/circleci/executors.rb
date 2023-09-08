@@ -12,13 +12,7 @@ module BK
         type, ex_conf = get_executor(config)
         raise "Invalid executor configuration #{config}" if key.nil?
 
-        @executors[name] = BK::Compat::CommandStep.new(key: "Executor #{type}").tap do |step|
-          step.env = config.fetch('environment', {})
-          step.commands << "cd #{config['working_directory']}" if config.include?('working_directory')
-          step.commands << '# shell should be configured in the agent' if config.include?('shell')
-          step.agents['resource_class'] = config['resource_class'] if config.include?('resource_class')
-          step << parse_executor(type, ex_conf)
-        end
+        @executors[name] = parse_executor(type, ex_conf)
       end
 
       def get_executor(config)
@@ -31,7 +25,17 @@ module BK
       end
 
       def parse_executor(type, config)
-        send("executor_#{type}", config)
+        BK::Compat::CommandStep.new(key: "Executor #{type}").tap do |step|
+          step.env = config.fetch('environment', {})
+          step.commands.concat(
+            [
+              config.include?('working_directory') ? "cd #{config['working_directory']}" : nil,
+              config.include?('shell') ? '# shell should be configured in the agent' : nil
+            ].compact
+          )
+          step.agents.merge(config.slice('resource_class'))
+          step << send("executor_#{type}", config)
+        end
       end
 
       def executor_docker(config)
@@ -42,45 +46,52 @@ module BK
 
         BK::Compat::CommandStep.new.tap do |step|
           step.agents['executor_type'] = 'docker'
-          plugin_config = config.slice('image', 'entrypoint', 'user', 'command', 'environment')
-          plugin_config['add-host'] = "${config['name']}:127.0.0.1" if config.include?('name')
-
-          step.plugins << BK::Compat::Plugin.new(
-            name: 'docker',
-            config: plugin_config
-          )
-
-          if config.include?('auth')
-            step.plugins << BK::Compat::Plugin.new(
-              name: 'docker-login',
-              config: {
-                'username' => config['auth']['username'],
-                'password-env' => config['auth']['password'].ltrim('$')
-              }
-            )
-          end
-
-          if config.include?('aws-auth')
-            url_regex = '^(?:[^/]+//)?(\d+).dkr.ecr.([^.]+).amazonaws.com'
-            account_id, region = config['image'].match(url_regex).captures
-            cfg = {
-              'login' => true,
-              'account-ids' => account_id,
-              'region' => region
-            }
-
-            cfg['assume-role'] = {'role-arn' => config['oidc_role_arn']} if config.include?('oidc_role_arn')
-
-            step.plugins << BK::Compat::Plugin.new(
-              name: 'ecr',
-              config: cfg
-            )
-
-            if cfg['aws-auth'].include('aws_access_key_id')
-              step.commands << '# Configure the agent to have the appropriate credentials for ECR auth'
-            end
-          end
+          step << executor_docker_plugin(config)
+          step << executor_docker_auth_plugin(config.fetch('auth', {}))
+          step << executor_docker_aws_auth(config['aws-auth']) if config.include?('aws-auth')
         end
+      end
+
+      def executor_docker_auth_plugin(auth_config)
+        return [] if auth_config.empty?
+
+        BK::Compat::Plugin.new(
+          name: 'docker-login',
+          config: {
+            'username' => auth_config['username'],
+            'password-env' => auth_config['password'].ltrim('$')
+          }
+        )
+      end
+
+      def executor_docker_aws_auth(config)
+        BK::Compat::CommandStep.new.tap do |step|
+          if config.include?('aws_access_key_id')
+            step.commands << '# Configure the agent to have the appropriate credentials for ECR auth'
+          end
+
+          url_regex = '^(?:[^/]+//)?(\d+).dkr.ecr.([^.]+).amazonaws.com'
+          account_id, region = config['image'].match(url_regex).captures
+          cfg = {
+            'login' => true,
+            'account-ids' => account_id,
+            'region' => region
+          }
+
+          cfg['assume-role'] = { 'role-arn' => config['oidc_role_arn'] } if config.include?('oidc_role_arn')
+
+          step << BK::Compat::Plugin.new(name: 'ecr', config: cfg)
+        end
+      end
+
+      def executor_docker_plugin(config)
+        plugin_config = config.slice('image', 'entrypoint', 'user', 'command', 'environment')
+        plugin_config['add-host'] = "${config['name']}:127.0.0.1" if config.include?('name')
+
+        BK::Compat::Plugin.new(
+          name: 'docker',
+          config: plugin_config
+        )
       end
 
       def executor_machine(config)

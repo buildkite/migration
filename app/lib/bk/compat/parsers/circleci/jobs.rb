@@ -15,21 +15,20 @@ module BK
       end
 
       def parse_job(name, config)
-        bk_step = BK::Compat::CommandStep.new(key: name, label: ":circleci: #{name}")
+        BK::Compat::CommandStep.new(key: name, label: ":circleci: #{name}").tap do |bk_step|
+          config.fetch('steps').each do |circle_step|
+            bk_step << translate_step(*string_or_key(circle_step))
+          end
 
-        config.fetch('steps').each do |circle_step|
-          bk_step << translate_step(*string_or_key(circle_step))
+          if config.include?('executor')
+            bk_step << @executors[config['executor']]
+          else
+            type, exc_conf = get_executor(config)
+            bk_step << parse_executor(type, exc_conf) unless type.nil?
+          end
+
+          bk_step.env = config.fetch('environment', {})
         end
-
-        if config.include?('executor')
-          bk_step << @executors[config['executor']]
-        else
-          type, exc_conf = get_executor(config)
-          bk_step << parse_executor(type, exc_conf) unless type.nil?
-        end
-
-        bk_step.env = config.fetch('environment', {})
-        bk_step
       end
     end
   end

@@ -74,6 +74,8 @@ module BK
 
           # TODO: add soft_fail, depends and ifs
           @depends_on.concat(new_step.commands)
+        elsif new_step.is_a?(BK::Compat::Plugin)
+          @plugins.concat(new_step)
         else
           @commands.concat(new_step)
         end
