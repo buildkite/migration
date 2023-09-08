@@ -7,3 +7,6 @@ Style/HashSyntax:
 
 Naming/BlockForwarding:
   EnforcedStyle: explicit
+
+Metrics/MethodLength:
+  CountAsOne: [ 'array', 'hash', 'heredoc' ]
