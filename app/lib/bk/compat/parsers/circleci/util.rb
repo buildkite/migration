@@ -19,6 +19,10 @@ module BK
         end
         [key, config]
       end
+
+      def string_or_list(object)
+        object.is_a?(String) ? [object] : object
+      end
     end
   end
 end
