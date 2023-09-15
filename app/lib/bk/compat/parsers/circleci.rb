@@ -69,15 +69,14 @@ module BK
       def string_or_key(job)
         case job
         when String
-          key = job
-          config = {}
+          [job, {}]
         when Hash
-          key = job.keys.first
-          config = job[key]
+          raise 'Job is a hash with more than one key!?' unless job.length == 1
+
+          job.dup.shift
         else
           raise "Job is not a hash or string! What could #{job.inspect} be!?"
         end
-        [key, config]
       end
     end
   end
