@@ -20,19 +20,23 @@ module BK
       attr_accessor :agents, :conditional, :depends_on, :key, :label, :plugins, :soft_fail
       attr_reader :commands, :env # we define special writers
 
-      def initialize(label: nil, key: nil, agents: {}, commands: [], plugins: [], depends_on: [], soft_fail: nil,
-                     env: {}, conditional: nil)
-        @label = label
-        @agents = agents
-        @key = key
-        @plugins = plugins
-        @depends_on = depends_on
-        @soft_fail = soft_fail
-        @conditional = conditional
+      def list_attributes
+        %w[commands depends_on plugins]
+      end
 
-        # have special setters
-        self.commands = commands
-        self.env = env
+      def hash_attributes
+        %w[agents env]
+      end
+
+      def initialize(**kwargs)
+        kwargs.map do |k, v|
+          # set attributes passed through as-is
+          send("#{k}=", v)
+        end
+
+        # nil as default are not acceptable
+        list_attributes.each { |k| send("#{k}=", []) unless kwargs.include?(k) }
+        hash_attributes.each { |k| send("#{k}=", {}) unless kwargs.include?(k) }
       end
 
       def commands=(value)
