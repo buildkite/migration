@@ -43,8 +43,20 @@ module BK
         Rouge::Lexers::YAML.new
       end
 
+      # prevent leading colon in YAML keys (see https://github.com/ruby/psych/issues/396)
+      class SymbolToStringYamlTreeVisitor < Psych::Visitors::YAMLTree
+        def visit_symbol(sym)
+          visit_String(sym.to_s)
+        end
+
+        # to prevent a rubocop warning
+        alias visit_Symbol visit_symbol
+      end
+
       def text_yaml
-        @structure.to_yaml
+        visitor = SymbolToStringYamlTreeVisitor.create
+        visitor << @structure
+        visitor.tree.yaml
       end
 
       def text_json
