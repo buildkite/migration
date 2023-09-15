@@ -10,9 +10,9 @@ module BK
         raise 'Duplicate executor name' if @executors.include?(name)
 
         type, ex_conf = get_executor(config)
-        raise "Invalid executor configuration #{config}" if key.nil?
+        raise "Invalid executor configuration #{config}" if type.nil?
 
-        @executors[name] = parse_executor(type, config, ex_conf)
+        @executors[name] = parse_executor(type, ex_conf)
       end
 
       def get_executor(config)
@@ -20,20 +20,20 @@ module BK
 
         # only one of these must exist
         key = existing.length == 1 ? existing.keys.first : nil
-        # Hash[nil] == nil :)
-        [key, config[key]]
+        elems = %w[environment resource_class shell working_directory]
+        [key, config.slice(*elems).merge(config.fetch(key, {}))]
       end
 
-      def parse_executor(type, config, exc_conf)
-        BK::Compat::CommandStep.new(key: "Executor #{type}").tap do |step|
-          step.env = config.fetch('environment', {})
-          step.commands.concat(
-            [
-              config.include?('working_directory') ? "cd #{config['working_directory']}" : nil,
-              config.include?('shell') ? '# shell should be configured in the agent' : nil
-            ].compact
-          )
-          step.agents.merge(config.slice('resource_class'))
+      def parse_executor(type, exc_conf)
+        return nil if type.nil?
+
+        BK::Compat::CommandStep.new(
+          key: "Executor #{type}",
+          env: exc_conf.fetch(environment, {}),
+          agents: exc_conf.slice('resource_class')
+        ).tap do |step|
+          step.commands << "cd #{exc_conf['workdir']}" if ex_conf.include?('workdir')
+          step.commands << '# shell should be configured in the agent' if exc_conf.include?['shell']
           step << send("executor_#{type}", exc_conf)
         end
       end
