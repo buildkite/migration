@@ -10,18 +10,15 @@ module BK
         req = Rack::Request.new(env)
 
         # We have only one url at the moment
-        if req.path == '/'
-          if req.get?
-            return handle_index(req)
-          elsif req.post?
-            return handle_parse(req)
-          else
-            return [405, {}, []]
-          end
-        end
+        return [404, {}, []] if req.path != '/'
 
-        # If we've gotten here, then the path isn't supported
-        [404, {}, []]
+        if req.get?
+          handle_index(req)
+        elsif req.post?
+          handle_parse(req)
+        else
+          [405, {}, []]
+        end
       end
 
       private
