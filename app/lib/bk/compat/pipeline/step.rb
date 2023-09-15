@@ -82,7 +82,7 @@ module BK
         list_attributes.each { |a| send(a).concat(new_step.send(a)) }
         hash_attributes.each { |a| send(a).merge!(new_step.send(a)) }
 
-        @conditional = xxand(conditional, new_step.conditional)
+        @conditional = BK::Compat.xxand(conditional, new_step.conditional)
 
         # TODO: these could be a hash with exit codes
         @soft_fail = soft_fail || new_step.soft_fail

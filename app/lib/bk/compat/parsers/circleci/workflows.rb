@@ -30,14 +30,14 @@ module BK
         branches = build_condition(config.fetch('branches', {}), 'build.branch')
         tags = build_condition(config.fetch('tags', {}), 'build.tag')
 
-        xxor(branches, tags)
+        BK::Compat.xxand(branches, tags)
       end
 
       def build_condition(filters, key)
         only = logic_builder(key, '=', string_or_list(filters.fetch('only', [])), ' || ')
         ignore = logic_builder(key, '!', string_or_list(filters.fetch('ignore', [])), ' && ')
 
-        xxor(only, ignore)
+        BK::Compat.xxand(only, ignore)
       end
 
       def logic_builder(key, operator, elements, joiner)
@@ -45,17 +45,6 @@ module BK
           negator = spec.start_with?('/') ? '~' : '='
           "#{key} #{operator}#{negator} #{spec}"
         end.join(joiner)
-      end
-
-      def xxor(first, second, separator = '&&')
-        if first.to_s.empty? && second.to_s.empty?
-          nil
-        elsif !first.to_s.empty? && !second.to_s.empty?
-          "(#{first}) #{separator} (#{second})"
-        else
-          # one of them is empty we don't care which
-          "#{first}#{second}"
-        end
       end
 
       def string_or_list(object)
