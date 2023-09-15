@@ -67,7 +67,9 @@ module BK
             cmd += ['OLD_DIR="$PWD"', "cd #{config['working_directory']}"] if config.include?('working_directory')
             cmd << '# no_output_timeout option has no translation' if config.include?('no_output_timeout')
             cmd << '# shell is environment-dependent and should be configured in the agent' if config.include?('shell')
-            cmd << generate_command_string(config['command'], config.fetch('environment'), config.fetch('background'))
+            cmd << generate_command_string(commands: config['command'],
+                                           env: config.fetch('environment', {}),
+                                           background: config.fetch('background', false))
             cmd << 'cd "$OLD_DIR"' if config.include?('working_directory')
           end
         end
