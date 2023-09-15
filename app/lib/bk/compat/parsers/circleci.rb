@@ -66,6 +66,20 @@ module BK
         @config.fetch('executors', {}).map { |key, config| load_executor(key, config) }
         @config.fetch('jobs', {}).map { |key, config| load_job(key, config) }
       end
+
+      def string_or_key(job)
+        case job
+        when String
+          key = job
+          config = {}
+        when Hash
+          key = job.keys.first
+          config = job[key]
+        else
+          raise "Job is not a hash or string! What could #{job.inspect} be!?"
+        end
+        [key, config]
+      end
     end
   end
 end

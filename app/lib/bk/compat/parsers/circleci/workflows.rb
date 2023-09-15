@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative 'util'
-
 module BK
   module Compat
     # CircleCI translation of workflows
