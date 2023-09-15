@@ -59,9 +59,10 @@ module BK
           # special handling
           h[:plugins] = @plugins.map(&:to_h)
           h[:env] = @env&.to_h
+          h[:commands] = @commands.flatten
 
           # remove empty and nil values
-          h.delete_if { |_, v| v&.empty? }
+          h.delete_if { |_, v| v.nil? || v.empty? }
         end
       end
 
@@ -70,15 +71,15 @@ module BK
         when BK::Compat::WaitStep
           raise 'Can not add a wait step to another step'
         when self.class
-          merge(new_step)
+          merge!(new_step)
         when BK::Compat::Plugin
           @plugins << new_step
         else
-          @commands.concat(new_step)
+          @commands.concat(new_step) unless new_step.nil?
         end
       end
 
-      def merge(new_step)
+      def merge!(new_step)
         list_attributes.each { |a| send(a).concat(new_step.send(a)) }
         hash_attributes.each { |a| send(a).merge!(new_step.send(a)) }
 
@@ -86,9 +87,10 @@ module BK
 
         # TODO: these could be a hash with exit codes
         @soft_fail = soft_fail || new_step.soft_fail
+        self
       end
 
-      def self.instance_attributes
+      def instance_attributes
         # helper method to get all instance attributes as a dictionary
         instance_variables.to_h { |v| [v.to_s.delete_prefix('@').to_sym, instance_variable_get(v)] }
       end
