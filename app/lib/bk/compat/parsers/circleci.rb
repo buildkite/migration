@@ -41,7 +41,7 @@ module BK
       end
 
       def parse
-        load_elements
+        load_elements!
 
         workflows = @config.fetch('workflows', {})
         workflows.delete('version')
@@ -60,7 +60,7 @@ module BK
 
       private
 
-      def load_elements
+      def load_elements!
         @config.fetch('orbs', {}).map { |key, config| load_orb(key, config) }
         @config.fetch('executors', {}).map { |key, config| load_executor(key, config) }
         @config.fetch('jobs', {}).map { |key, config| load_job(key, config) }
