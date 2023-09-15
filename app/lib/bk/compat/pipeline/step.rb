@@ -20,13 +20,8 @@ module BK
       attr_accessor :agents, :conditional, :depends_on, :key, :label, :plugins, :soft_fail
       attr_reader :commands, :env # we define special writers
 
-      def list_attributes
-        %w[commands depends_on plugins]
-      end
-
-      def hash_attributes
-        %w[agents env]
-      end
+      LIST_ATTRIBUTES = %w[commands depends_on plugins].freeze
+      HASH_ATTRIBUTES = %w[agents env].freeze
 
       def initialize(**kwargs)
         kwargs.map do |k, v|
@@ -35,8 +30,8 @@ module BK
         end
 
         # nil as default are not acceptable
-        list_attributes.each { |k| send("#{k}=", []) unless kwargs.include?(k) }
-        hash_attributes.each { |k| send("#{k}=", {}) unless kwargs.include?(k) }
+        LIST_ATTRIBUTES.each { |k| send("#{k}=", []) unless kwargs.include?(k) }
+        HASH_ATTRIBUTES.each { |k| send("#{k}=", {}) unless kwargs.include?(k) }
       end
 
       def commands=(value)
@@ -84,14 +79,13 @@ module BK
       end
 
       def merge!(new_step)
-        list_attributes.each { |a| send(a).concat(new_step.send(a)) }
-        hash_attributes.each { |a| send(a).merge!(new_step.send(a)) }
+        LIST_ATTRIBUTES.each { |a| send(a).concat(new_step.send(a)) }
+        HASH_ATTRIBUTES.each { |a| send(a).merge!(new_step.send(a)) }
 
         @conditional = BK::Compat.xxand(conditional, new_step.conditional)
 
         # TODO: these could be a hash with exit codes
         @soft_fail = soft_fail || new_step.soft_fail
-        self
       end
 
       def instance_attributes
