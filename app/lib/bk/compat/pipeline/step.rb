@@ -52,41 +52,45 @@ module BK
       end
 
       def to_h
-        {}.tap do |h|
-          h[:key] = @key if @key
-          h[:label] = @label if @label
-          h[:agents] = @agents unless @agents.empty?
-          if @commands.is_a?(Array)
-            if @commands.length == 1
-              h[:command] = @commands.first
-            elsif @commands.length > 1
-              h[:commands] = @commands
-            end
-          end
-          h[:env] = @env.to_h unless @env.empty?
-          h[:depends_on] = @depends_on unless @depends_on.empty?
-          h[:plugins] = @plugins.map(&:to_h) unless @plugins.empty?
-          h[:soft_fail] = @soft_fail unless @soft_fail.nil?
-          h[:if] = @conditional unless @conditional.nil?
+        instance_attributes.tap do |h|
+          # rename conditional to if (a reserved word as an attribute or instance variable is complicated)
+          h[:if] = h.delete('conditional')
+
+          # special handling
+          h[:plugins] = @plugins.map(&:to_h)
+          h[:env] = @env&.to_h
+
+          # remove empty and nil values
+          h.delete_if { |_, v| v&.empty? }
         end
       end
 
       def <<(new_step)
-        raise 'Can not add a wait step to another step' if new_step.is_a?(BK::Compat::WaitStep)
-
-        if new_step.is_a?(self.class)
-          env.merge!(new_step.env)
-          @agents.merge!(new_step.agents)
-          @commands.concat(new_step.commands)
-          @plugins.concat(new_step.plugins)
-
-          # TODO: add soft_fail, depends and ifs
-          @depends_on.concat(new_step.commands)
-        elsif new_step.is_a?(BK::Compat::Plugin)
+        case new_step
+        when BK::Compat::WaitStep
+          raise 'Can not add a wait step to another step'
+        when self.class
+          merge(new_step)
+        when BK::Compat::Plugin
           @plugins << new_step
         else
           @commands.concat(new_step)
         end
+      end
+
+      def merge(new_step)
+        list_attributes.each { |a| send(a).concat(new_step.send(a)) }
+        hash_attributes.each { |a| send(a).merge!(new_step.send(a)) }
+
+        @conditional = xxand(conditional, new_step.conditional)
+
+        # TODO: these could be a hash with exit codes
+        @soft_fail = soft_fail || new_step.soft_fail
+      end
+
+      def self.instance_attributes
+        # helper method to get all instance attributes as a dictionary
+        instance_variables.to_h { |v| [v.to_s.delete_prefix('@').to_sym, instance_variable_get(v)] }
       end
     end
 
