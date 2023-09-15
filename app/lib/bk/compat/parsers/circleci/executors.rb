@@ -34,9 +34,9 @@ module BK
           key: "Executor #{type}",
           env: environment
         ).tap do |step|
-          setp.agents.merge!({ 'resource_class' => resource_class }) unless resource_class.nil?
-          step.commands << "cd #{working_directory}" unless working_directory.nil?
-          step.commands << '# shell should be configured in the agent' unless shell.nil?
+          step.agents.merge!({ 'resource_class' => resource_class }) unless resource_class.nil?
+          step.add_commands("cd #{working_directory}") unless working_directory.nil?
+          step.add_commands('# shell should be configured in the agent') unless shell.nil?
           step << send("executor_#{type}", conf)
         end
       end
@@ -70,7 +70,7 @@ module BK
       def executor_docker_aws_auth(config)
         BK::Compat::CommandStep.new.tap do |step|
           if config.include?('aws_access_key_id')
-            step.commands << '# Configure the agent to have the appropriate credentials for ECR auth'
+            step.add_commands('# Configure the agent to have the appropriate credentials for ECR auth')
           end
 
           url_regex = '^(?:[^/]+//)?(\d+).dkr.ecr.([^.]+).amazonaws.com'
@@ -102,7 +102,7 @@ module BK
           step.agents['executor_type'] = 'machine'
           step.agents['executor_image'] = config['image']
           if config.include?('docker_layer_caching')
-            step.commands << '# Docker Layer Caching should be configured in the agent'
+            step.add_commands('# Docker Layer Caching should be configured in the agent')
           end
         end
       end

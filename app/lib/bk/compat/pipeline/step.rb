@@ -43,6 +43,10 @@ module BK
         @commands = [*value].flatten
       end
 
+      def add_commands(*values)
+        @commands.concat(values.flatten)
+      end
+
       def env=(value)
         @env = if value.is_a?(BK::Compat::Environment)
                  value
@@ -75,7 +79,7 @@ module BK
         when BK::Compat::Plugin
           @plugins << new_step
         else
-          @commands.concat(new_step) unless new_step.nil?
+          add_commands(new_step) unless new_step.nil?
         end
       end
 
