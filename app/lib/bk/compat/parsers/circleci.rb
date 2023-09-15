@@ -56,9 +56,7 @@ module BK
         # pull the steps out.
         bk_groups = bk_groups.first.steps if bk_groups.length == 1
 
-        Pipeline.new.tap do |bk_pipeline|
-          bk_pipeline.steps.concat(bk_groups)
-        end
+        Pipeline.new.steps.concat(bk_groups)
       end
 
       private

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative '../environment'
+
 module BK
   module Compat
     # simple waiting step
@@ -15,7 +17,7 @@ module BK
 
     # basic command step
     class CommandStep
-      attr_accessor :label, :key, :agents, :plugins, :depends_on, :soft_fail, :conditional
+      attr_accessor :agents, :conditional, :depends_on, :key, :label, :plugins, :soft_fail
       attr_reader :commands, :env # we define special writers
 
       def initialize(label: nil, key: nil, agents: {}, commands: [], plugins: [], depends_on: [], soft_fail: nil,
