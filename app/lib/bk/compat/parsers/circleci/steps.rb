@@ -67,12 +67,16 @@ module BK
             cmd += ['OLD_DIR="$PWD"', "cd #{config['working_directory']}"] if config.include?('working_directory')
             cmd << '# no_output_timeout option has no translation' if config.include?('no_output_timeout')
             cmd << '# shell is environment-dependent and should be configured in the agent' if config.include?('shell')
-
-            vars = config.fetch('environment', {}).map { |k, v| "#{k}='#{v}'" }.join(' ')
-            bg = config.fetch('background', false) ? '&' : ''
-            cmd << "#{vars} (#{config['command'].lines(chomp: true).join('; ')}) #{bg}".strip
+            cmd << generate_command_string(config['command'], config.fetch('environment'), config.fetch('background'))
             cmd << 'cd "$OLD_DIR"' if config.include?('working_directory')
           end
+        end
+
+        def generate_command_string(commands: [], env: {}, background: false)
+          vars = env&.map { |k, v| "#{k}='#{v}'" }&.join(' ')
+          bg = background ? '&' : ''
+          cmd = commands.lines(chomp: true).join('; ')
+          "#{vars} (#{cmd}) #{bg}".strip
         end
 
         def translate_save_cache(_config)

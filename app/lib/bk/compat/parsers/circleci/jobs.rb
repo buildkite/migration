@@ -16,7 +16,7 @@ module BK
 
       def parse_job(name, config)
         BK::Compat::CommandStep.new(key: name, label: ":circleci: #{name}").tap do |bk_step|
-          config.fetch('steps').each do |circle_step|
+          config['steps'].each do |circle_step|
             bk_step << translate_step(*string_or_key(circle_step))
           end
 
