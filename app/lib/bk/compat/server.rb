@@ -40,41 +40,48 @@ module BK
         # Make sure the request looks legit
         return [400, {}, []] if !req.form_data? || !req.params['file'].is_a?(Hash)
 
-        case req.get_header('HTTP_ACCEPT')
-        when 'application/json'
-          format = BK::Compat::Renderer::Format::JSON
-          content_type = 'application/json'
-        when 'text/yaml', '', '*/*', nil
-          format = BK::Compat::Renderer::Format::YAML
-          content_type = 'text/yaml'
-        else
-          return [406, {}, []]
-        end
+        conf = parse_accept(req.get_header('HTTP_ACCEPT'))
 
-        # Read the file from the request
-        contents = req.params['file'][:tempfile].read
+        return [406, {}, []] if conf.nil?
 
-        # Figure out which parser to use
-        parser_klass = BK::Compat.guess(contents)
+        conf[:contents] = req.params['file'][:tempfile].read
 
-        # Parse it and render it as YAML
-        begin
-          body = parser_klass.new(contents).parse.render(colors: false, format: format)
-          [200, { 'content-type' => content_type }, StringIO.new(body)]
-        rescue BK::Compat::Error::NotSupportedError => e
-          error_message(500, e.message)
-        rescue StandardError
-          error_message(
-            501,
-            'Whoops! You found a bug! ' \
-            'Please email support@buildkite.com about this ' \
+        reply(**conf)
+      end
+
+      def reply(contents:, format:, content_type:)
+        body = BK::Compat.guess(contents).new(contents).parse.render(colors: false, format: format)
+        [200, { 'content-type' => content_type }, StringIO.new(body)]
+      rescue BK::Compat::Error::NotSupportedError => e
+        error_message(500, e.message)
+      rescue StandardError
+        error_message(
+          501,
+          [
+            'Whoops! You found a bug!',
+            'Please email support@buildkite.com about this',
             '(with a copy of the file you are trying to convert if possible).'
-          )
-        end
+          ].join(' ')
+        )
       end
 
       def error_message(code, message)
         [code, { 'content-type' => 'text/plain' }, StringIO.new("👎 #{message}\n")]
+      end
+
+      def parse_accept(accept_header)
+        case accept_header
+        when 'application/json'
+          {
+            format: BK::Compat::Renderer::Format::JSON,
+            content_type: 'application/json'
+          }
+        when 'text/yaml', '', '*/*', nil
+          {
+            format: BK::Compat::Renderer::Format::YAML,
+            content_type: 'text/yaml'
+          }
+        end
       end
     end
   end
