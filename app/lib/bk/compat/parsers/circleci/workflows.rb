@@ -43,20 +43,20 @@ module BK
       end
 
       def logic_builder(key, operator, elements, joiner)
-        elements.map { |spec|
+        elements.map do |spec|
           negator = spec.start_with?('/') ? '~' : '='
           "#{key} #{operator}#{negator} #{spec}"
-        }.join(joiner)
+        end.join(joiner)
       end
 
-      def xxor(first, second, separator='&&')
+      def xxor(first, second, separator = '&&')
         if first.to_s.empty? && second.to_s.empty?
-          return nil
+          nil
         elsif !first.to_s.empty? && !second.to_s.empty?
-          return "(#{first}) #{separator} (#{second})"
+          "(#{first}) #{separator} (#{second})"
         else
           # one of them is empty we don't care which
-          return "#{first}#{second}"
+          "#{first}#{second}"
         end
       end
     end
