@@ -21,7 +21,7 @@ module BK
           bk_step << if config.include?('executor')
                        @executors[config['executor']]
                      else
-                       bk_step << parse_executor(*get_executor(config))
+                       parse_executor(**get_executor(config))
                      end
 
           bk_step.env = config.fetch('environment', {})
