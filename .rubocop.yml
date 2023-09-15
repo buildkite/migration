@@ -10,3 +10,6 @@ Naming/BlockForwarding:
 
 Metrics/MethodLength:
   CountAsOne: [ 'array', 'hash', 'heredoc' ]
+
+Metrics/ParameterLists:
+  CountKeywordArgs: false
