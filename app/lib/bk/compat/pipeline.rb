@@ -24,7 +24,7 @@ module BK
 
       def to_h
         {}.tap do |h|
-          h[:env] = @env.to_h if @env
+          h[:env] = @env.to_h if @env && !@env.empty?
           h[:steps] = steps.map(&:to_h)
         end
       end

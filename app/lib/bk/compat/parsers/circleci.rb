@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
 require_relative '../pipeline'
-require_relative 'circleci/translator'
+require_relative 'circleci/jobs'
 require_relative 'circleci/steps'
+require_relative 'circleci/translator'
+require_relative 'circleci/workflows'
 
 module BK
   module Compat
@@ -21,13 +23,15 @@ module BK
 
       def self.matches?(text)
         keys = YAML.safe_load(text, aliases: true).keys
-        keys.include?('version') && keys.include?('jobs')
+        mandatory_keys = %w[version jobs workflows].freeze
+        keys & mandatory_keys == mandatory_keys
       end
 
       def initialize(text, options = {})
         @config = YAML.safe_load(text, aliases: true)
         @now = Time.now
         @options = options
+        @steps_by_key = {}
 
         builtin_steps = BK::Compat::CircleCISteps::Builtins.new
         register_translator(*builtin_steps.register)
@@ -36,78 +40,25 @@ module BK
       def parse
         bk_pipeline = Pipeline.new
 
-        steps_by_key = @config.fetch('jobs').each_with_object({}) do |(key, job), hash|
-          bk_step = BK::Compat::CommandStep.new(key: key, label: ":circleci: #{key}")
-
-          job.fetch('steps').each do |circle_step|
-            [*transform_circle_step_to_commands(circle_step)].each do |s|
-              bk_step.commands << s if s
-            end
-          end
-
-          # Figure out which executor to use
-          executors = job.slice('docker')
-          if executors.length > 1
-            raise "More than 1 executor found (#{executors.keys.length.inspect})"
-          elsif executors.length == 1
-            executor_name = executors.keys.first
-            executor_config = executors.values.first
-
-            case executor_name
-            when 'docker'
-              setup_docker_executor(bk_step, executor_config)
-            else
-              raise "Unsupported executor #{executor_name}"
-            end
-          end
-
-          hash[key] = bk_step
+        @config.fetch('jobs').each do |key, config|
+          parse_job(key, config)
         end
 
-        if @config.key?('workflows')
-          workflows = @config.fetch('workflows')
-          workflows.delete('version')
+        workflows = @config.fetch('workflows', {})
+        workflows.delete('version')
+        # Turn each work flow into a step group
+        bk_groups = workflows.map { |wf, config| parse_workflow(wf, config) }
 
-          # Turn each work flow into a step group
-          bk_groups = workflows.map do |(workflow_name, workflow_config)|
-            bk_steps = workflow_config.fetch('jobs').map do |j|
-              case j
-              when String
-                steps_by_key.fetch(j)
-              when Hash
-                key = j.keys.first
-                step = steps_by_key.fetch(key).dup
-
-                if (requires = j[key]['requires'])
-                  step.depends_on = [*requires]
-                end
-
-                step
-              else
-                raise "Dunno what #{j.inspect} is"
-              end
-            end
-
-            BK::Compat::GroupStep.new(
-              label: ":circleci: #{workflow_name}",
-              key: workflow_name,
-              steps: bk_steps
-            )
-          end
-
-          # If there ended up being only 1 workflow, skip the group and just
-          # pull the steps out. If there were multiple groups, make sure
-          # they're all part of the pipeline.
-          if bk_groups.length == 1
-            bk_pipeline.steps.concat(bk_groups.first.steps)
-          elsif bk_groups.length > 1
-            bk_pipeline.steps.concat(bk_groups)
-          end
-        else
+        if bk_groups.empty?
           # If no workflow is defined, it's expected that there's a `build` job
-          # defined
-          bk_pipeline.steps << steps_by_key.fetch('build')
+          bk_groups = [@steps_by_key.fetch('build')]
+        elsif bk_groups.length == 1
+          # If there ended up being only 1 workflow, skip the group and just
+          # pull the steps out.
+          bk_groups = bk_groups.first.steps
         end
+
+        bk_pipeline.steps.concat(bk_groups)
 
         bk_pipeline
       end
@@ -283,78 +234,7 @@ module BK
           config = nil
         end
 
-        translate_step(action, config) + transform_circle_step_to_commands_old(circle_step)
-      end
-
-      def transform_circle_step_to_commands_old(circle_step)
-        if circle_step.is_a?(Hash)
-          action = circle_step.keys.first
-          config = circle_step[action]
-
-          case action
-          when 'run'
-            if config.is_a?(Hash)
-              env_prefix = []
-              if (env = config['environment'])
-                env.each do |(key, value)|
-                  env_prefix << "#{key}=#{value.inspect}"
-                end
-              end
-
-              command = if env_prefix.any?
-                          "#{env_prefix.join(' ')} #{config.fetch('command')}"
-                        else
-                          config.fetch('command')
-                        end
-
-              if (name = config['name'])
-                [
-                  "echo #{"--- #{name}".inspect}",
-                  command
-                ]
-              else
-                [
-                  "echo '--- :circleci: run'",
-                  command
-                ]
-              end
-            else
-              [
-                "echo '--- :circleci: run'",
-                config
-              ]
-            end
-          when 'persist_to_workspace'
-            [*config.fetch('paths')].map do |path|
-              [
-                "echo '~~~ :circleci: persist_to_workspace (path: #{path.inspect})'",
-                'workspace_dir=$$(mktemp -d)',
-                'sudo chown -R circleci:circleci $$workspace_dir',
-                'mkdir $$workspace_dir/.workspace',
-                'cp -R . $$workspace_dir/.workspace',
-                'cd $$workspace_dir',
-                "buildkite-agent artifact upload #{".workspace/#{path}".inspect}",
-                'cd -'
-              ]
-            end.flatten
-          when 'attach_workspace'
-            at = config.fetch('at')
-            [
-              "echo '~~~ :circleci: attach_workspace (at: #{at.inspect})'",
-              'workspace_dir=$$(mktemp -d)',
-              'sudo chown -R circleci:circleci $$workspace_dir',
-              'buildkite-agent artifact download ".workspace/*" $$workspace_dir',
-              'mv $$workspace_dir/.workspace/* .'
-            ].flatten
-          else
-            [
-              "echo '~~~ :circleci: #{action}'",
-              "echo '⚠️ Not support yet'"
-            ]
-          end
-        else
-          ["echo #{circle_step.inspect}"]
-        end
+        translate_step(action, config)
       end
     end
   end
