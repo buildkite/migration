@@ -13,7 +13,7 @@ module BK
           key, config = string_or_key(job)
 
           if config['type'] == 'approval'
-            BK::Compat::BlockStep(key, config)
+            BK::Compat::BlockStep(key, depends_on: config.fetch('requires', []))
           else
             process_job(key, config)
           end
