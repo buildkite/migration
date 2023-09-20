@@ -15,6 +15,27 @@ module BK
       end
     end
 
+    # simple block step
+    class BlockStep
+      attr_accessor :depends_on, :key
+
+      def initialize(key:, depends_on: [])
+        @key = key
+        @depends_on = depends_on
+      end
+
+      def <<(_obj)
+        raise 'Can not add to a block step'
+      end
+
+      def to_h
+        {
+          key: @key,
+          depends_on: @depends_on
+        }
+      end
+    end
+
     # basic command step
     class CommandStep
       attr_accessor :agents, :conditional, :depends_on, :key, :label, :plugins, :soft_fail

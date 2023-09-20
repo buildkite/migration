@@ -12,7 +12,11 @@ module BK
         bk_steps = wf_config.fetch('jobs').map do |job|
           key, config = string_or_key(job)
 
-          process_job(key, config)
+          if config['type'] == 'approval'
+            BK::Compat::BlockStep(key, config)
+          else
+            process_job(key, config)
+          end
         end
 
         BK::Compat::GroupStep.new(
