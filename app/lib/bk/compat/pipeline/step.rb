@@ -42,6 +42,10 @@ module BK
         @commands.concat(values.flatten)
       end
 
+      def prepend_commands(*values)
+        @commands.prepend(values.flatten)
+      end
+
       def env=(value)
         @env = if value.is_a?(BK::Compat::Environment)
                  value
