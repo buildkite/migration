@@ -35,7 +35,7 @@ module BK
 
       def parse_command(name, config)
         BK::Compat::CommandStep.new(key: name).tap do |bk_step|
-          bk_step << translate_steps(config['steps'])
+          translate_steps(config['steps']).each { |step| bk_step << step }
           bk_step.parameters = config.fetch('parameters', {})
         end
       end
