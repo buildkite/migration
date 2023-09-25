@@ -27,9 +27,9 @@ module BK
       end
 
       def process_job(key, config)
-        @steps_by_key.fetch(key).dup.tap do |step|
-          step.prepend_commands(parse_steps(config['pre-steps']))
-          step.add_commands(parse_steps(config['post-steps']))
+        @commands_by_key[key].instantiate(config.fetch('parameters', {})).tap do |step|
+          step >> translate_steps(config['pre-steps'])
+          step << translate_steps(config['post-steps'])
           step.depends_on = config.fetch('requires', [])
 
           # rename step (to respect dependencies and avoid clashes)
