@@ -86,7 +86,7 @@ module BK
       def to_h
         instance_attributes.tap do |h|
           # rename conditional to if (a reserved word as an attribute or instance variable is complicated)
-          h[:if] = h.delete('conditional')
+          h[:if] = h.delete(:conditional)
           h.delete('parameters')
 
           # special handling

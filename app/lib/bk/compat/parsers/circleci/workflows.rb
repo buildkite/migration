@@ -16,7 +16,7 @@ module BK
           label: ":circleci: #{wf_name}",
           key: wf_name,
           steps: bk_steps,
-          condition: condition
+          conditional: condition
         )
       end
 
