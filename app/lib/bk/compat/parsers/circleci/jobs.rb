@@ -10,7 +10,7 @@ module BK
         bk_step = BK::Compat::CommandStep.new(key: key, label: ":circleci: #{key}")
 
         config.fetch('steps').each do |circle_step|
-          bk_step << transform_circle_step_to_commands(circle_step)
+          bk_step << translate_step(*string_or_key(circle_step))
         end
 
         setup_docker_executor(bk_step, config.fetch('docker', []))

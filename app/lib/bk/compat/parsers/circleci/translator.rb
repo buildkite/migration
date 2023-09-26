@@ -27,7 +27,7 @@ module BK
       def generic_matcher?(matcher, step_key)
         case matcher
         when Regexp
-          key.to_s.match(matcher)
+          matcher.match?(step_key)
         when Array
           matcher.include?(step_key)
         when Proc, Method

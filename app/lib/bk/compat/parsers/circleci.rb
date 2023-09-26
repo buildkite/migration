@@ -2,8 +2,10 @@
 
 require_relative '../pipeline'
 require_relative 'circleci/jobs'
+require_relative 'circleci/orbs'
 require_relative 'circleci/steps'
 require_relative 'circleci/translator'
+require_relative 'circleci/util'
 require_relative 'circleci/workflows'
 
 module BK
@@ -40,9 +42,8 @@ module BK
       def parse
         bk_pipeline = Pipeline.new
 
-        @config.fetch('jobs').each do |key, config|
-          parse_job(key, config)
-        end
+        @config.fetch('orbs', {}).map { |key, config| parse_orb(key, config) }
+        @config.fetch('jobs', {}).map { |key, config| parse_job(key, config) }
 
         workflows = @config.fetch('workflows', {})
         workflows.delete('version')
@@ -222,19 +223,6 @@ module BK
             }
           )
         end
-      end
-
-      def transform_circle_step_to_commands(circle_step)
-        if circle_step.is_a?(Hash)
-          # TODO: make sure that a step is a single-key action
-          action = circle_step.keys.first
-          config = circle_step[action]
-        else
-          action = circle_step
-          config = nil
-        end
-
-        translate_step(action, config)
       end
     end
   end
