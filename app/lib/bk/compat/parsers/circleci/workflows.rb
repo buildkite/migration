@@ -43,7 +43,7 @@ module BK
       end
 
       def process_job(key, config)
-        @commands_by_key[key].instantiate(config.fetch('parameters', {})).tap do |step|
+        @commands_by_key[key].instantiate(config).tap do |step|
           step >> translate_steps(config['pre-steps'])
           step << translate_steps(config['post-steps'])
           step.depends_on = config.fetch('requires', [])

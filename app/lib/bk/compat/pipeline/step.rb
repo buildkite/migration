@@ -158,7 +158,8 @@ module BK
         case value
         when String
           @parameters.each_with_object(value.dup) do |(name, param), str|
-            str.sub!(/<<\s*parameters\.#{name}\s*>>/, config.fetch(name, param.fetch('default')))
+            value = config.fetch(name, param.fetch('default', nil))
+            str.sub!(/<<\s*parameters\.#{name}\s*>>/, value)
           end
         when Hash
           value.transform_values! { |elem| replace_parameters(elem, config) }
