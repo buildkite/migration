@@ -25,9 +25,15 @@ module BK
 
       def self.matches?(text)
         # sorting is important
-        keys = YAML.safe_load(text, aliases: true).keys.sort
+        config = YAML.safe_load(text, aliases: true)
         mandatory_keys = %w[jobs version workflows].freeze
-        keys & mandatory_keys == mandatory_keys
+
+        if mandatory_keys & config.keys == mandatory_keys
+          true
+        else
+          # legacy format support
+          config.fetch('version', 2.1) == 2 && config['jobs'].include?('build')
+        end
       end
 
       def initialize(text, options = {})
@@ -69,7 +75,7 @@ module BK
 
         # If there ended up being only 1 workflow, skip the group and just
         # pull the steps out.
-        groups = groups.first.steps if groups.length == 1
+        groups = groups.first.steps.each { |step| step.conditional = groups.first.conditional } if groups.length == 1
 
         groups
       end
