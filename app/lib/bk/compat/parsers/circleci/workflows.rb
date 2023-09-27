@@ -25,7 +25,7 @@ module BK
         key, config = string_or_key(job)
 
         if config['type'] == 'approval'
-          BK::Compat::BlockStep(key, depends_on: config.fetch('requires', []))
+          BK::Compat::BlockStep.new(key: key, depends_on: config.fetch('requires', []))
         else
           process_job(key, config)
         end
