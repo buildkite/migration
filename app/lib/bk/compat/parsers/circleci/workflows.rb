@@ -39,7 +39,7 @@ module BK
         key = config.keys.first
 
         tree = key == 'unless' ? { 'not' => config[key] } : config[key]
-        parse_condition(tree)
+        BK::Compat::CircleCI.parse_condition(tree)
       end
 
       def process_job(key, config)
@@ -55,8 +55,8 @@ module BK
       end
 
       def parse_filters(config)
-        branches = build_condition(config.fetch('branches', {}), 'build.branch')
-        tags = build_condition(config.fetch('tags', {}), 'build.tag')
+        branches = BK::Compat::CircleCI.build_condition(config.fetch('branches', {}), 'build.branch')
+        tags = BK::Compat::CircleCI.build_condition(config.fetch('tags', {}), 'build.tag')
 
         BK::Compat.xxand(branches, tags)
       end
