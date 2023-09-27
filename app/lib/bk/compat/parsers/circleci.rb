@@ -24,8 +24,9 @@ module BK
       end
 
       def self.matches?(text)
-        keys = YAML.safe_load(text, aliases: true).keys
-        mandatory_keys = %w[version jobs workflows].freeze
+        # sorting is important
+        keys = YAML.safe_load(text, aliases: true).keys.sort
+        mandatory_keys = %w[jobs version workflows].freeze
         keys & mandatory_keys == mandatory_keys
       end
 
