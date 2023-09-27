@@ -10,14 +10,14 @@ module BK
         req = Rack::Request.new(env)
 
         # We have only one url at the moment
-        return [404, {}, []] if req.path != '/'
+        return error_message('Not found', code: 404) if req.path != '/'
 
         if req.get?
           handle_index(req)
         elsif req.post?
           handle_parse(req)
         else
-          [405, {}, []]
+          error_message('Invalid request', code: 405)
         end
       end
 
@@ -33,16 +33,15 @@ module BK
                  File.read(INDEX_HTML_PATH)
                end
 
-        [200, { 'content-type' => 'text/html' }, StringIO.new(html)]
+        success_message(html, content_type: 'text/html')
       end
 
       def handle_parse(req)
         # Make sure the request looks legit
-        return [400, {}, []] if !req.form_data? || !req.params['file'].is_a?(Hash)
+        return error_message('Invalid request', code: 400) if !req.form_data? || !req.params['file'].is_a?(Hash)
 
         conf = parse_accept(req.get_header('HTTP_ACCEPT'))
-
-        return [406, {}, []] if conf.nil?
+        return conf unless conf.is_a?(Hash)
 
         conf[:contents] = req.params['file'][:tempfile].read
 
@@ -50,13 +49,15 @@ module BK
       end
 
       def reply(contents:, format:, content_type:)
-        body = BK::Compat.guess(contents).new(contents).parse.render(colors: false, format: format)
-        [200, { 'content-type' => content_type }, StringIO.new(body)]
+        parser = BK::Compat.guess(contents)
+        return error_message('Could not identify parser') if parser.nil?
+
+        body = parser.new(contents).parse.render(colors: false, format: format)
+        success_message(body, content_type: content_type)
       rescue BK::Compat::Error::NotSupportedError => e
-        error_message(500, e.message)
+        error_message(e.message, code: 501)
       rescue StandardError
         error_message(
-          501,
           [
             'Whoops! You found a bug!',
             'Please email support@buildkite.com about this',
@@ -65,8 +66,12 @@ module BK
         )
       end
 
-      def error_message(code, message)
-        [code, { 'content-type' => 'text/plain' }, StringIO.new("👎 #{message}\n")]
+      def error_message(message, code: 500)
+        [code, { 'content-type' => 'text/plain' }, StringIO.new("👎 ERROR 👎\n#{message}\n")]
+      end
+
+      def success_message(message, content_type: 'text/plain')
+        [200, { 'content-type' => content_type }, StringIO.new(message)]
       end
 
       def parse_accept(accept_header)
@@ -81,6 +86,8 @@ module BK
             format: BK::Compat::Renderer::Format::YAML,
             content_type: 'text/yaml'
           }
+        else
+          error_message('Invalid request', code: 406) if conf.nil?
         end
       end
     end
