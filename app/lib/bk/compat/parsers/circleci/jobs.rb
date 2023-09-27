@@ -26,7 +26,8 @@ module BK
         parse_command(name, config).tap do |bk_step|
           # TODO: move this logic to executor module
           bk_step << if config.include?('executor')
-                       @executors[config['executor']] || "# #{config['executor']} not supported yet"
+                       exc_name = config['executor'].is_a?(Hash) ? config['executor'].keys.first : config['executor']
+                       @executors[exc_name] || "# executor #{config['executor']} not supported yet"
                      else
                        parse_executor(**get_executor(config))
                      end

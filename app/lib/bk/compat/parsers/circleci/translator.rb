@@ -17,7 +17,7 @@ module BK
                              .map { |translator| translator[:function]&.call(step_key, config, *args) }
                              .flatten
 
-        return [" # #{step_key} not implemented yet :("] if result.empty?
+        return [" # step #{step_key} not implemented yet :("] if result.empty?
 
         result
       end
