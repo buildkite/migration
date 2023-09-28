@@ -1,0 +1,42 @@
+version: 2.1
+
+jobs:
+  orb-executor:
+    executor:
+      name: win/default # executor type
+      size: medium # can be medium, large, xlarge, 2xlarge
+
+    steps:
+      # Commands are run in a Windows virtual machine environment
+      - run: Hello, Orb Executor
+  
+  self-runner:
+    machine: true
+    resource_class: win/default
+    steps:
+      - run: Hello, self runner
+
+  docker:
+    docker:
+      - image: circleci/python:3.6.2
+    steps:
+      - run: Hello from docker
+
+  multi-docker:
+    docker:
+      - image: circleci/python:3.6.2
+      - image: circleci/python:3.9-stretch-browsers
+    steps:
+      - run: Hello from multi-image docker
+
+  OSX:
+    macos:
+      xcode: 14.2.0
+    steps:
+      - run: Hello from OS X
+
+workflows:
+  test:
+    jobs:
+      - build
+      - build2

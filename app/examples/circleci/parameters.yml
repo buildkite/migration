@@ -1,0 +1,26 @@
+version: 2.1
+
+commands:
+  print:
+    parameters:
+      message:
+        type: string
+        default: test
+    steps:
+      - run: echo << parameters.message >>
+
+jobs:
+  daily-message:
+    parameters:
+      message:
+        type: string
+        default: testjob
+    steps:
+      - print:
+          message: Printing << parameters.message >>
+
+workflows:
+  my-workflow:
+    jobs:
+      - daily-message:
+          message: testworkflow

@@ -1,0 +1,20 @@
+version: 2.1
+commands: # a reusable command with parameters
+  greeting:
+    parameters:
+      to:
+        default: "world"
+        type: string
+    steps:
+      - run: echo "Hello <<parameters.to>>"
+jobs:
+  my-job:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - greeting:
+          to: "My-Name"
+workflows:
+  my-workflow:
+    jobs:
+      - my-job
