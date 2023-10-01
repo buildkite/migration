@@ -177,8 +177,8 @@ module BK
               duped_bk_step.label = "#{duped_bk_step.label} (#{this_env})"
 
               env = BK::Compat::Environment.new('')
-              env.merge(this_env)
-              env.merge(bk_step.env)
+              env.merge!(this_env)
+              env.merge!(bk_step.env)
               duped_bk_step.env = env
 
               bk_pipeline.steps << duped_bk_step

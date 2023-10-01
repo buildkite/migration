@@ -8,13 +8,27 @@ module BK
       require 'optparse'
 
       def self.parse_options
-        options = {
-          runner: 'ELASTIC_CI'
-        }
+        options = { runner: 'ELASTIC_CI' }
 
+        option_parser = cli_parser
+        option_parser.parse!(into: options)
+
+        # treat rest of parameters as files (or stdin if none)
+        options[:text] = ARGF.read
+
+        if options[:text].empty?
+          warn 'ERROR: Missing file or input'
+          warn option_parser
+          exit 1
+        end
+
+        options
+      end
+
+      def self.cli_parser
         parsers = BK::Compat::PARSERS.to_h { |v| [v.option, v] }
 
-        option_parser = OptionParser.new do |opts|
+        OptionParser.new do |opts|
           opts.program_name = 'buildkite-compat'
           opts.version = BK::Compat::VERSION
           opts.banner = <<~BANNER
@@ -30,19 +44,6 @@ module BK
           opts.on('-r RUNNNER', '--runner', 'Which runner to target, ELASTIC_CI or ON_DEMAND')
           opts.on('-p PARSER', '--parser', parsers, "Parser for original pipeline (#{parsers.keys.join(', ')})")
         end
-
-        option_parser.parse!(into: options)
-
-        # treat rest of parameters as files (or stdin if none)
-        options[:text] = ARGF.read
-
-        if options[:text].empty?
-          warn 'ERROR: Missing file or input'
-          warn option_parser
-          exit 1
-        end
-
-        options
       end
 
       def self.run

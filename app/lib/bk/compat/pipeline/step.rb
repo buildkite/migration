@@ -18,17 +18,19 @@ module BK
       attr_accessor :label, :key, :agents, :plugins, :depends_on, :soft_fail, :conditional
       attr_reader :commands, :env # we define special writers
 
-      def initialize(label: nil, key: nil, agents: [], commands: [], plugins: [], depends_on: nil, soft_fail: nil,
-                     env: nil, conditional: nil)
-        self.label = label
+      def initialize(label: nil, key: nil, agents: {}, commands: [], plugins: [], depends_on: [], soft_fail: nil,
+                     env: {}, conditional: nil)
+        @label = label
+        @agents = agents
+        @key = key
+        @plugins = plugins
+        @depends_on = depends_on
+        @soft_fail = soft_fail
+        @conditional = conditional
+
+        # have special setters
         self.commands = commands
-        self.agents = agents
-        self.key = key
-        self.plugins = plugins
-        self.depends_on = depends_on
-        self.soft_fail = soft_fail
         self.env = env
-        self.conditional = conditional
       end
 
       def commands=(value)
@@ -55,24 +57,27 @@ module BK
               h[:commands] = @commands
             end
           end
-          h[:env] = @env.to_h if @env && !@env.empty?
-          h[:depends_on] = @depends_on if @depends_on && !@depends_on.empty?
-          h[:plugins] = @plugins.map(&:to_h) if @plugins && !@plugins.empty?
+          h[:env] = @env.to_h unless @env.empty?
+          h[:depends_on] = @depends_on unless @depends_on.empty?
+          h[:plugins] = @plugins.map(&:to_h) unless @plugins.empty?
           h[:soft_fail] = @soft_fail unless @soft_fail.nil?
           h[:if] = @conditional unless @conditional.nil?
         end
       end
 
       def <<(new_step)
+        raise 'Can not add a wait step to another step' if new_step.is_a?(BK::Compat::WaitStep)
+
         if new_step.is_a?(self.class)
-          env.merge(new_step.env)
+          env.merge!(new_step.env)
+          @agents.merge!(new_step.agents)
           @commands.concat(new_step.commands)
-          @plugins.merge(new_step.plugins)
+          @plugins.concat(new_step.plugins)
 
           # TODO: add soft_fail, depends and ifs
           @depends_on.concat(new_step.commands)
-        elsif new_step.is_a?(BK::Compat::WaitStep)
-          raise 'Can not add a wait step to another step'
+        elsif new_step.is_a?(BK::Compat::Plugin)
+          @plugins << new_step
         else
           @commands.concat(new_step)
         end
