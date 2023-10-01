@@ -1,0 +1,13 @@
+name: GitHub Actions Demo
+
+run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+
+on: [push]
+
+jobs:
+  explore:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - run: echo "The job was automatically triggered"
+      - run: echo "This job is now running on a server hosted by GitHub!"
