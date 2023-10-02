@@ -46,11 +46,11 @@ module BK
 
     # basic command step
     class CommandStep
-      attr_accessor :agents, :conditional, :depends_on, :key, :label, :plugins, :soft_fail
+      attr_accessor :agents, :conditional, :depends_on, :key, :label, :parameters, :plugins, :soft_fail
       attr_reader :commands, :env # we define special writers
 
       LIST_ATTRIBUTES = %w[commands depends_on plugins].freeze
-      HASH_ATTRIBUTES = %w[agents env].freeze
+      HASH_ATTRIBUTES = %w[agents env parameters].freeze
 
       def initialize(**kwargs)
         # nil as default are not acceptable
@@ -61,7 +61,6 @@ module BK
           # set attributes passed through as-is
           send("#{k}=", v)
         end
-
       end
 
       def commands=(value)
@@ -88,11 +87,11 @@ module BK
         instance_attributes.tap do |h|
           # rename conditional to if (a reserved word as an attribute or instance variable is complicated)
           h[:if] = h.delete('conditional')
+          h.delete('parameters')
 
           # special handling
           h[:plugins] = @plugins.map(&:to_h)
           h[:env] = @env&.to_h
-          h[:commands] = @commands.flatten
 
           # remove empty and nil values
           h.delete_if { |_, v| v.nil? || v.empty? }
@@ -146,7 +145,25 @@ module BK
       end
 
       def instantiate(config)
-        dup
+        params = instance_attributes.transform_values { |value| replace_parameters(value, config) }
+        params.delete(:parameters)
+
+        self.class.new(**params)
+      end
+
+      def replace_parameters(value, config)
+        return value if @parameters.empty?
+
+        case value
+        when String
+          @parameters.each_with_object(value.dup) do |(name, param), str|
+            str.sub!(/<<\s*parameters\.#{name}\s*>>/, config.fetch(name, param.fetch('default')))
+          end
+        when Hash
+          value.transform_values! { |elem| replace_parameters(elem, config) }
+        when Array
+          value.map! { |elem| replace_parameters(elem, config) }
+        end
       end
     end
 
