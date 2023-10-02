@@ -30,20 +30,51 @@ module BK
       def parse
         bk_pipeline = Pipeline.new
 
-        # Parse out name, run name
-        jobs = @config.fetch('jobs')['explore']['steps'].each do |step|
+        # Load elements
+        load_elements
+        puts("Jobs: #{@jobs}")
+
+        # Loop through all jobs defined
+        @jobs.each do |job|
+
+          # Extract the Job's name
+          job_name = job[0]
+          job_list = []
+          job_needs = @jobs[job_name]['needs']
+
+          # Put info to console
+          puts("Job name: #{job_name}")
+          puts("Steps: #{@jobs[job_name]['steps']}")
+          puts("Job needs: #{job_needs}")
           
-          bk_step = BK::Compat::CommandStep.new(
-            label: step['name'],
-            commands: step['run']
+          # For each job, extract the name/run
+          @jobs[job_name]['steps'].each do |step|
+            bk_step = BK::Compat::CommandStep.new(
+              label: step['name'],
+              commands: step['run']
+            )
+            job_list.append(bk_step)
+
+          end 
+
+          # Create a Group Step
+          steps = BK::Compat::GroupStep.new(
+            label: ":github:: #{job_name}",
+            key: job_name,
+            steps: job_list,
+            depends_on: job_needs
           )
 
-          # Insert to pipeline
-          bk_pipeline.steps << bk_step        
+          ## Insert Group into pipeline
+          bk_pipeline.steps << steps
         end
 
         # Render the pipeline 
         bk_pipeline
+      end
+
+      def load_elements
+        @jobs = @config.fetch('jobs')
       end
 
     end
