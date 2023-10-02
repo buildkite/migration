@@ -1,0 +1,18 @@
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - run: ./setup_server.sh
+  build:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - run: ./build_server.sh
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test server
+        run: ./test_server.sh
+      - name: Validate
+        run: ./validate.sh
