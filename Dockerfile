@@ -1,5 +1,7 @@
 FROM ruby:3.2
 
+ENV RACK_ENV=production
+
 WORKDIR /app
 COPY app/Gemfile* ./
 RUN bundle install

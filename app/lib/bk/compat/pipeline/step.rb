@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative '../environment'
+
 module BK
   module Compat
     # simple waiting step
@@ -15,26 +17,29 @@ module BK
 
     # basic command step
     class CommandStep
-      attr_accessor :label, :key, :agents, :plugins, :depends_on, :soft_fail, :conditional
+      attr_accessor :agents, :conditional, :depends_on, :key, :label, :plugins, :soft_fail
       attr_reader :commands, :env # we define special writers
 
-      def initialize(label: nil, key: nil, agents: {}, commands: [], plugins: [], depends_on: [], soft_fail: nil,
-                     env: {}, conditional: nil)
-        @label = label
-        @agents = agents
-        @key = key
-        @plugins = plugins
-        @depends_on = depends_on
-        @soft_fail = soft_fail
-        @conditional = conditional
+      LIST_ATTRIBUTES = %w[commands depends_on plugins].freeze
+      HASH_ATTRIBUTES = %w[agents env].freeze
 
-        # have special setters
-        self.commands = commands
-        self.env = env
+      def initialize(**kwargs)
+        kwargs.map do |k, v|
+          # set attributes passed through as-is
+          send("#{k}=", v)
+        end
+
+        # nil as default are not acceptable
+        LIST_ATTRIBUTES.each { |k| send("#{k}=", []) unless kwargs.include?(k) }
+        HASH_ATTRIBUTES.each { |k| send("#{k}=", {}) unless kwargs.include?(k) }
       end
 
       def commands=(value)
         @commands = [*value].flatten
+      end
+
+      def add_commands(*values)
+        @commands.concat(values.flatten)
       end
 
       def env=(value)
@@ -46,41 +51,46 @@ module BK
       end
 
       def to_h
-        {}.tap do |h|
-          h[:key] = @key if @key
-          h[:label] = @label if @label
-          h[:agents] = @agents unless @agents.empty?
-          if @commands.is_a?(Array)
-            if @commands.length == 1
-              h[:command] = @commands.first
-            elsif @commands.length > 1
-              h[:commands] = @commands
-            end
-          end
-          h[:env] = @env.to_h unless @env.empty?
-          h[:depends_on] = @depends_on unless @depends_on.empty?
-          h[:plugins] = @plugins.map(&:to_h) unless @plugins.empty?
-          h[:soft_fail] = @soft_fail unless @soft_fail.nil?
-          h[:if] = @conditional unless @conditional.nil?
+        instance_attributes.tap do |h|
+          # rename conditional to if (a reserved word as an attribute or instance variable is complicated)
+          h[:if] = h.delete('conditional')
+
+          # special handling
+          h[:plugins] = @plugins.map(&:to_h)
+          h[:env] = @env&.to_h
+          h[:commands] = @commands.flatten
+
+          # remove empty and nil values
+          h.delete_if { |_, v| v.nil? || v.empty? }
         end
       end
 
       def <<(new_step)
-        raise 'Can not add a wait step to another step' if new_step.is_a?(BK::Compat::WaitStep)
-
-        if new_step.is_a?(self.class)
-          env.merge!(new_step.env)
-          @agents.merge!(new_step.agents)
-          @commands.concat(new_step.commands)
-          @plugins.concat(new_step.plugins)
-
-          # TODO: add soft_fail, depends and ifs
-          @depends_on.concat(new_step.commands)
-        elsif new_step.is_a?(BK::Compat::Plugin)
+        case new_step
+        when BK::Compat::WaitStep
+          raise 'Can not add a wait step to another step'
+        when self.class
+          merge!(new_step)
+        when BK::Compat::Plugin
           @plugins << new_step
         else
-          @commands.concat(new_step)
+          add_commands(new_step) unless new_step.nil?
         end
+      end
+
+      def merge!(new_step)
+        LIST_ATTRIBUTES.each { |a| send(a).concat(new_step.send(a)) }
+        HASH_ATTRIBUTES.each { |a| send(a).merge!(new_step.send(a)) }
+
+        @conditional = BK::Compat.xxand(conditional, new_step.conditional)
+
+        # TODO: these could be a hash with exit codes
+        @soft_fail = soft_fail || new_step.soft_fail
+      end
+
+      def instance_attributes
+        # helper method to get all instance attributes as a dictionary
+        instance_variables.to_h { |v| [v.to_s.delete_prefix('@').to_sym, instance_variable_get(v)] }
       end
     end
 

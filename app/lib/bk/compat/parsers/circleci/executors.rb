@@ -9,10 +9,7 @@ module BK
       def load_executor(name, config)
         raise 'Duplicate executor name' if @executors.include?(name)
 
-        type, ex_conf = get_executor(config)
-        raise "Invalid executor configuration #{config}" if key.nil?
-
-        @executors[name] = parse_executor(type, config, ex_conf)
+        @executors[name] = parse_executor(**get_executor(config))
       end
 
       def get_executor(config)
@@ -20,21 +17,27 @@ module BK
 
         # only one of these must exist
         key = existing.length == 1 ? existing.keys.first : nil
-        # Hash[nil] == nil :)
-        [key, config[key]]
+
+        # standardize configuration
+        elems = %w[environment resource_class shell working_directory]
+        config.slice(*elems).tap do |cfg|
+          cfg.transform_keys!(&:to_sym)
+          cfg[:type] = key
+          cfg[:conf] = config[key]
+        end
       end
 
-      def parse_executor(type, config, exc_conf)
-        BK::Compat::CommandStep.new(key: "Executor #{type}").tap do |step|
-          step.env = config.fetch('environment', {})
-          step.commands.concat(
-            [
-              config.include?('working_directory') ? "cd #{config['working_directory']}" : nil,
-              config.include?('shell') ? '# shell should be configured in the agent' : nil
-            ].compact
-          )
-          step.agents.merge(config.slice('resource_class'))
-          step << send("executor_#{type}", exc_conf)
+      def parse_executor(type: nil, conf: {}, working_directory: nil, shell: nil, resource_class: nil, environment: {})
+        raise 'Invalid executor configuration' if type.nil?
+
+        BK::Compat::CommandStep.new(
+          key: "Executor #{type}",
+          env: environment
+        ).tap do |step|
+          step.agents.merge!({ 'resource_class' => resource_class }) unless resource_class.nil?
+          step.add_commands("cd #{working_directory}") unless working_directory.nil?
+          step.add_commands('# shell should be configured in the agent') unless shell.nil?
+          step << send("executor_#{type}", conf)
         end
       end
 
@@ -67,7 +70,7 @@ module BK
       def executor_docker_aws_auth(config)
         BK::Compat::CommandStep.new.tap do |step|
           if config.include?('aws_access_key_id')
-            step.commands << '# Configure the agent to have the appropriate credentials for ECR auth'
+            step.add_commands('# Configure the agent to have the appropriate credentials for ECR auth')
           end
 
           url_regex = '^(?:[^/]+//)?(\d+).dkr.ecr.([^.]+).amazonaws.com'
@@ -99,7 +102,7 @@ module BK
           step.agents['executor_type'] = 'machine'
           step.agents['executor_image'] = config['image']
           if config.include?('docker_layer_caching')
-            step.commands << '# Docker Layer Caching should be configured in the agent'
+            step.add_commands('# Docker Layer Caching should be configured in the agent')
           end
         end
       end

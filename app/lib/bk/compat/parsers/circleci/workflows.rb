@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative 'util'
-
 module BK
   module Compat
     # CircleCI translation of workflows
@@ -32,14 +30,14 @@ module BK
         branches = build_condition(config.fetch('branches', {}), 'build.branch')
         tags = build_condition(config.fetch('tags', {}), 'build.tag')
 
-        xxor(branches, tags)
+        BK::Compat.xxand(branches, tags)
       end
 
       def build_condition(filters, key)
         only = logic_builder(key, '=', string_or_list(filters.fetch('only', [])), ' || ')
         ignore = logic_builder(key, '!', string_or_list(filters.fetch('ignore', [])), ' && ')
 
-        xxor(only, ignore)
+        BK::Compat.xxand(only, ignore)
       end
 
       def logic_builder(key, operator, elements, joiner)
@@ -49,15 +47,8 @@ module BK
         end.join(joiner)
       end
 
-      def xxor(first, second, separator = '&&')
-        if first.to_s.empty? && second.to_s.empty?
-          nil
-        elsif !first.to_s.empty? && !second.to_s.empty?
-          "(#{first}) #{separator} (#{second})"
-        else
-          # one of them is empty we don't care which
-          "#{first}#{second}"
-        end
+      def string_or_list(object)
+        object.is_a?(String) ? [object] : object
       end
     end
   end

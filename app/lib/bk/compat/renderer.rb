@@ -9,34 +9,58 @@ module BK
       require 'yaml'
 
       module Format
+        # whatever is here needs to define the corresponding
+        # text_X and lexer_x methods
         YAML = :yaml
         JSON = :json
       end
 
       def initialize(structure)
         @structure = structure
+        @rouge = Rouge::Formatters::Terminal256.new(Rouge::Themes::Base16.new)
       end
 
       def render(colors: $stdout.tty?, format: Format::YAML)
-        case format
-        when Format::YAML
-          text = JSON.parse(@structure.to_json).to_yaml
-          lexer = Rouge::Lexers::YAML.new
-        when Format::JSON
-          # Add a new line so it outputs nicely in terminals
-          text = JSON.pretty_generate(@structure)
-          text += "\n"
-          lexer = Rouge::Lexers::JSON.new
-        else
-          raise ArgumentError, "Unknown format `#{format.inspect}`"
-        end
+        text = send("text_#{format}")
 
         if colors
-          formatter = Rouge::Formatters::Terminal256.new(Rouge::Themes::Base16.new)
-          formatter.format(lexer.lex(text))
+          lexer = send("lexer_#{format}")
+          @rouge.format(lexer.lex(text))
         else
           text
         end
+      rescue NoMethodError
+        raise ArgumentError, "Unknown format `#{format.inspect}`"
+      end
+
+      private
+
+      def lexer_json
+        Rouge::Lexers::JSON.new
+      end
+
+      def lexer_yaml
+        Rouge::Lexers::YAML.new
+      end
+
+      # prevent leading colon in YAML keys (see https://github.com/ruby/psych/issues/396)
+      class SymbolToStringYamlTreeVisitor < Psych::Visitors::YAMLTree
+        def visit_symbol(sym)
+          visit_String(sym.to_s)
+        end
+
+        # to prevent a rubocop warning
+        alias visit_Symbol visit_symbol
+      end
+
+      def text_yaml
+        visitor = SymbolToStringYamlTreeVisitor.create
+        visitor << @structure
+        visitor.tree.yaml
+      end
+
+      def text_json
+        JSON.pretty_generate(@structure)
       end
     end
   end
