@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative '../environment'
+
 module BK
   module Compat
     # simple waiting step
@@ -11,30 +13,66 @@ module BK
       def <<(_obj)
         raise 'Can not add to a wait step'
       end
+
+      def instantiate
+        dup
+      end
+    end
+
+    # simple block step
+    class BlockStep
+      attr_accessor :depends_on, :key
+
+      def initialize(key:, depends_on: [])
+        @key = key
+        @depends_on = depends_on
+      end
+
+      def <<(_obj)
+        raise 'Can not add to a block step'
+      end
+
+      def to_h
+        {
+          key: @key,
+          depends_on: @depends_on
+        }
+      end
+
+      def instantiate
+        dup
+      end
     end
 
     # basic command step
     class CommandStep
-      attr_accessor :label, :key, :agents, :plugins, :depends_on, :soft_fail, :conditional
+      attr_accessor :agents, :conditional, :depends_on, :key, :label, :parameters, :plugins, :soft_fail
       attr_reader :commands, :env # we define special writers
 
-      def initialize(label: nil, key: nil, agents: {}, commands: [], plugins: [], depends_on: [], soft_fail: nil,
-                     env: {}, conditional: nil)
-        @label = label
-        @agents = agents
-        @key = key
-        @plugins = plugins
-        @depends_on = depends_on
-        @soft_fail = soft_fail
-        @conditional = conditional
+      LIST_ATTRIBUTES = %w[commands depends_on plugins].freeze
+      HASH_ATTRIBUTES = %w[agents env parameters].freeze
 
-        # have special setters
-        self.commands = commands
-        self.env = env
+      def initialize(**kwargs)
+        # nil as default are not acceptable
+        LIST_ATTRIBUTES.each { |k| send("#{k}=", []) }
+        HASH_ATTRIBUTES.each { |k| send("#{k}=", {}) }
+
+        kwargs.map do |k, v|
+          # set attributes passed through as-is
+          send("#{k}=", v)
+        end
       end
 
       def commands=(value)
         @commands = [*value].flatten
+      end
+
+      def add_commands(*values)
+        @commands.concat(values.flatten)
+      end
+
+      def prepend_commands(*values)
+        @commands.prepend(*values.flatten)
       end
 
       def env=(value)
@@ -46,40 +84,85 @@ module BK
       end
 
       def to_h
-        {}.tap do |h|
-          h[:key] = @key if @key
-          h[:label] = @label if @label
-          h[:agents] = @agents unless @agents.empty?
-          if @commands.is_a?(Array)
-            if @commands.length == 1
-              h[:command] = @commands.first
-            elsif @commands.length > 1
-              h[:commands] = @commands
-            end
-          end
-          h[:env] = @env.to_h unless @env.empty?
-          h[:depends_on] = @depends_on unless @depends_on.empty?
-          h[:plugins] = @plugins.map(&:to_h) unless @plugins.empty?
-          h[:soft_fail] = @soft_fail unless @soft_fail.nil?
-          h[:if] = @conditional unless @conditional.nil?
+        instance_attributes.tap do |h|
+          # rename conditional to if (a reserved word as an attribute or instance variable is complicated)
+          h[:if] = h.delete('conditional')
+          h.delete('parameters')
+
+          # special handling
+          h[:plugins] = @plugins.map(&:to_h)
+          h[:env] = @env&.to_h
+
+          # remove empty and nil values
+          h.delete_if { |_, v| v.nil? || v.empty? }
         end
       end
 
-      def <<(new_step)
-        raise 'Can not add a wait step to another step' if new_step.is_a?(BK::Compat::WaitStep)
-
-        if new_step.is_a?(self.class)
-          env.merge!(new_step.env)
-          @agents.merge!(new_step.agents)
-          @commands.concat(new_step.commands)
-          @plugins.concat(new_step.plugins)
-
-          # TODO: add soft_fail, depends and ifs
-          @depends_on.concat(new_step.commands)
-        elsif new_step.is_a?(BK::Compat::Plugin)
-          @plugins << new_step
+      # add/merge step
+      def <<(other)
+        case other
+        when BK::Compat::WaitStep
+          raise 'Can not add a wait step to another step'
+        when self.class
+          merge!(other)
+        when BK::Compat::Plugin
+          @plugins << other
         else
-          @commands.concat(new_step)
+          add_commands(*other) unless other.nil?
+        end
+      end
+
+      # prepend/merge steps
+      def >>(other)
+        case other
+        when BK::Compat::WaitStep
+          raise 'Can not add a wait step to another step'
+        when self.class
+          other.merge!(self).tap do |step|
+            step.key = key
+            step.label = label
+          end
+        when BK::Compat::Plugin
+          @plugins.prepend(other)
+        else
+          prepend_commands(*other) unless other.nil?
+        end
+      end
+
+      def merge!(new_step)
+        LIST_ATTRIBUTES.each { |a| send(a).concat(new_step.send(a)) }
+        HASH_ATTRIBUTES.each { |a| send(a).merge!(new_step.send(a)) }
+
+        @conditional = BK::Compat.xxand(conditional, new_step.conditional)
+
+        # TODO: these could be a hash with exit codes
+        @soft_fail = soft_fail || new_step.soft_fail
+      end
+
+      def instance_attributes
+        # helper method to get all instance attributes as a dictionary
+        instance_variables.to_h { |v| [v.to_s.delete_prefix('@').to_sym, instance_variable_get(v)] }
+      end
+
+      def instantiate(config)
+        params = instance_attributes.transform_values { |value| replace_parameters(value, config) }
+        params.delete(:parameters)
+
+        self.class.new(**params)
+      end
+
+      def replace_parameters(value, config)
+        return value if @parameters.empty?
+
+        case value
+        when String
+          @parameters.each_with_object(value.dup) do |(name, param), str|
+            str.sub!(/<<\s*parameters\.#{name}\s*>>/, config.fetch(name, param.fetch('default')))
+          end
+        when Hash
+          value.transform_values! { |elem| replace_parameters(elem, config) }
+        when Array
+          value.map! { |elem| replace_parameters(elem, config) }
         end
       end
     end

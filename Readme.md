@@ -52,7 +52,7 @@ Buildkite Compat can also be used via a HTTP API using `rackup` from the `app` f
 
 Note that if you are using the docker image you will have to override the entrypoint:
 ```shell
-$ docker run --rm -ti -p 9292 --entrypoint '' --workdir /app $IMAGE:$TAG rackup --port 9292
+$ docker run --rm -ti -p 9292:9292 --entrypoint '' --workdir /app $IMAGE:$TAG rackup --port 9292
 ```
 
 After that you should be able to access a very simple web interface at http://localhost:9292 
