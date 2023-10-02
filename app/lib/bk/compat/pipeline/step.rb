@@ -13,6 +13,35 @@ module BK
       def <<(_obj)
         raise 'Can not add to a wait step'
       end
+
+      def instantiate
+        dup
+      end
+    end
+
+    # simple block step
+    class BlockStep
+      attr_accessor :depends_on, :key
+
+      def initialize(key:, depends_on: [])
+        @key = key
+        @depends_on = depends_on
+      end
+
+      def <<(_obj)
+        raise 'Can not add to a block step'
+      end
+
+      def to_h
+        {
+          key: @key,
+          depends_on: @depends_on
+        }
+      end
+
+      def instantiate
+        dup
+      end
     end
 
     # basic command step
@@ -24,14 +53,15 @@ module BK
       HASH_ATTRIBUTES = %w[agents env].freeze
 
       def initialize(**kwargs)
+        # nil as default are not acceptable
+        LIST_ATTRIBUTES.each { |k| send("#{k}=", []) }
+        HASH_ATTRIBUTES.each { |k| send("#{k}=", {}) }
+
         kwargs.map do |k, v|
           # set attributes passed through as-is
           send("#{k}=", v)
         end
 
-        # nil as default are not acceptable
-        LIST_ATTRIBUTES.each { |k| send("#{k}=", []) unless kwargs.include?(k) }
-        HASH_ATTRIBUTES.each { |k| send("#{k}=", {}) unless kwargs.include?(k) }
       end
 
       def commands=(value)
@@ -40,6 +70,10 @@ module BK
 
       def add_commands(*values)
         @commands.concat(values.flatten)
+      end
+
+      def prepend_commands(*values)
+        @commands.prepend(*values.flatten)
       end
 
       def env=(value)
@@ -65,16 +99,34 @@ module BK
         end
       end
 
-      def <<(new_step)
-        case new_step
+      # add/merge step
+      def <<(other)
+        case other
         when BK::Compat::WaitStep
           raise 'Can not add a wait step to another step'
         when self.class
-          merge!(new_step)
+          merge!(other)
         when BK::Compat::Plugin
-          @plugins << new_step
+          @plugins << other
         else
-          add_commands(new_step) unless new_step.nil?
+          add_commands(*other) unless other.nil?
+        end
+      end
+
+      # prepend/merge steps
+      def >>(other)
+        case other
+        when BK::Compat::WaitStep
+          raise 'Can not add a wait step to another step'
+        when self.class
+          other.merge!(self).tap do |step|
+            step.key = key
+            step.label = label
+          end
+        when BK::Compat::Plugin
+          @plugins.prepend(other)
+        else
+          prepend_commands(*other) unless other.nil?
         end
       end
 
@@ -91,6 +143,10 @@ module BK
       def instance_attributes
         # helper method to get all instance attributes as a dictionary
         instance_variables.to_h { |v| [v.to_s.delete_prefix('@').to_sym, instance_variable_get(v)] }
+      end
+
+      def instantiate(config)
+        dup
       end
     end
 

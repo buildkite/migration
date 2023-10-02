@@ -16,7 +16,7 @@ module BK
         existing = config.slice('docker', 'machine', 'macos', 'windows')
 
         # only one of these must exist
-        key = existing.length == 1 ? existing.keys.first : nil
+        key = existing.length == 1 ? existing.keys.first : 'default'
 
         # standardize configuration
         elems = %w[environment resource_class shell working_directory]
@@ -118,6 +118,10 @@ module BK
         BK::Compat::CommandStep.new.tap do |step|
           step.agents['executor_type'] = 'windows'
         end
+      end
+
+      def executor_default(_config)
+        []
       end
     end
   end

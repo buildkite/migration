@@ -33,7 +33,7 @@ module BK
         @config = YAML.safe_load(text, aliases: true)
         @now = Time.now
         @options = options
-        @steps_by_key = {}
+        @commands_by_key = {}
         @executors = {}
 
         builtin_steps = BK::Compat::CircleCISteps::Builtins.new
@@ -55,14 +55,16 @@ module BK
       private
 
       def load_elements!
+        # order is important
         @config.fetch('orbs', {}).map { |key, config| load_orb(key, config) }
         @config.fetch('executors', {}).map { |key, config| load_executor(key, config) }
+        @config.fetch('commands', {}).map { |key, config| load_command(key, config) }
         @config.fetch('jobs', {}).map { |key, config| load_job(key, config) }
       end
 
       def simplify_group(groups)
         # If no workflow is defined, it's expected that there's a `build` job
-        groups = [BK::Compat::GroupStep.new(steps: [@steps_by_key.fetch('build')])] if groups.empty?
+        groups = [BK::Compat::GroupStep.new(steps: [@commands_by_key['build'].instantiate({})])] if groups.empty?
 
         # If there ended up being only 1 workflow, skip the group and just
         # pull the steps out.
