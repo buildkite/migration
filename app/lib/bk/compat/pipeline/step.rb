@@ -47,10 +47,10 @@ module BK
 
     # basic command step
     class CommandStep
-      attr_accessor :agents, :conditional, :depends_on, :key, :label, :parameters, :plugins, :soft_fail
+      attr_accessor :agents, :conditional, :depends_on, :key, :label, :parameters, :plugins, :soft_fail, :transformers
       attr_reader :commands, :env # we define special writers
 
-      LIST_ATTRIBUTES = %w[commands depends_on plugins].freeze
+      LIST_ATTRIBUTES = %w[commands depends_on plugins transformers].freeze
       HASH_ATTRIBUTES = %w[agents env parameters].freeze
 
       def initialize(**kwargs)
@@ -89,6 +89,7 @@ module BK
           # rename conditional to if (a reserved word as an attribute or instance variable is complicated)
           h[:if] = h.delete(:conditional)
           h.delete('parameters')
+          h.delete('transformers')
 
           # special handling
           h[:plugins] = @plugins.map(&:to_h)
@@ -146,25 +147,33 @@ module BK
       end
 
       def instantiate(config)
-        params = instance_attributes.transform_values { |value| replace_parameters(value, config) }
+        @transformers << method(:circle_ci_params)
+        params = instance_attributes
+        params.delete(:transformers).each do |func|
+          params.transform_values! { |val| recurse_to_string(val, config, func.to_proc) }
+        end
         params.delete(:parameters)
 
         self.class.new(**params)
       end
 
-      def replace_parameters(value, config)
+      def circle_ci_params(value, config)
+        @parameters.each_with_object(value.dup) do |(name, param), str|
+          val = config.fetch(name, param.fetch('default', nil))
+          str.sub!(/<<\s*parameters\.#{name}\s*>>/, val)
+        end
+      end
+
+      def recurse_to_string(value, config, block)
         return value if @parameters.empty?
 
         case value
         when String
-          @parameters.each_with_object(value.dup) do |(name, param), str|
-            value = config.fetch(name, param.fetch('default', nil))
-            str.sub!(/<<\s*parameters\.#{name}\s*>>/, value)
-          end
+          block.call(value, config)
         when Hash
-          value.transform_values! { |elem| replace_parameters(elem, config) }
+          value.transform_values! { |elem| recurse_to_string(elem, config, block) }
         when Array
-          value.map! { |elem| replace_parameters(elem, config) }
+          value.map! { |elem| recurse_to_string(elem, config, block) }
         end
       end
     end
