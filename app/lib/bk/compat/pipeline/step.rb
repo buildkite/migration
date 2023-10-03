@@ -47,10 +47,10 @@ module BK
 
     # basic command step
     class CommandStep
-      attr_accessor :agents, :conditional, :depends_on, :key, :label, :parameters, :plugins, :soft_fail, :transformers
+      attr_accessor :agents, :conditional, :depends_on, :key, :label, :parameters, :plugins, :soft_fail, :transformer
       attr_reader :commands, :env # we define special writers
 
-      LIST_ATTRIBUTES = %w[commands depends_on plugins transformers].freeze
+      LIST_ATTRIBUTES = %w[commands depends_on plugins].freeze
       HASH_ATTRIBUTES = %w[agents env parameters].freeze
 
       def initialize(**kwargs)
@@ -88,8 +88,8 @@ module BK
         instance_attributes.tap do |h|
           # rename conditional to if (a reserved word as an attribute or instance variable is complicated)
           h[:if] = h.delete(:conditional)
-          h.delete('parameters')
-          h.delete('transformers')
+          h.delete(:parameters)
+          h.delete(:transformer)
 
           # special handling
           h[:plugins] = @plugins.map(&:to_h)
@@ -147,21 +147,12 @@ module BK
       end
 
       def instantiate(config)
-        @transformers << method(:circle_ci_params)
-        params = instance_attributes
-        params.delete(:transformers).each do |func|
-          params.transform_values! { |val| recurse_to_string(val, config, func.to_proc) }
+        unless @transformer.nil?
+          params = instance_attributes.transform_values { |val| recurse_to_string(val, config, @transformer.to_proc) }
         end
         params.delete(:parameters)
 
         self.class.new(**params)
-      end
-
-      def circle_ci_params(value, config)
-        @parameters.each_with_object(value.dup) do |(name, param), str|
-          val = config.fetch(name, param.fetch('default', nil))
-          str.sub!(/<<\s*parameters\.#{name}\s*>>/, val)
-        end
       end
 
       def recurse_to_string(value, config, block)
