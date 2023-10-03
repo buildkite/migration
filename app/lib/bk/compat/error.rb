@@ -4,7 +4,11 @@ module BK
   module Compat
     # unsupported feature
     module Error
-      class NotSupportedError < StandardError; end
+      class CompatError < StandardError; end
+
+      class NotSupportedError < CompatError; end
+
+      class ConfigurationError < CompatError; end
     end
   end
 end
