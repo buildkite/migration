@@ -1,10 +1,17 @@
 # frozen_string_literal: true
 
+require_relative 'logic'
+require_relative '../../pipeline/step'
+
 module BK
   module Compat
     module CircleCISteps
       # Implementation of native step translation
       class Builtins
+        def initialize(recursor: nil)
+          @recursor = recursor # to call back to translate steps further
+        end
+
         def register
           [
             %w[
@@ -75,10 +82,14 @@ module BK
         end
 
         def generate_command_string(commands: [], env: {}, background: false)
-          vars = env&.map { |k, v| "#{k}='#{v}'" }&.join(' ')
+          vars = env.map { |k, v| "#{k}='#{v}'" }
           bg = background ? '&' : ''
-          cmd = commands.lines(chomp: true).join('; ')
-          "#{vars} (#{cmd}) #{bg}".strip
+          [
+            '(',
+            vars.empty? ? nil : vars.join(' '),
+            commands.lines(chomp: true),
+            ") #{bg}".strip
+          ].compact
         end
 
         def translate_save_cache(_config)
@@ -100,9 +111,13 @@ module BK
           ['# `store_test_results` has no direct translation (you should try Test Analytics!)']
         end
 
-        def translate_when(_config)
-          # TODO
-          ['# `when` not implemented yet']
+        def translate_when(config)
+          condition = BK::Compat::CircleCI.parse_condition(config['condition'])
+          commands = @recursor&.call(config['steps'])
+          [
+            '# when condition translation may not be compatible with your shell',
+            "if [ #{condition} ]; then"
+          ] + commands.compact + ['fi']
         end
       end
     end

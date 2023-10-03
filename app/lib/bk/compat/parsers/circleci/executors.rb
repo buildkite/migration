@@ -42,7 +42,7 @@ module BK
       end
 
       def executor_docker(config)
-        raise 'Need to use Docker Compose for this :(' if config.length > 1
+        return 'Need to use Docker Compose for multiple image execution :(' if config.length > 1
 
         # assume we have a single configuration
         config = config[0]
@@ -98,6 +98,7 @@ module BK
       end
 
       def executor_machine(config)
+        config = { 'image' => 'self-hosted' } if config == true
         BK::Compat::CommandStep.new.tap do |step|
           step.agents['executor_type'] = 'machine'
           step.agents['executor_image'] = config['image']

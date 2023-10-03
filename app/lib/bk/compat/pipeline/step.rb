@@ -34,6 +34,7 @@ module BK
 
       def to_h
         {
+          block: @key,
           key: @key,
           depends_on: @depends_on
         }
@@ -86,7 +87,7 @@ module BK
       def to_h
         instance_attributes.tap do |h|
           # rename conditional to if (a reserved word as an attribute or instance variable is complicated)
-          h[:if] = h.delete('conditional')
+          h[:if] = h.delete(:conditional)
           h.delete('parameters')
 
           # special handling
@@ -157,7 +158,8 @@ module BK
         case value
         when String
           @parameters.each_with_object(value.dup) do |(name, param), str|
-            str.sub!(/<<\s*parameters\.#{name}\s*>>/, config.fetch(name, param.fetch('default')))
+            value = config.fetch(name, param.fetch('default', nil))
+            str.sub!(/<<\s*parameters\.#{name}\s*>>/, value)
           end
         when Hash
           value.transform_values! { |elem| replace_parameters(elem, config) }

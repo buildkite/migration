@@ -84,6 +84,9 @@
       textarea[readonly] {
         background: #f9fafb;
       }
+      .error {
+        background: #ff000044 !important;
+      }
     </style>
   </head>
   <body>
@@ -118,7 +121,9 @@
         }).then(function(response) {
           button.disabled = false;
           if (!response.ok) {
-            throw Error(response.statusText);
+            resultsTextarea.classList.add('error')
+          } else {
+            resultsTextarea.classList.remove('error')
           }
           return response;
         }).then(function(response) {
