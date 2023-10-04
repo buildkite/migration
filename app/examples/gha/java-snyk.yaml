@@ -1,0 +1,27 @@
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    env:
+      JAVA_VERSION: '11'
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK ${{env.JAVA_VERSION}}
+      uses: actions/setup-java@v3
+      with:
+        java-version: ${{env.JAVA_VERSION}}
+        distribution: 'temurin'
+        cache: maven
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+    - name: Print name
+      run: echo "Hello $NAME. $BUILD. Using Java Version $JAVA_VERSION"
+      env:
+        BUILD: 'We are currently running the Build job'
