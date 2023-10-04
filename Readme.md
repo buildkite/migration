@@ -3,47 +3,35 @@
 A tool to transform pipelines from other CI providers to Buildkite.
 
 ```shell
-$ cat examples/circleci/basic.yml
-version: 2
-jobs:
-  build:
-    docker:
-      - image: circleci/python:3.6.2-stretch-browsers
-    steps:
-      - checkout
-      - run: pip install -r requirements/dev.txt
-
-$ buildkite-compat examples/circleci/basic.yml
+$ buildkite-compat examples/circleci/legacy.yml
+---
 steps:
-- label: ":circleci: build"
-  key: "build"
-  commands:
-    - "sudo cp -R /buildkite-checkout /home/circleci/checkout"
-    - "sudo chown -R circleci:circleci /home/circleci/checkout"
-    - "cd /home/circleci/checkout"
-    - "pip install -r requirements/dev.txt"
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - pip install -r requirements/dev.txt
   plugins:
-  - docker#v3.3.0:
-      image: "circleci/python:3.6.2-stretch-browsers"
-      workdir: "/buildkite-checkout"
+  - docker#v5.7.0:
+      image: circleci/python:3.6.2-stretch-browsers
+  agents:
+    executor_type: docker
+  key: build
 ```
 
 Note that setting the environment variable `BUILDKITE_PLUGIN_<UPPERCASE_NAME>_VERSION` will override the default version of the plugins used. For example:
 
 ```shell
-$ BUILDKITE_PLUGIN_DOCKER_VERSION=testing-branch buildkite-compat examples/circleci/basic.yml
+$ BUILDKITE_PLUGIN_DOCKER_VERSION=testing-branch buildkite-compat examples/circleci/legacy.yml
+---
 steps:
-- label: ":circleci: build"
-  key: "build"
-  commands:
-    - "sudo cp -R /buildkite-checkout /home/circleci/checkout"
-    - "sudo chown -R circleci:circleci /home/circleci/checkout"
-    - "cd /home/circleci/checkout"
-    - "pip install -r requirements/dev.txt"
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - pip install -r requirements/dev.txt
   plugins:
   - docker#testing-branch:
-      image: "circleci/python:3.6.2-stretch-browsers"
-      workdir: "/buildkite-checkout"
+      image: circleci/python:3.6.2-stretch-browsers
+  agents:
+    executor_type: docker
+  key: build
 ```
 
 ## Web Service/API
@@ -62,17 +50,20 @@ After that you should be able to access a very simple web interface at http://lo
 You could also programatically interact with it (maybe even pipe the output directly to `buildkite-agent pipeline upload`!):
 
 ```shell
-$ curl -X POST -F 'file=@app/examples/circleci/basic.yml' http://localhost:9292
+$ curl -X POST -F 'file=@app/examples/circleci/legacy.yml' http://localhost:9292
+---
 steps:
-- label: ":circleci: build"
-  key: build
-  commands:
-  - sudo cp -R /buildkite-checkout /home/circleci/checkout
-  - sudo chown -R circleci:circleci /home/circleci/checkout
-  - cd /home/circleci/checkout
+- commands:
+  - "# No need for checkout, the agent takes care of that"
   - pip install -r requirements/dev.txt
   plugins:
-  - docker#v3.3.0:
+  - docker#v5.7.0:
       image: circleci/python:3.6.2-stretch-browsers
-      workdir: "/buildkite-checkout"
+  agents:
+    executor_type: docker
+  key: build
 ```
+
+## Translation results
+
+BuildKite has its own suggestions and best practices that are probably different to those of other providers so you should review and use the results of this tool as your first stepping stone into your adoption of BuildKite.

@@ -1,0 +1,25 @@
+version: 2.1
+
+jobs:
+  test:
+    steps:
+      - run: echo 'Hello'
+      - when:
+          condition:
+            equal: [ main, << pipeline.git.branch >> ]
+          steps:
+            - run: echo 'Running in main'
+
+workflows:
+  my-workflow:
+    when:
+      and:
+        - not:
+            matches:
+              pattern: "^main$"
+              value: << pipeline.git.branch >>
+        - or:
+            - equal: [ canary, << pipeline.git.tag >> ]
+            - << pipeline.parameters.deploy-canary >>
+    jobs:
+      - test
