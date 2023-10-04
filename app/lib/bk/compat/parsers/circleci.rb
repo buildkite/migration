@@ -28,7 +28,9 @@ module BK
         config = YAML.safe_load(text, aliases: true)
         mandatory_keys = %w[jobs version workflows].freeze
 
-        if mandatory_keys & config.keys == mandatory_keys
+        if config.is_a?(String)
+          false
+        elsif mandatory_keys & config.keys == mandatory_keys
           true
         else
           # legacy format support
