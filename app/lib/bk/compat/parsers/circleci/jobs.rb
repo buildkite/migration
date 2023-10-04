@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'executors'
+require_relative 'steps'
 
 module BK
   module Compat
@@ -37,7 +38,7 @@ module BK
       end
 
       def parse_command(name, config)
-        BK::Compat::CommandStep.new(key: name).tap do |bk_step|
+        BK::Compat::CircleCISteps::CircleCIStep.new(key: name).tap do |bk_step|
           translate_steps(config['steps']).each { |step| bk_step << step }
           bk_step.parameters = config.fetch('parameters', {})
         end

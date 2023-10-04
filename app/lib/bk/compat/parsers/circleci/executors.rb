@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'steps'
+
 module BK
   module Compat
     # CircleCI translation of workflows
@@ -30,7 +32,7 @@ module BK
       def parse_executor(type: nil, conf: {}, working_directory: nil, shell: nil, resource_class: nil, environment: {})
         raise 'Invalid executor configuration' if type.nil?
 
-        BK::Compat::CommandStep.new(
+        BK::Compat::CircleCISteps::CircleCIStep.new(
           key: "Executor #{type}",
           env: environment
         ).tap do |step|
@@ -47,7 +49,7 @@ module BK
         # assume we have a single configuration
         config = config[0]
 
-        BK::Compat::CommandStep.new.tap do |step|
+        BK::Compat::CircleCISteps::CircleCIStep.new.tap do |step|
           step.agents['executor_type'] = 'docker'
           step << executor_docker_plugin(config)
           step << executor_docker_auth_plugin(config.fetch('auth', {}))
@@ -68,7 +70,7 @@ module BK
       end
 
       def executor_docker_aws_auth(config)
-        BK::Compat::CommandStep.new.tap do |step|
+        BK::Compat::CircleCISteps::CircleCIStep.new.tap do |step|
           if config.include?('aws_access_key_id')
             step.add_commands('# Configure the agent to have the appropriate credentials for ECR auth')
           end
@@ -99,7 +101,7 @@ module BK
 
       def executor_machine(config)
         config = { 'image' => 'self-hosted' } if config == true
-        BK::Compat::CommandStep.new.tap do |step|
+        BK::Compat::CircleCISteps::CircleCIStep.new.tap do |step|
           step.agents['executor_type'] = 'machine'
           step.agents['executor_image'] = config['image']
           if config.include?('docker_layer_caching')
@@ -109,14 +111,14 @@ module BK
       end
 
       def executor_macos(config)
-        BK::Compat::CommandStep.new.tap do |step|
+        BK::Compat::CircleCISteps::CircleCIStep.new.tap do |step|
           step.agents['executor_type'] = 'osx'
           step.agents['executor_xcode'] = config['xcode']
         end
       end
 
       def executor_windows(_config)
-        BK::Compat::CommandStep.new.tap do |step|
+        BK::Compat::CircleCISteps::CircleCIStep.new.tap do |step|
           step.agents['executor_type'] = 'windows'
         end
       end
