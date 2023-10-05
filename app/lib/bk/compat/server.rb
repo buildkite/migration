@@ -54,7 +54,7 @@ module BK
 
         body = parser.new(contents).parse.render(colors: false, format: format)
         success_message(body, content_type: content_type)
-      rescue BK::Compat::Error::NotSupportedError => e
+      rescue BK::Compat::Error::CompatError => e
         error_message(e.message, code: 501)
       rescue StandardError
         error_message(

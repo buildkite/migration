@@ -2,6 +2,7 @@
 
 require_relative 'jobs'
 require_relative 'logic'
+require_relative '../../error'
 
 module BK
   module Compat
@@ -26,8 +27,11 @@ module BK
 
         if config['type'] == 'approval'
           BK::Compat::BlockStep.new(key: key, depends_on: config.fetch('requires', []))
-        else
+        elsif @commands_by_key.include?(key)
           process_job(key, config)
+        else
+          raise BK::Compat::Error::ConfigurationError,
+                "Job '#{key}' is not defined"
         end
       end
 

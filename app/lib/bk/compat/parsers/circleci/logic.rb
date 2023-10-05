@@ -47,7 +47,7 @@ module BK
       end
 
       def self.condition_equal(first_val, *rest)
-        rest.product([first_val]).map { |a, b| "#{string_or_key(a)} == #{string_or_key(b)}" }.join(' && ')
+        rest.product([first_val]).map { |a, b| "\"#{string_or_key(a)}\" == \"#{string_or_key(b)}\"" }.join(' && ')
       end
 
       def self.string_or_list(object)
