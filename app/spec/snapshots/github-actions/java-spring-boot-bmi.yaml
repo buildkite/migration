@@ -7,7 +7,7 @@ steps:
       - mvn install
       - mvn --batch-mode --update-snapshots verify
   - label: ":github: docker-build"
-    if: build.branch = "main"
+    if: build.branch == "main"
     key: docker-build
     commands:
       # actions/setup-java@v3 is not supported at this time
@@ -19,7 +19,7 @@ steps:
     depends_on:
       - project-build
   - label: ":github: deploy"
-    if: build.branch = "main"
+    if: build.branch == "main"
     key: test
     env:
       SERVER_HOST: ${{ secrets.SERVER_HOST }}
