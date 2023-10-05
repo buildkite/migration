@@ -1,0 +1,20 @@
+---
+steps:
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - echo "this is the build job"
+  plugins:
+  - docker#v5.7.0:
+      image: cimg/base:2023.03
+  agents:
+    executor_type: docker
+  key: build
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - echo "this is the test job"
+  plugins:
+  - docker#v5.7.0:
+      image: cimg/base:2023.03
+  agents:
+    executor_type: docker
+  key: test

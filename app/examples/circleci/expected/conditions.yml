@@ -1,0 +1,11 @@
+---
+steps:
+- commands:
+  - echo 'Hello'
+  - "# when condition translation may not be compatible with your shell"
+  - if [ "<< pipeline.git.branch >>" == "main" ]; then
+  - echo 'Running in main'
+  - fi
+  key: test
+  if: '!(/^main$/ ~= << pipeline.git.branch >>) && "<< pipeline.git.tag >>" == "canary"
+    || << pipeline.parameters.deploy-canary >>'

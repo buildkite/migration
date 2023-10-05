@@ -1,0 +1,31 @@
+---
+steps:
+- commands:
+  - Hello, Orb Executor
+  - '# executor {"name"=>"win/default", "size"=>"medium"} not supported yet'
+  key: orb-executor
+- commands:
+  - Hello, self runner
+  agents:
+    resource_class: win/default
+    executor_type: machine
+    executor_image: self-hosted
+  key: self-runner
+- commands:
+  - Hello from docker
+  plugins:
+  - docker#v5.7.0:
+      image: circleci/python:3.6.2
+  agents:
+    executor_type: docker
+  key: docker
+- commands:
+  - Hello from multi-image docker
+  - Need to use Docker Compose for multiple image execution :(
+  key: multi-docker
+- commands:
+  - Hello from OS X
+  agents:
+    executor_type: osx
+    executor_xcode: 14.2.0
+  key: OSX
