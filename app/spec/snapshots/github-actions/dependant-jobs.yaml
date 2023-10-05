@@ -1,0 +1,17 @@
+steps:
+  - label: ":github: setup"
+    key: setup
+    command:
+      - ./setup_server.sh
+  - label: ":github: build"
+    key: build
+    command:
+      - ./build_server.sh
+    depends_on:
+      - setup
+  - label: ":github: test"
+    key: test
+    command:
+      - ./test_server.sh
+    depends_on:
+      - build
