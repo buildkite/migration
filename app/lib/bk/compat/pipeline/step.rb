@@ -173,18 +173,16 @@ module BK
     class GroupStep
       attr_accessor :label, :key, :steps, :conditional
 
-      def initialize(label: nil, key: nil, steps: [], conditional: nil, depends_on: nil)
+      def initialize(label: nil, key: nil, steps: [], conditional: nil)
         @label = label
         @key = key
         @steps = steps
         @conditional = conditional
-        @depends_on = depends_on
       end
 
       def to_h
-        { group: @label, key: @key, steps: @steps.map(&:to_h), depends_on: @depends_on }.tap do |h|
+        { group: @label, key: @key, steps: @steps.map(&:to_h) }.tap do |h|
           h[:if] = @conditional unless @conditional.nil?
-          h[:depends_on] = @depends_on if @depends_on
         end
       end
     end
