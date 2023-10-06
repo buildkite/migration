@@ -2,49 +2,29 @@
 
 module BK
   module Compat
-    # CircleCI translation scaffolding
+    # GHA translation scaffolding
     class GitHubActions
-
-      def parse_jobs(bk_pipeline)
-        @jobs.each do |job|
-
-        # Extract the Job's name
-          job_name = job[0]
-          job_needs = @jobs[job_name]['needs']
-          
-          # Put info to console
-          puts("Job name: #{job_name}")
-          puts("Steps: #{@jobs[job_name]['steps']}")
-          puts("Job needs: #{job_needs}")
-  
-          # For each job, extract the name/run
-          parse_job_steps(job, steps = [])
-  
-          # Create a Group Step
-          groups = BK::Compat::GroupStep.new(
-            label: ":github:: #{job[0]}",
-            key: job_name,
-            steps: steps,
-            depends_on: job_needs
-          )
-  
-          ## Insert Group into pipeline
-          bk_pipeline.steps << groups
+      def parse_job(name, config)
+        BK::Compat::CommandStep.new(
+          label: ":github:: #{name}",
+          key: name,
+          depends_on: config.fetch('needs', [])
+        ).tap do |bk_step|
+          config['steps'].each { |step| bk_step << parse_step(step) }
+          bk_step.agents.update(config.slice('runs-on'))
         end
       end
 
-      def parse_job_steps(job, steps)
-        job[1]['steps'].each do |step|
-              
-          bk_step = BK::Compat::CommandStep.new(
-              label: step['name'],
-              commands: step['run']
+      def parse_step(step)
+        if step.include?('run')
+          BK::Compat::CommandStep.new(
+            label: step['name'],
+            commands: step['run']
           )
-  
-          steps.append(bk_step)
-        end 
+        else
+          "# step #{step} can not be translated just yet"
+        end
       end
     end
   end
 end
-  

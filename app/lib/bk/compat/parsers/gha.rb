@@ -19,8 +19,10 @@ module BK
       end
 
       def self.matches?(text)
-        keys = YAML.safe_load(text).keys
-        keys.include?('language') || keys.include?('rvm')
+        config = YAML.safe_load(text)
+        mandatory_keys = ['jobs', true]
+
+        config.is_a?(Hash) && mandatory_keys & config.keys == mandatory_keys
       end
 
       def initialize(text, options = {})
@@ -29,21 +31,11 @@ module BK
       end
 
       def parse
-        # Load elements
-        load_elements
-        puts("Jobs: #{@jobs}")
-
-        # Loop through all jobs defined
-        parse_jobs(bk_pipeline = Pipeline.new)
-
-        # Render the pipeline 
-        bk_pipeline
+        # Pipeline with steps defined as jobs
+        Pipeline.new(
+          steps: @config.fetch('jobs', {}).map { |key, config| parse_job(key, config) }
+        )
       end
-
-      def load_elements
-        @jobs = @config.fetch('jobs')
-      end
-
     end
   end
 end
