@@ -16,6 +16,7 @@ steps:
       # docker/setup-buildx-action@v2 is not supported at this time
       # docker/login-action@v2 is not supported at this time
       # docker/build-push-action@v4 is not supported at this time
+      - []
     depends_on:
       - project-build
   - label: ":github: deploy"
@@ -26,6 +27,8 @@ steps:
       SERVER_PORT: ${{ secrets.SERVER_PORT }}
       SERVER_USER: ${{ secrets.SERVER_USER }}
     commands:
+      - touch key.txt && echo "${{ secrets.SERVER_KEY }}" > key.txt
+      - chmod 600 key.txt
       - set -e
       - ./deploy.sh
     depends_on:

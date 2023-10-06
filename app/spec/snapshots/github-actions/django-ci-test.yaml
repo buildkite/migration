@@ -1,9 +1,7 @@
 steps:
-  # actions/checkout@v2 skipped as git checkout is automatic
-  # actions/setup-python@v2 is not supported at this time
-  - label: ":github: Install requirements"
-    command: pip install -r requirements.txt
-  - label: ":github: Run tests"
-    commands:
-      - cd src
-      - python manage.py test 
+  - commands:
+    # actions/checkout@v2 skipped as git checkout is automatic
+    # actions/setup-python@v2 is not supported at this time
+    - pip install -r requirements.txt
+    - cd src
+    - python manage.py test 
