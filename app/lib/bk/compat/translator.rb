@@ -15,11 +15,15 @@ module BK
 
         result = @translators.select { |translator| translator[:matcher]&.call(*, **) }
                              .map { |translator| translator[:function]&.call(*, **) }
-                             .flatten
 
-        return [" # step #{step_key} not implemented yet :("] if result.empty?
+        simplify_result(result.flatten, *, **)
+      end
 
-        result
+      def simplify_result(result_list, *args, **kwargs)
+        return [" # step #{args} #{kwargs} not implemented yet :("] if result_list.empty?
+
+        result_list = result_list.first if result_list.one?
+        result_list
       end
     end
   end
