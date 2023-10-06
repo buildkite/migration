@@ -12,6 +12,7 @@ module BK
         ).tap do |bk_step|
           config['steps'].each { |step| bk_step << translate_step(step) }
           bk_step.agents.update(config.slice('runs-on'))
+          bk_step.depends_on = config.fetch('needs', [])
         end
       end
     end
