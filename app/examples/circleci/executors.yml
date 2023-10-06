@@ -38,5 +38,8 @@ jobs:
 workflows:
   test:
     jobs:
-      - build
-      - build2
+      - orb-executor
+      - self-runner
+      - docker
+      - multi-docker
+      - OSX

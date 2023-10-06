@@ -47,7 +47,7 @@ module BK
 
     # basic command step
     class CommandStep
-      attr_accessor :agents, :conditional, :depends_on, :key, :label, :parameters, :plugins, :soft_fail
+      attr_accessor :agents, :conditional, :depends_on, :key, :label, :parameters, :plugins, :soft_fail, :transformer
       attr_reader :commands, :env # we define special writers
 
       LIST_ATTRIBUTES = %w[commands depends_on plugins].freeze
@@ -88,7 +88,8 @@ module BK
         instance_attributes.tap do |h|
           # rename conditional to if (a reserved word as an attribute or instance variable is complicated)
           h[:if] = h.delete(:conditional)
-          h.delete('parameters')
+          h.delete(:parameters)
+          h.delete(:transformer)
 
           # special handling
           h[:plugins] = @plugins.map(&:to_h)
@@ -146,25 +147,24 @@ module BK
       end
 
       def instantiate(config)
-        params = instance_attributes.transform_values { |value| replace_parameters(value, config) }
+        unless @transformer.nil?
+          params = instance_attributes.transform_values { |val| recurse_to_string(val, config, @transformer.to_proc) }
+        end
         params.delete(:parameters)
 
         self.class.new(**params)
       end
 
-      def replace_parameters(value, config)
+      def recurse_to_string(value, config, block)
         return value if @parameters.empty?
 
         case value
         when String
-          @parameters.each_with_object(value.dup) do |(name, param), str|
-            value = config.fetch(name, param.fetch('default', nil))
-            str.sub!(/<<\s*parameters\.#{name}\s*>>/, value)
-          end
+          block.call(value, config)
         when Hash
-          value.transform_values! { |elem| replace_parameters(elem, config) }
+          value.transform_values! { |elem| recurse_to_string(elem, config, block) }
         when Array
-          value.map! { |elem| replace_parameters(elem, config) }
+          value.map! { |elem| recurse_to_string(elem, config, block) }
         end
       end
     end

@@ -20,6 +20,8 @@ module BK
       def self.matches?(text)
         keys = YAML.safe_load(text).keys
         keys.include?('language') || keys.include?('rvm')
+      rescue NoMethodError
+        false
       end
 
       def initialize(text, options = {})
