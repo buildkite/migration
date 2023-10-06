@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
+require_relative '../translator'
 require_relative '../pipeline'
 require_relative 'circleci/executors'
 require_relative 'circleci/jobs'
 require_relative 'circleci/orbs'
 require_relative 'circleci/steps'
-require_relative 'circleci/translator'
 require_relative 'circleci/workflows'
 
 module BK

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative '../error'
+require_relative '../translator'
 require_relative '../pipeline'
 require_relative 'gha/jobs'
 
@@ -8,6 +9,7 @@ module BK
   module Compat
     # GitHub Actions converter
     class GitHubActions
+      include StepTranslator
       require 'yaml'
 
       def self.name
