@@ -43,8 +43,10 @@ module BK
         @commands_by_key = {}
         @executors = {}
 
-        builtin_steps = BK::Compat::CircleCISteps::Builtins.new(recursor: method(:translate_steps))
-        register_translator(*builtin_steps.register)
+        BK::Compat::CircleCISteps::Builtins.new(
+          register: method(:register_translator),
+          recursor: method(:translate_steps)
+        )
       end
 
       def parse

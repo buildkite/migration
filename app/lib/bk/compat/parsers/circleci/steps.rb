@@ -8,21 +8,24 @@ module BK
     module CircleCISteps
       # Implementation of native step translation
       class Builtins
-        def initialize(recursor: nil)
+        def initialize(register:, recursor: nil)
           @recursor = recursor # to call back to translate steps further
-        end
-
-        def register
-          [
-            %w[
-              add_ssh_keys attach_workspace checkout deploy persist_to_workspace restore_cache
-              run save_cache setup_remote_docker store_artifacts store_test_results when
-            ].freeze,
+          register.call(
+            method(:matcher),
             method(:translator)
-          ]
+          )
         end
 
         private
+
+        VALID_ACTIONS = %w[
+          add_ssh_keys attach_workspace checkout deploy persist_to_workspace restore_cache
+          run save_cache setup_remote_docker store_artifacts store_test_results when
+        ].freeze
+
+        def matcher(action, _config)
+          VALID_ACTIONS.include?(action)
+        end
 
         def translator(action, config)
           send("translate_#{action.gsub('-', '_')}", config)
