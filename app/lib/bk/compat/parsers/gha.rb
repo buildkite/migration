@@ -4,6 +4,7 @@ require_relative '../error'
 require_relative '../translator'
 require_relative '../pipeline'
 require_relative 'gha/jobs'
+require_relative 'gha/steps'
 
 module BK
   module Compat
@@ -30,6 +31,8 @@ module BK
       def initialize(text, options = {})
         @config = YAML.safe_load(text)
         @options = options
+
+        GHABuiltins.new(register: method(:register_translator))
       end
 
       def parse
