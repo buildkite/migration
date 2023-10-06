@@ -1,0 +1,11 @@
+env:
+  JAVA_VERSION: 11
+
+steps:
+  - commands: 
+    # actions/checkout@v3 skipped as git checkout is automatic
+    # actions/setup-java@v3 is not supported at this time
+    - mvn -B package --file pom.xml
+    - echo "Hello $NAME. $BUILD. Using Java Version $JAVA_VERSION"
+  env:
+    BUILD: 'We are currently running the Build job'
