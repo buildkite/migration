@@ -1,0 +1,9 @@
+steps:
+  - label: ":npm: Run tests"
+    command:
+      - npm install
+      - npm run build --if-present
+      - npm test
+    plugins:
+      - docker#v5.9.0:
+          image: node:slim

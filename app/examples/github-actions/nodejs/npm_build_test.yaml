@@ -1,0 +1,16 @@
+name: Node.js CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4 # <-- Likely doesnot need mapping, given we run a checkout on each step
+      - name: Use Node.js
+        uses: actions/setup-node@v3 # <-- This would be removed in favour of using a Dockerfile; we don't run on single instance
+        with:
+          node-version: '20.x'
+      - run: npm ci
+      - run: npm run build --if-present
+      - run: npm test
