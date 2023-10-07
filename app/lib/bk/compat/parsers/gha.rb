@@ -20,6 +20,7 @@ module BK
 
       def self.matches?(text)
         config = YAML.safe_load(text)
+        # YAML translates the `on` key in YAML to ruby's `true` boolean
         mandatory_keys = ['jobs', true]
 
         config.is_a?(Hash) && mandatory_keys & config.keys == mandatory_keys
