@@ -16,7 +16,7 @@ module BK
       def translate_run(step)
         [
           step.include?('name') ? "echo '~~~ #{step['name']}'" : nil,
-          step['run']
+          step['run'].lines(chomp: true)
         ].compact
       end
     end
