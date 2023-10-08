@@ -37,8 +37,10 @@ module BK
 
       def parse
         # Pipeline with steps defined as jobs
+        defaults = @config.fetch('defaults', {})
         Pipeline.new(
-          steps: @config.fetch('jobs', {}).map { |key, config| parse_job(key, config) }
+          steps: @config.fetch('jobs', {}).map { |key, config| parse_job((key, defaults.merge(config)) }
+          env: @config.fetch('env', {})
         )
       end
     end
