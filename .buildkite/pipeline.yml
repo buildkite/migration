@@ -3,15 +3,12 @@ steps:
     command: gem install rubocop && rubocop -l app
     plugins:
       - docker#v5.7.0:
-          image: ruby:3.4
-
-  - wait: ~
-
+          image: ruby:3.2 
   - label: ":rspec:"
     command: bundle install && bundle exec rspec --color specs
     plugins:
       - docker#v5.7.0:
-          image: ruby:3.4
+          image: ruby:3.2
 
   - wait: ~
 
