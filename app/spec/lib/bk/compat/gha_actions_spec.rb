@@ -2,11 +2,9 @@
 
 require 'spec_helper'
 
-RSpec.describe 'Github Actions Parser' do
-
-  context 'do stuff' do 
-    it 'does stuff' do
-      # puts JSON.parse(subject.to_h.to_json).to_yaml
+RSpec.describe 'Github Actions Parser' do 
+    it 'runs ok' do
+      expect(1).to eql(1)
     end
   end
 end
