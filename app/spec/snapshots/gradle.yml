@@ -1,0 +1,11 @@
+steps:
+  - label: Build with Gradle
+    if: build.branch == "master" 
+    command: echo "calling gradle/gradle-build-action"
+    plugin:
+      - docker#v5.9.0:
+          image: eclipse-temurin:11
+      - github-action-mux#v0.1:
+          uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
+          with:
+            arguments: build
