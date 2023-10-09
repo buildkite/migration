@@ -13,7 +13,7 @@ module BK
           timeout_in_minutes: config['timeout-minutes'],
           soft_fail: config['continue-on-error'],
           concurrency: config.include?('concurrency') ? 1 : [],
-          concurrency_group: config.include?('concurrency') ? config.fetch('concurrency')['group'] : []
+          concurrency_group: config.include?('concurrency') ? config['concurrency']['group'] : []
 
         ).tap do |bk_step|
           config['steps'].each { |step| bk_step << translate_step(step) }
