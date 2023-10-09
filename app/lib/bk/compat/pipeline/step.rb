@@ -47,7 +47,8 @@ module BK
 
     # basic command step
     class CommandStep
-      attr_accessor :agents, :conditional, :depends_on, :key, :label, :parameters, :plugins, :soft_fail, :transformer
+      attr_accessor :agents, :conditional, :depends_on, :key, :label, :parameters,
+                    :plugins, :soft_fail, :timeout_in_minutes, :transformer
       attr_reader :commands, :env # we define special writers
 
       LIST_ATTRIBUTES = %w[commands depends_on plugins].freeze
@@ -85,18 +86,23 @@ module BK
       end
 
       def to_h
-        instance_attributes.tap do |h|
-          # rename conditional to if (a reserved word as an attribute or instance variable is complicated)
-          h[:if] = h.delete(:conditional)
-          h.delete(:parameters)
-          h.delete(:transformer)
-
+        clean_attributes.tap do |h|
           # special handling
           h[:plugins] = @plugins.map(&:to_h)
           h[:env] = @env&.to_h
 
           # remove empty and nil values
-          h.delete_if { |_, v| v.nil? || v.empty? }
+          h.delete_if { |_, v| v.nil? || (v.is_a?(Enumerable) && v.empty?) }
+        end
+      end
+
+      def clean_attributes
+        instance_attributes.tap do |h|
+          # rename conditional to if (a reserved word as an attribute or instance variable is complicated)
+          h[:if] = h.delete(:conditional)
+          h.delete(:parameters)
+          h.delete(:transformer)
+          h.delete(:soft_fail) if h[:soft_fail] == false
         end
       end
 
