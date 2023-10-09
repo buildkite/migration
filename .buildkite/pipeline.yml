@@ -5,11 +5,10 @@ steps:
       - docker#v5.7.0:
           image: ruby:3.2 
   - label: ":rspec:"
-    command: rspec --color
-    plugins:
+    command: gem install rspec && rspec --color rspec
+    plugins: 
       - docker#v5.7.0:
-          image: ruby:3.2
-          workdir: /app
+          image: ruby:3.2 
 
   - wait: ~
 

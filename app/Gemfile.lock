@@ -23,7 +23,7 @@ GEM
     webrick (1.8.1)
 
 PLATFORMS
-  arm64-darwin-22
+  ruby
 
 DEPENDENCIES
   rack
