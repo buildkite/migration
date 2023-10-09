@@ -48,7 +48,8 @@ module BK
     # basic command step
     class CommandStep
       attr_accessor :agents, :conditional, :depends_on, :key, :label, :parameters,
-                    :plugins, :soft_fail, :timeout_in_minutes, :transformer
+                    :plugins, :soft_fail, :timeout_in_minutes, :transformer, :concurrency,
+                    :concurrency_group
       attr_reader :commands, :env # we define special writers
 
       LIST_ATTRIBUTES = %w[commands depends_on plugins].freeze

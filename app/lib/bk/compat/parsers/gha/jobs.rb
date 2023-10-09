@@ -11,7 +11,10 @@ module BK
           depends_on: config.fetch('needs', []),
           env: config.fetch('env', {}),
           timeout_in_minutes: config['timeout-minutes'],
-          soft_fail: config['continue-on-error']
+          soft_fail: config['continue-on-error'],
+          concurrency: config.include?('concurrency') ? 1 : [],
+          concurrency_group: config.include?('concurrency') ? config.fetch('concurrency')['group'] : []
+
         ).tap do |bk_step|
           config['steps'].each { |step| bk_step << translate_step(step) }
           bk_step.agents.update(config.slice('runs-on'))

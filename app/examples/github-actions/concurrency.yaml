@@ -1,0 +1,35 @@
+# .github/workflows/main-api.yml
+name: main-api
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'services/api/**'
+
+jobs:
+  build:
+    steps:  
+    - run: ./build.sh
+
+  deploy-test:
+    needs: build
+    concurrency:
+      group: deploy-test
+    steps: 
+      - run: ./deploy-test.sh
+
+  deploy-staging:
+    needs: deploy-test
+    concurrency:
+      group: deploy-staging
+    steps:  
+      - run: ./deploy-staging.sh
+
+  deploy-prod:
+    needs: deploy-staging
+    concurrency:
+      group: deploy-production
+    steps:  
+      - run: ./deploy-prod.sh
