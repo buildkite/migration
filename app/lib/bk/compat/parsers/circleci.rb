@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
+require_relative '../translator'
 require_relative '../pipeline'
 require_relative 'circleci/executors'
 require_relative 'circleci/jobs'
 require_relative 'circleci/orbs'
 require_relative 'circleci/steps'
-require_relative 'circleci/translator'
 require_relative 'circleci/workflows'
 
 module BK
@@ -45,8 +45,10 @@ module BK
         @commands_by_key = {}
         @executors = {}
 
-        builtin_steps = BK::Compat::CircleCISteps::Builtins.new(recursor: method(:translate_steps))
-        register_translator(*builtin_steps.register)
+        BK::Compat::CircleCISteps::Builtins.new(
+          register: method(:register_translator),
+          recursor: method(:translate_steps)
+        )
       end
 
       def parse
