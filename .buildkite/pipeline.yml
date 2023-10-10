@@ -6,7 +6,7 @@ steps:
           image: ruby:3.2
 
   - label: ":rspec: Snapshot Testing"
-    command: gem install rspec && rspec --require spec_helper.rb --color app/spec
+    command: gem install rspec && rspec --require app/spec/spec_helper.rb --color app/spec
     plugins:
       - docker#v5.9.0:
           image: ruby:3.2
