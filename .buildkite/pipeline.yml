@@ -1,16 +1,11 @@
 steps:
-  - label: ":hammer: Testing"
+  - label: ":hammer: Linting"
     command: gem install rubocop && rubocop -l app
     plugins:
       - docker#v5.7.0:
           image: ruby:3.2
-  - label: ":docker: Check working directory"
-    command: gem install rspec && rspec --init && ls -al app
-    plugins:
-      - docker#v5.9.0:
-          image: ruby:3.2
-          workdir: /app
-  - label: ":rspec: gem install rspec && rspec "
+
+  - label: ":rspec: Snapshot Testing"
     command: gem install rspec && rspec --init && rspec --color app/spec
     plugins:
       - docker#v5.9.0:
