@@ -1,11 +1,11 @@
 steps:
   - label: ":hammer: Lint Tests"
-    command: rubocop -l --auto-gen-config .
+    command: gem install rubocop && rubocop -l --auto-gen-config .
     plugins:
       - docker-compose#v4.14.0:
           run: app
   - label: ":rspec: Snapshot Tests"
-    command: rspec --color spec
+    command: gem install rspec && rspec --color spec
     plugins:
       - docker-compose#v4.14.0:
           run: app
