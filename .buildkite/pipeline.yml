@@ -5,7 +5,7 @@ steps:
       - docker-compose#v4.14.0:
           run: app
   - label: ":rspec: Snapshot Tests"
-    command: rspec --color spec
+    command: bundle exec rspec && rspec --color spec
     plugins:
       - docker-compose#v4.14.0:
           run: app
