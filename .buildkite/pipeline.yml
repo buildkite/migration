@@ -11,7 +11,7 @@ steps:
           image: ruby:3.2
           workdir: /app
   - label: ":rspec: gem install rspec && rspec "
-    command: gem install rspec && rspec --color app/specs
+    command: gem install rspec && rspec --color app/spec
     plugins:
       - docker#v5.9.0:
           image: ruby:3.2
