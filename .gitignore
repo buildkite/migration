@@ -3,3 +3,4 @@ rubyc
 
 # dist folder
 dist
+.rubocop_todo.yml

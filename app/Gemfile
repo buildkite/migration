@@ -7,5 +7,5 @@ git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
 gem 'rack'
 gem 'rackup' # necessary for starting the HTTP interface
 gem 'rouge'
-gem 'rubocop'
 gem 'rspec'
+gem 'rubocop'
