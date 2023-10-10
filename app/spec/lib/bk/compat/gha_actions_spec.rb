@@ -7,3 +7,9 @@ RSpec.describe 'Github Actions Parser' do
     expect(1).to eql(1)
   end
 end
+
+RSpec.describe 'Github Actions Parser Test 2' do 
+  it 'runs ok' do
+    expect(1).to eql(1)
+  end
+end
