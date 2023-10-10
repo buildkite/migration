@@ -4,6 +4,11 @@ steps:
     plugins:
       - docker#v5.7.0:
           image: ruby:3.2
+  - label: ":docker: Check working directory"
+    command: ls -al app
+    plugins:
+      - docker#v5.9.0:
+          image: ruby:3.2
 
   - wait: ~
 
