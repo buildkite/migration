@@ -7,3 +7,8 @@ git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
 gem 'rack'
 gem 'rackup' # necessary for starting the HTTP interface
 gem 'rouge'
+
+group :development, :test do
+    gem "rspec", ">= 3.12"
+    gem "rubocop", ">= 1.56.4"
+end
