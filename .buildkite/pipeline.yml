@@ -1,16 +1,11 @@
 steps:
   - label: ":hammer: Testing"
-    command: gem install rubocop && rubocop -l app
+    command: rubocop -l .
     plugins:
-      - docker#v5.7.0:
-          image: ruby:3.2 
+      - docker-compose#v4.14.0:
+          run: app
   - label: ":rspec:"
-    command: gem install rspec && rspec --color rspec
-    plugins: 
-      - docker#v5.7.0:
-          image: ruby:3.2 
-
-  - wait: ~
-
-  - label: ":docker: Build image"
-    command: docker build . -t migration
+    command: rspec
+    plugins:
+      - docker-compose#v4.14.0:
+          run: app

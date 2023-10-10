@@ -3,12 +3,7 @@ FROM ruby:3.2
 ENV RACK_ENV=production
 
 WORKDIR /app
-COPY app/Gemfile* ./
+COPY app /app
 RUN bundle install
 
-COPY app /app
-
 RUN ln -s /app/bin/buildkite-compat /bin/buildkite-compat
-
-WORKDIR /
-ENTRYPOINT [ "buildkite-compat" ]
