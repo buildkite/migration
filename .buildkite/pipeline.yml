@@ -7,9 +7,10 @@ steps:
   - label: ":rspec:"
     command: rspec --color
     plugins:
-      - docker#v5.7.0:
-          image: ruby:3.2
+      - docker-compose#v4.14.0:
+          run: migrator
           workdir: /app
+          command: ["--help"]
 
   - wait: ~
 
