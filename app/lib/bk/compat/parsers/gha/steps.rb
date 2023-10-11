@@ -36,7 +36,7 @@ module BK
       end
 
       def generate_command_string(commands: [], env: {}, workdir: nil)
-        vars = env.map { |k, v| "#{k}=\"#{v}]\"" }
+        vars = env.map { |k, v| "#{k}=\"#{v}\"" }
         avoid_parens = vars.empty? && workdir.nil?
         [
           avoid_parens ? nil : '(',
