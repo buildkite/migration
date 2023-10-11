@@ -9,6 +9,11 @@ module BK
           ->(conf) { conf.include?('run') },
           method(:translate_run)
         )
+
+        register.call(
+          ->(conf) { conf.include?('uses') },
+          method(:translate_uses)
+        )
       end
 
       private
@@ -16,7 +21,29 @@ module BK
       def translate_run(step)
         [
           step.include?('name') ? "echo '~~~ #{step['name']}'" : nil,
-          step['run'].lines(chomp: true)
+          step.include?('shell') ? '# Shell is determined in the agent' : nil,
+          step.include?('timeout-minutes') ? '# timeouts are per-job, not step' : nil,
+          generate_command_string(
+            commands: step['run'],
+            env: step.fetch('env', {}),
+            workdir: step['working-directory']
+          )
+        ].flatten.compact
+      end
+
+      def translate_uses(step)
+        "# action #{step['uses']} can not be translated just yet"
+      end
+
+      def generate_command_string(commands: [], env: {}, workdir: nil)
+        vars = env.map { |k, v| "#{k}=\"#{v}]\"" }
+        avoid_parens = vars.empty? && workdir.nil?
+        [
+          avoid_parens ? nil : '(',
+          workdir.nil? ? nil : "cd '#{workdir}'",
+          vars.empty? ? nil : vars,
+          commands.lines(chomp: true),
+          avoid_parens ? nil : ')'
         ].compact
       end
     end
