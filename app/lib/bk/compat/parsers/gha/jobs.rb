@@ -9,6 +9,7 @@ module BK
           config['steps'].each { |step| bk_step << translate_step(step) }
           bk_step.agents.update(config.slice('runs-on'))
           bk_step.depends_on = Array(config['needs'])
+          bk_step << translate_outputs(config['outputs'])
         end
       end
 
@@ -23,6 +24,22 @@ module BK
         )
       end
 
+      def translate_outputs(outputs)
+        return nil if outputs.nil?
+
+        bk_step = BK::Compat::CommandStep.new(
+          env: { GITHUB_OUTPUT: '/tmp/outputs' },
+          commands: ['source $GITHUB_OUTPUT']
+        )
+        outputs.keys.each do |key|
+          bk_step.add_commands(
+            # the original source makes variables available
+            "buildkite-agent metadata set #{key} \"$#{key}\""
+          )
+        end
+
+        bk_step
+      end
     end
   end
 end
