@@ -12,10 +12,9 @@ module BK
           env: config.fetch('env', {}),
           timeout_in_minutes: config['timeout-minutes'],
           soft_fail: config['continue-on-error'],
-          concurrency: config['concurrency'] ? 1 : nil,
-          concurrency_group: config['concurrency'] ? obtain_concurrency(config['concurrency']).first : nil
 
         ).tap do |bk_step|
+          set_concurrency(bk_step, config) if config['concurrency']
           config['steps'].each { |step| bk_step << translate_step(step) }
           bk_step.agents.update(config.slice('runs-on'))
           bk_step.depends_on = Array(config['needs'])
@@ -58,6 +57,13 @@ module BK
         ].compact
       end
 
+      def set_concurrency(bk_step, config)
+        group, cancel_in_progress = obtain_concurrency(config['concurrency']) 
+        bk_step << ["# `cancel_in_progress` is not supported. Please use Cancel Intermediate Builds."] if cancel_in_progress
+        bk_step.concurrency = 1 
+        bk_step.concurrency_group = group
+      end
+
       def obtain_concurrency(concurrency)
         case concurrency
         when String
@@ -67,10 +73,6 @@ module BK
           group = concurrency_arr.first.last
           cancel_in_progress = concurrency_arr.length == 2 ? concurrency_arr.last.last : nil
           [group, cancel_in_progress]
-        when nil
-          [nil, nil]
-        else
-          raise "Job's concurrency is not a hash, string or nil! What could #{concurrency.inspect} be!?"
         end
       end
     end
