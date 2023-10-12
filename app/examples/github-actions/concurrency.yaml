@@ -22,8 +22,7 @@ jobs:
 
   deploy-staging:
     needs: deploy-test
-    concurrency:
-      group: deploy-staging
+    concurrency: deploy-staging
     steps:  
       - run: ./deploy-staging.sh
 
@@ -31,5 +30,6 @@ jobs:
     needs: deploy-staging
     concurrency:
       group: deploy-production
+      cancel-in-progress: true
     steps:  
       - run: ./deploy-prod.sh

@@ -13,7 +13,7 @@ module BK
           timeout_in_minutes: config['timeout-minutes'],
           soft_fail: config['continue-on-error'],
           concurrency: config['concurrency'] ? 1 : nil,
-          concurrency_group: config.include?('concurrency') ? config['concurrency']['group'] : nil
+          concurrency_group: config['concurrency'] ? obtain_concurrency(config['concurrency']).first : nil
 
         ).tap do |bk_step|
           config['steps'].each { |step| bk_step << translate_step(step) }
@@ -56,6 +56,22 @@ module BK
           commands.lines(chomp: true),
           avoid_parens ? nil : ')'
         ].compact
+      end
+
+      def obtain_concurrency(concurrency)
+        case concurrency
+        when String
+          [concurrency, nil]
+        when Hash
+          concurrency_arr = concurrency.to_a
+          group = concurrency_arr.first.last
+          cancel_in_progress = concurrency_arr.length == 2 ? concurrency_arr.last.last : nil
+          [group, cancel_in_progress]
+        when nil
+          [nil, nil]
+        else
+          raise "Job's concurrency is not a hash, string or nil! What could #{concurrency.inspect} be!?"
+        end
       end
     end
   end
