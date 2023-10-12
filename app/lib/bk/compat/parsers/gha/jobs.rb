@@ -13,8 +13,7 @@ module BK
           depends_on: config.fetch('needs', []),
           env: config.fetch('env', {}),
           timeout_in_minutes: config['timeout-minutes'],
-          soft_fail: config['continue-on-error'],
-
+          soft_fail: config['continue-on-error']
         ).tap do |bk_step|
           set_concurrency(bk_step, config) if config['concurrency']
           config['steps'].each { |step| bk_step << translate_step(step) }
