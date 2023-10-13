@@ -47,5 +47,24 @@ module BK
         ].compact
       end
     end
+
+    # wrapper class to setup parameters
+    class GHAStep < BK::Compat::CommandStep
+      def initialize(**)
+        super
+        @transformer = method(:gha_params)
+      end
+
+      def gha_params(value)
+        value.gsub(/\${{\s*(?<data>.*)\s*}}/) do |v|
+          replace_params(v)
+        end
+      end
+
+      def replace_params(str)
+        p "Processing #{str}"
+        "PROCESSED #{str}"
+      end
+    end
   end
 end
