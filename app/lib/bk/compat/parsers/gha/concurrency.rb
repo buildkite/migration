@@ -15,15 +15,13 @@ module BK
       def normalize_concurrency(concurrency)
         case concurrency
         when String
+          # Return the group name since the concurrency value is the group name
           [concurrency, nil]
         when Hash
-          # Convert the hash to an key/value array
-          concurrency_arr = concurrency.to_a
-          # Extract the group name and cancel-in-progress values (latter if the array length is 2)
-          group = concurrency_arr.first.last
-          cancel_in_progress = concurrency_arr.length == 2 ? concurrency_arr.last.last : nil
-          # Return the group name/cancel-in-progress value]
-          [group, cancel_in_progress]
+          # Return the group name/cancel-in-progress values from the hash
+          [concurrency['group'], concurrency['cancel-in-progress']]
+        else
+          raise TypeError, 'Invalid concurrency configuration'
         end
       end 
     end
