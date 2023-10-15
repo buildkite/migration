@@ -11,7 +11,7 @@ module BK
         config['steps'].each { |step| bk_step << translate_step(step) }
         bk_step.agents.update(config.slice('runs-on'))
         bk_step.depends_on = Array(config['needs'])
-        bk_step << translate_outputs(config['outputs'])
+        bk_step << translate_outputs(config['outputs'], name)
         bk_step.instantiate
       end
 
@@ -26,7 +26,7 @@ module BK
         )
       end
 
-      def translate_outputs(outputs)
+      def translate_outputs(outputs, job_name)
         return nil if outputs.nil?
 
         bk_step = BK::Compat::GHAStep.new(
@@ -36,7 +36,7 @@ module BK
         outputs.each_key do |key|
           bk_step.add_commands(
             # the original source makes variables available
-            "buildkite-agent metadata set #{key} \"$#{key}\""
+            "buildkite-agent metadata set \"#{job_name}.#{key}\" \"$#{key}\""
           )
         end
 
