@@ -7,7 +7,7 @@ steps:
 
   - label: ":rspec: Snapshot Testing"
     command: 
-      - bundle config set --local
+      - bundle config set --local with 'test'
       - cd app && bundle install
       - rspec --color spec
     plugins:
