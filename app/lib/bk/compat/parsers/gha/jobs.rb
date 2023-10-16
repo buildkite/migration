@@ -1,11 +1,14 @@
 # frozen_string_literal: true
 
+require_relative 'concurrency'
+
 module BK
   module Compat
     # GHA translation scaffolding
     class GitHubActions
       def parse_job(name, config)
         generate_base_step(name, config).tap do |bk_step|
+          set_concurrency(bk_step, config) if config['concurrency']
           config['steps'].each { |step| bk_step << translate_step(step) }
           bk_step.agents.update(config.slice('runs-on'))
           bk_step.depends_on = Array(config['needs'])
