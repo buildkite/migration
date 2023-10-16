@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'concurrency'
+require_relative 'matrix'
 
 module BK
   module Compat
@@ -9,6 +10,7 @@ module BK
       def parse_job(name, config)
         generate_base_step(name, config).tap do |bk_step|
           set_concurrency(bk_step, config) if config['concurrency']
+          set_matrix(bk_step, config) if config['strategy']
           config['steps'].each { |step| bk_step << translate_step(step) }
           bk_step.agents.update(config.slice('runs-on'))
           bk_step.depends_on = Array(config['needs'])
