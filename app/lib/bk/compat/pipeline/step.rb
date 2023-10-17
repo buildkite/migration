@@ -47,12 +47,13 @@ module BK
 
     # basic command step
     class CommandStep
-      attr_accessor :agents, :conditional, :depends_on, :key, :label, :parameters,
-                    :plugins, :soft_fail, :timeout_in_minutes, :transformer
+      attr_accessor :agents, :concurrency, :concurrency_group, :conditional, :depends_on, :key, :label,
+                    :matrix, :parameters, :plugins, :soft_fail, :timeout_in_minutes, :transformer
+
       attr_reader :commands, :env # we define special writers
 
       LIST_ATTRIBUTES = %w[commands depends_on plugins].freeze
-      HASH_ATTRIBUTES = %w[agents env parameters].freeze
+      HASH_ATTRIBUTES = %w[agents env matrix parameters].freeze
 
       def initialize(**kwargs)
         # nil as default are not acceptable
