@@ -1,7 +1,20 @@
-require 'spec_helper'
+# frozen_string_literal: true
 
-RSpec.describe 'Github Actions Parser' do 
-  it 'runs ok' do
-    expect(1).to eql(1)
-  end
-end 
+
+require_relative '../../../../lib/bk/compat'
+
+RSpec.describe BK::Compat::GitHubActions do
+  let (:gha) { BK::Compat::GitHubActions.new } 
+
+  context 'basic.yaml' do 
+    let(:subject) do |e|   
+      gha_content = File.open("examples/gha/basic.yaml").read 
+      BK::Compat::GitHubActions.new(gha_content).parse() 
+    end
+    
+    it 'does stuff' do       
+      actual = JSON.parse(subject.to_h.to_json).to_yaml
+      expect(actual).to match_snapshot('basic.yaml')
+    end
+  end  
+end
