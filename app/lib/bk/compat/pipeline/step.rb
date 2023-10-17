@@ -53,7 +53,7 @@ module BK
       attr_reader :commands, :env # we define special writers
 
       LIST_ATTRIBUTES = %w[commands depends_on plugins].freeze
-      HASH_ATTRIBUTES = %w[agents env parameters].freeze
+      HASH_ATTRIBUTES = %w[agents env parameters matrix].freeze
 
       def initialize(**kwargs)
         # nil as default are not acceptable
