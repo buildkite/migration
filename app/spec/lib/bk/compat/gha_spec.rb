@@ -4,10 +4,9 @@
 require_relative '../../../../lib/bk/compat'
 
 RSpec.describe BK::Compat::GitHubActions do
-  let (:gha) { BK::Compat::GitHubActions.new } 
-
+ 
   context 'basic.yaml' do 
-    let(:subject) do |e|   
+    let(:subject) do
       gha_content = File.open("examples/gha/basic.yaml").read 
       BK::Compat::GitHubActions.new(gha_content).parse() 
     end

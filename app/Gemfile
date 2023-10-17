@@ -10,4 +10,6 @@ gem 'rouge'
 
 group :development, :test do
     gem 'rspec'
+    gem 'rspec-snapshot'
 end
+
