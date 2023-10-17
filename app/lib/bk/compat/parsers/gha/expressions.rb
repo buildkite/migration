@@ -11,52 +11,54 @@ module BK
       rule(:space?) { space.maybe }
       rule(:quote) { match('\'') }
 
-      rule(:expression) { literals | parens | operators | functions }
+      rule(:base_exp) { space? >> (parens | unary_op | functions | literals) >> space? }
+      rule(:expression) { operations | base_exp }
 
-      rule(:literals) { boolean | null | number | string }
+      rule(:literals) { boolean.as(:bool) | null.as(:null) | number.as(:num) | string }
       rule(:boolean) { str('false') | str('true') }
       rule(:null) { str('null') }
       rule(:number) { match('[0-9]').repeat(1) } # TODO: support other numbers
-      rule(:string) { quoted_string | unquoted_string }
-      rule(:quoted_string) { quote >> (unquoted_string | match('\'\'')).repeat >> quote }
+      rule(:string) { quoted_string | unquoted_string.as(:str) }
+      rule(:quoted_string) { quote >> (unquoted_string >> (str("''") >> unquoted_string).repeat).as(:str) >> quote }
       rule(:unquoted_string) { match('[^\']').repeat }
 
-      rule(:parens) { match('(') >> space? >> expression >> space? >> match(')') }
+      rule(:parens) { str('(') >> expression >> str(')') }
 
-      rule(:operators) { ops | unary | logical }
-      rule(:ops) { expression >> space? >> operators >> space? >> expression }
-      rule(:unary) { match('!') >> space? >> expression } # can not name it "not"
-      rule(:operators) do
-        match('<=') |
-          match('<') |
-          match('>=') |
-          match('>') |
-          match('==') |
-          match('!=') |
-          match('&&') |
-          match('||')
+      rule(:operations) do
+        infix_expression(
+          base_exp,
+          [str('<='), 1],
+          [str('<'), 1],
+          [str('>='), 1],
+          [str('>'), 1],
+          [str('=='), 2],
+          [str('!='), 2],
+          [str('&&'), 1],
+          [str('||'), 1]
+        )
       end
+      rule(:unary_op) { (str('!') >> expression).as(:not) } # can not name it "not"
 
       rule(:functions) { arg_functions | status_functions }
 
-      rule(:arg_functions) { func_name >> match('(') >> space? >> arguments >> space? >> match(')') }
-      rule(:arguments) { expression >> (match(',') >> space? >> expression).repeat }
+      rule(:arg_functions) { func_name.as(:func) >> str('(') >> arguments.as(:args) >> str(')') }
+      rule(:arguments) { expression >> (str(',') >> expression).repeat }
       rule(:func_name) do
-        match('contains') |
-          match('startsWith') |
-          match('endsWith') |
-          match('format') |
-          match('join') |
-          match('toJSON') |
-          match('fromJSON') |
-          match('hashFiles')
+        str('contains') |
+          str('startsWith') |
+          str('endsWith') |
+          str('format') |
+          str('join') |
+          str('toJSON') |
+          str('fromJSON') |
+          str('hashFiles')
       end
-      rule(:status_functions) { status_func >> match('(') >> space? >> match(')') }
+      rule(:status_functions) { status_func.as(:status) >> str('(') >> space? >> str(')') }
       rule(:status_func) do
-        match('success') |
-          match('always') |
-          match('cancelled') |
-          match('failure')
+        str('success') |
+          str('always') |
+          str('cancelled') |
+          str('failure')
       end
 
       root(:expression)
