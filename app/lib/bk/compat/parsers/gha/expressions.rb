@@ -7,17 +7,27 @@ module BK
     # parse GHA expressions
     # https://docs.github.com/en/actions/learn-github-actions/expressions
     class ExpressionParser < Parslet::Parser
+      # helper rules
       rule(:space) { match('\s').repeat(1) }
       rule(:space?) { space.maybe }
       rule(:quote) { match('\'') }
 
       rule(:base_exp) { space? >> (parens | unary_op | functions | literals) >> space? }
+      # TODO: allow operations to include other operations
       rule(:expression) { operations | base_exp }
 
       rule(:literals) { boolean.as(:bool) | null.as(:null) | number.as(:num) | string }
       rule(:boolean) { str('false') | str('true') }
       rule(:null) { str('null') }
-      rule(:number) { match('[0-9]').repeat(1) } # TODO: support other numbers
+
+      rule(:number) { signed_integer | float | hex | exp }
+      rule(:integer) { match('[0-9]').repeat(1) }
+      rule(:signed_integer) { str('-').maybe >> integer }
+      rule(:float) { signed_integer >> str('.') >> integer }
+      rule(:hex) { str('0x') >> match('[0-9a-f]').repeat(1) }
+      rule(:exp) { float >> match('[eE]') >> signed_integer }
+
+      # TODO: Unquoted strings are a special case that needs to be handled separately
       rule(:string) { quoted_string | unquoted_string.as(:str) }
       rule(:quoted_string) { quote >> (unquoted_string >> (str("''") >> unquoted_string).repeat).as(:str) >> quote }
       rule(:unquoted_string) { match('[^\']').repeat }
