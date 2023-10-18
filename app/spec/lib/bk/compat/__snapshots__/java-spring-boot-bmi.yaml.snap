@@ -1,0 +1,47 @@
+---
+steps:
+- commands:
+  - "# action actions/checkout@v3 can not be translated just yet"
+  - "# action actions/setup-java@v3 can not be translated just yet"
+  - "# action actions/cache@v3 can not be translated just yet"
+  - echo '~~~ Install Maven dependencies'
+  - mvn install
+  - echo '~~~ Run tests'
+  - mvn --batch-mode --update-snapshots verify
+  agents:
+    runs-on: ubuntu-latest
+  label: ":github: project-build"
+  key: project-build
+- commands:
+  - "# action actions/checkout@v3 can not be translated just yet"
+  - "# action actions/setup-java@v3 can not be translated just yet"
+  - "# action actions/cache@v3 can not be translated just yet"
+  - "# action docker/setup-qemu-action@v2 can not be translated just yet"
+  - "# action docker/setup-buildx-action@v2 can not be translated just yet"
+  - "# action docker/login-action@v2 can not be translated just yet"
+  - "# action docker/build-push-action@v4 can not be translated just yet"
+  depends_on:
+  - project-build
+  agents:
+    runs-on: ubuntu-latest
+  label: ":github: docker-build"
+  key: docker-build
+- commands:
+  - "# action actions/checkout@v3 can not be translated just yet"
+  - echo '~~~ Add Server key'
+  - touch key.txt && echo "${{ secrets.SERVER_KEY }}" > key.txt
+  - chmod 600 key.txt
+  - echo '~~~ Deploy the application'
+  - "("
+  - SERVER_HOST="${{ secrets.SERVER_HOST }}"
+  - SERVER_PORT="${{ secrets.SERVER_PORT }}"
+  - SERVER_USER="${{ secrets.SERVER_USER }}"
+  - set -e
+  - "./deploy.sh"
+  - ")"
+  depends_on:
+  - docker-build
+  agents:
+    runs-on: ubuntu-latest
+  label: ":github: deploy"
+  key: deploy
