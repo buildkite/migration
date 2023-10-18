@@ -1,0 +1,14 @@
+---
+steps:
+- commands:
+  - "# action actions/checkout@v2 can not be translated just yet"
+  - "# action actions/setup-python@v2 can not be translated just yet"
+  - echo '~~~ Install requirements'
+  - pip install -r requirements.txt
+  - echo '~~~ Run tests'
+  - cd src
+  - python manage.py test
+  agents:
+    runs-on: ubuntu-latest
+  label: ":github: simple_build"
+  key: simple_build
