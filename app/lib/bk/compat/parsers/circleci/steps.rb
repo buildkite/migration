@@ -132,6 +132,8 @@ module BK
         end
 
         def circle_ci_params(value, config)
+          return value if @parameters.empty?
+
           @parameters.each_with_object(value.dup) do |(name, param), str|
             val = config.fetch(name, param.fetch('default', nil))
             str.sub!(/<<\s*parameters\.#{name}\s*>>/, val)

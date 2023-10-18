@@ -47,13 +47,13 @@ module BK
 
     # basic command step
     class CommandStep
-      attr_accessor :agents, :concurrency, :concurrency_group, :conditional, :depends_on, :key, :label, 
-                    :parameters, :plugins, :soft_fail, :timeout_in_minutes, :transformer
-                    
+      attr_accessor :agents, :concurrency, :concurrency_group, :conditional, :depends_on, :key, :label,
+                    :matrix, :parameters, :plugins, :soft_fail, :timeout_in_minutes, :transformer
+
       attr_reader :commands, :env # we define special writers
 
       LIST_ATTRIBUTES = %w[commands depends_on plugins].freeze
-      HASH_ATTRIBUTES = %w[agents env parameters].freeze
+      HASH_ATTRIBUTES = %w[agents env matrix parameters].freeze
 
       def initialize(**kwargs)
         # nil as default are not acceptable
@@ -153,25 +153,23 @@ module BK
         instance_variables.to_h { |v| [v.to_s.delete_prefix('@').to_sym, instance_variable_get(v)] }
       end
 
-      def instantiate(config)
+      def instantiate(**)
         unless @transformer.nil?
-          params = instance_attributes.transform_values { |val| recurse_to_string(val, config, @transformer.to_proc) }
+          params = instance_attributes.transform_values { |val| recurse_to_string(val, @transformer.to_proc, **) }
         end
         params.delete(:parameters)
 
         self.class.new(**params)
       end
 
-      def recurse_to_string(value, config, block)
-        return value if @parameters.empty?
-
+      def recurse_to_string(value, block, **)
         case value
         when String
-          block.call(value, config)
+          block.call(value, **)
         when Hash
-          value.transform_values! { |elem| recurse_to_string(elem, config, block) }
+          value.transform_values! { |elem| recurse_to_string(elem, block, **) }
         when Array
-          value.map! { |elem| recurse_to_string(elem, config, block) }
+          value.map! { |elem| recurse_to_string(elem, block, **) }
         end
       end
     end
