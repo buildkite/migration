@@ -15,7 +15,7 @@ RSpec.describe BK::Compat::GitHubActions do
         gha_content = File.read(file)
         parsed_content = BK::Compat::GitHubActions.new(gha_content).parse()
 
-        actual = JSON.parse(parsed_content.to_h.to_json).to_yaml
+        actual = parsed_content.render(colors: false)
         expect(actual).to match_snapshot(file_name)
       end
     end  
