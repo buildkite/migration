@@ -3,13 +3,8 @@ steps:
 - commands:
   - "# action actions/checkout@v3 can not be translated just yet"
   - "# action actions/setup-java@v3 can not be translated just yet"
-  - echo '~~~ Build with Maven'
-  - mvn -B package --file pom.xml
-  - echo '~~~ Print name'
-  - "("
-  - BUILD="We are currently running the Build job"
-  - echo "Hello $NAME. $BUILD. Using Java Version $JAVA_VERSION"
-  - ")"
+  - "# action gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25
+    can not be translated just yet"
   agents:
     runs-on: ubuntu-latest
   label: ":github: build"
