@@ -27,12 +27,12 @@ module BK
       rule(:hex) { str('0x') >> match('[0-9a-f]').repeat(1) }
       rule(:exp) { float >> match('[eE]') >> signed_integer }
 
-      # TODO: Unquoted strings are a special case that needs to be handled separately
-      rule(:string) { quoted_string | unquoted_string.as(:str) }
-      rule(:quoted_string) { quote >> (unquoted_string >> (str("''") >> unquoted_string).repeat).as(:str) >> quote }
-      rule(:unquoted_string) { match('[^\']').repeat }
+      # Docs state that strings must be quoted (unless they are not surrounded with ${{ }})
+      rule(:string) do
+        quote >> (UnquotedStringParser.new >> (str("''") >> UnquotedStringParser.new).repeat).as(:str) >> quote
+      end
 
-      rule(:parens) { str('(') >> expression >> str(')') }
+      rule(:parens) { (str('(') >> expression >> str(')')).as(:paren) }
 
       rule(:operations) do
         infix_expression(
@@ -72,6 +72,12 @@ module BK
       end
 
       root(:expression)
+    end
+
+    # Unquoted strings are just characters that don't have single quotes
+    class UnquotedStringParser < Parslet::Parser
+      root(:unquoted_string)
+      rule(:unquoted_string) { match('[^\']').repeat }
     end
   end
 end
