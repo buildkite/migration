@@ -50,7 +50,7 @@ module BK
 
       rule(:functions) { arg_functions | status_functions }
 
-      rule(:arg_functions) { func_name.as(:func) >> str('(') >> arguments.as(:args) >> str(')') }
+      rule(:arg_functions) { func_name.as(:func) >> str('(') >> arguments.repeat(0, 1).as(:args) >> str(')') }
       rule(:arguments) { expression >> (str(',') >> expression).repeat }
       rule(:func_name) do
         str('contains') |
