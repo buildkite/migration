@@ -1,13 +1,14 @@
 steps:
   - label: ":hammer: Linting"
-    command: gem install rubocop && rubocop -l app
+    command:
+      - cd app && bundle install
+      - rubocop -l
     plugins:
       - docker#v5.7.0:
           image: ruby:3.2
 
   - label: ":rspec: Snapshot Testing"
-    command: 
-      - bundle config set --local with 'test'
+    command:
       - cd app && bundle install
       - rspec spec
     plugins:
