@@ -13,9 +13,11 @@ The Buildkite Migration tool supports transforming GitHub Action pipeline defini
 
 ## Partially supported properties
 
+### concurrency
 
+The `concurrency` key within a GitHub Action workflow can be defined at topmost level, and within a single job. The Buildkite Migration tool supports the translation of the `concurrency` key (and `group`/`cancel-in-progress`) in job definitions: and maps to the `concurrency_group` [key](https://buildkite.com/docs/pipelines/controlling-concurrency#concurrency-groups) available within Buildkite. Buildkite also allows a upper limit on how much jobs are created through a single step definition with the `concurrency` key: which is set as `1` by default (there isn't a translatable key within a GitHub Action workflow).
 
-
+The `cancel-in-progress` Boolean value that can be definied in a `concurrency` hash inside a GitHub Action job workflow maps to the Buildkite pipeline setting of [Cancel Intermediate Builds](https://buildkite.com/docs/pipelines/skipping#cancel-running-intermediate-builds) - which can be set within a pipeline's settings page, or when creating/updating a pipeline via the [REST](https://buildkite.com/docs/apis/rest-api/pipelines#create-a-yaml-pipeline)/[GraphQL](https://buildkite.com/docs/apis/graphql/schemas/mutation/pipelinecreate) APIs.
 
 ## Unsupported properties
 
