@@ -1,0 +1,12 @@
+---
+steps:
+- commands:
+  - "# action actions/checkout@v4 can not be translated just yet"
+  - "# action actions/setup-node@v3 can not be translated just yet"
+  - npm ci
+  - npm run build --if-present
+  - npm test
+  agents:
+    runs-on: ubuntu-latest
+  label: ":github: build"
+  key: build
