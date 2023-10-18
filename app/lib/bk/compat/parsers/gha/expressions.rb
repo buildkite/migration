@@ -28,9 +28,8 @@ module BK
       rule(:exp) { float >> match('[eE]') >> signed_integer }
 
       # Docs state that strings must be quoted (unless they are not surrounded with ${{ }})
-      rule(:string) do
-        quote >> (UnquotedStringParser.new >> (str("''") >> UnquotedStringParser.new).repeat).as(:str) >> quote
-      end
+      rule(:string) { quote >> (unquoted_string >> (str("''") >> unquoted_string).repeat).as(:str) >> quote }
+      rule(:unquoted_string) { match('[^\']').repeat }
 
       rule(:parens) { (str('(') >> expression >> str(')')).as(:paren) }
 
@@ -72,12 +71,6 @@ module BK
       end
 
       root(:expression)
-    end
-
-    # Unquoted strings are just characters that don't have single quotes
-    class UnquotedStringParser < Parslet::Parser
-      root(:unquoted_string)
-      rule(:unquoted_string) { match('[^\']').repeat }
     end
   end
 end
