@@ -4,18 +4,16 @@ steps:
   - echo "test=hello" >> "$GITHUB_OUTPUT"
   - echo "test=world" >> "$GITHUB_OUTPUT"
   - source $GITHUB_OUTPUT
-  - buildkite-agent metadata set output1 "$output1"
-  - buildkite-agent metadata set output2 "$output2"
+  - buildkite-agent metadata set "job1.output1" "$output1"
+  - buildkite-agent metadata set "job1.output2" "$output2"
   agents:
     runs-on: ubuntu-latest
-  env:
-    GITHUB_OUTPUT: "/tmp/outputs"
   label: ":github: job1"
   key: job1
 - commands:
   - "("
-  - OUTPUT1="${{needs.job1.outputs.output1}}"
-  - OUTPUT2="${{needs.job1.outputs.output2}}"
+  - OUTPUT1="$(buildkite-agent meta-data get 'job1.output1')"
+  - OUTPUT2="$(buildkite-agent meta-data get 'job1.output2')"
   - echo "$OUTPUT1 $OUTPUT2"
   - ")"
   depends_on:
