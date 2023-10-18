@@ -11,6 +11,5 @@ gem 'rouge'
 group :development, :test do
     gem 'rspec'
     gem 'rspec-snapshot'
-    gem 'rubocop'
 end
 
