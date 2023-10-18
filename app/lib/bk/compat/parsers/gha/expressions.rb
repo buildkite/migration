@@ -72,5 +72,32 @@ module BK
 
       root(:expression)
     end
+
+    # Transform a GHA expression to something that BuildKite can probably understand
+    class ExpressionTransform < Parslet::Transform
+      rule(boolean: simple(:b)) { b.to_b }
+      rule(num: simple(:n)) { n.to_i }
+      rule(str: simple(:s)) { s.to_s }
+      rule(:null) { 0 }
+
+      rule(paren: simple(:e)) { "(#{e})" }
+      rule(not: simple(:t)) { "!#{t}" }
+
+      rule(l: simple(:lhs), o: simple(:o), r: simple(:rhs)) { "#{lhs} #{o} #{rhs}" }
+      rule(status: simple(:s)) { "#{s} not currently supported" }
+
+      rule(func: simple(:func), args: subtree(:args)) do
+        case func
+        when 'contains'
+          "#{args[0]} ~= /#{args[1]}/"
+        when 'startsWith'
+          "#{args[0]} ~= /^#{args[1]}/"
+        when 'endsWith'
+          "#{args[0]} ~= /#{args[1]}$/"
+        else
+          "#{func} not currently supported with #{args}"
+        end
+      end
+    end
   end
 end
