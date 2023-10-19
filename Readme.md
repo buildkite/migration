@@ -1,6 +1,6 @@
 # Buildkite Migration tool
 
-A tool to transform pipelines from other CI providers to Buildkite.
+A tool to help kick start the transition of pipelines from other CI providers, to Buildkite.
 
 ```shell
 $ buildkite-compat examples/circleci/legacy.yml
@@ -17,7 +17,7 @@ steps:
   key: build
 ```
 
-Note that setting the environment variable `BUILDKITE_PLUGIN_<UPPERCASE_NAME>_VERSION` will override the default version of the plugins used. For example:
+Note: Setting the environment variable `BUILDKITE_PLUGIN_<UPPERCASE_NAME>_VERSION` will override the default version of the plugins used. For example:
 
 ```shell
 $ BUILDKITE_PLUGIN_DOCKER_VERSION=testing-branch buildkite-compat examples/circleci/legacy.yml
@@ -38,16 +38,16 @@ steps:
 
 Buildkite Compat can also be used via a HTTP API using `rackup` from the `app` folder of this repository.
 
-Note that if you are using the docker image you will have to override the entrypoint:
+Note: If you are using the docker image you will have to override the entrypoint:
 ```shell
 $ docker run --rm -ti -p 9292:9292 --entrypoint '' --workdir /app $IMAGE:$TAG rackup --port 9292
 ```
 
-After that you should be able to access a very simple web interface at http://localhost:9292 
+After that, you can access a simple web interface at http://localhost:9292
 
 ![Web UI](docs/images/web-ui.png)
 
-You could also programatically interact with it (maybe even pipe the output directly to `buildkite-agent pipeline upload`!):
+You can also programatically interact with it (maybe even pipe the output directly to `buildkite-agent pipeline upload`!):
 
 ```shell
 $ curl -X POST -F 'file=@app/examples/circleci/legacy.yml' http://localhost:9292
@@ -66,4 +66,4 @@ steps:
 
 ## Translation results
 
-BuildKite has its own suggestions and best practices that are probably different to those of other providers so you should review and use the results of this tool as your first stepping stone into your adoption of BuildKite.
+Buildkite has its own suggested best practices, these may differ to those from other providers, check out the [Buildkite Docs](https://buildkite.com/docs) for more information. Review and use the results of this tool as the basis towards Buildkite adoption, the output of the migration tool is a guide and manual editing is likely to be required.
