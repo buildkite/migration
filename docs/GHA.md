@@ -1,15 +1,6 @@
 # GitHub Actions
 
-The Buildkite Migration tool supports transforming GitHub Action pipeline definitions to Buildkite pipelines.
-
-## Supported properties
-
-
-
-
-
-
-
+The Buildkite Migration tool supports transforming GitHub Action workflow definitions to Buildkite pipelines.
 
 ## Partially supported properties
 
@@ -19,7 +10,26 @@ The `concurrency` key within a GitHub Action workflow can be defined at topmost 
 
 The `cancel-in-progress` Boolean value that can be definied in a `concurrency` hash inside a GitHub Action job workflow maps to the Buildkite pipeline setting of [Cancel Intermediate Builds](https://buildkite.com/docs/pipelines/skipping#cancel-running-intermediate-builds) - which can be set within a pipeline's settings page, or when creating/updating a pipeline via the [REST](https://buildkite.com/docs/apis/rest-api/pipelines#create-a-yaml-pipeline)/[GraphQL](https://buildkite.com/docs/apis/graphql/schemas/mutation/pipelinecreate) APIs.
 
+### jobs
+
+GitHub Action workflows allows you to specify one or more `jobs` - main tasks of a workflow that run in parallel by default.
+
+The Buildkite Migration tool currently suports the following 
+
+- `runs_on`: The `runs_on` key defines the type of machine that the job will run on. Within Buildkite, this is mapped to an agent targeting [tag](https://buildkite.com/docs/agent/v3/queues#targeting-a-queue) of `runs_on`. Note that jobs that target custom `tag` names will have a `queue` target of `default`.
+- `steps`: Steps that are defined for a particular `job`. Any `run` key is supported - and at present, any action that defines a `uses` attribute currently is not supported
+
+### env
+
+
+
 ## Unsupported properties
+
+### defaults
+
+A `defaults` key allows the definition of a hash in which configuration will apply to all of a workflow's jobs. 
+
+While there isn't a direct translation from a GitHub Action workflow to a Buildkite pipeline - the Buildkite platform allows jobs to have default configuration applied to them through the use of [Agent](https://buildkite.com/docs/agent/v3/hooks#agent-lifecycle-hooks) or [Job](https://buildkite.com/docs/agent/v3/hooks#job-lifecycle-hooks) Lifecycle hooks. Agent lifecycle hooks allows the coniguration of customized commands on agent start up and shut down. Job Lifecycle hooks allow for the customization of what occurs at each stage of a job's lifecycle - and can be specified and applied at an agent, repository or plugin level.
 
 ### name
 
