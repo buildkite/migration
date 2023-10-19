@@ -16,7 +16,7 @@ module BK
       # TODO: allow operations to include other operations
       rule(:expression) { operations | base_exp }
 
-      rule(:literals) { boolean.as(:bool) | null.as(:null) | number.as(:num) | string }
+      rule(:literals) { boolean.as(:bool) | null.as(:null) | number.as(:num) | string | context }
       rule(:boolean) { str('false') | str('true') }
       rule(:null) { str('null') }
 
@@ -69,6 +69,23 @@ module BK
           str('cancelled') |
           str('failure')
       end
+
+      rule(:context) { (ctx_name >> (str('.') >> atom).repeat(1)).as(:context) }
+      rule(:ctx_name) do
+        str('env') |
+          str('github') |
+          str('inputs') |
+          str('jobs') |
+          str('job') |
+          str('matrix') |
+          str('needs') |
+          str('runner') |
+          str('secrets') |
+          str('steps') |
+          str('strategy') |
+          str('vars')
+      end
+      rule(:atom) { str('*') | (match('[_a-zA-Z]') >> match('[a-zA-Z0-9_-]').repeat) }
 
       root(:expression)
     end

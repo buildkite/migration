@@ -149,4 +149,27 @@ RSpec.describe BK::Compat::ExpressionParser do
       end
     end
   end
+
+  context 'contexts' do
+    subject { p.context }
+
+    contexts = %w[github inputs job jobs matrix needs runner secrets steps strategy vars].freeze
+    contexts.each do |ctx|
+      it "can parse #{ctx}" do
+        expect(subject).to parse("#{ctx}.one")
+        expect(subject).to parse("#{ctx}.one.two1")
+        expect(subject).to parse("#{ctx}.*.two.thr2ee")
+        expect(subject).to parse("#{ctx}.on_e.*.three")
+        expect(subject).to parse("#{ctx}.one.tw-o.*")
+        expect(subject).to parse("#{ctx}.*._two.*")
+
+        expect { subject.parse("#{ctx}.0invalid") }.to raise_error Parslet::ParseFailed
+        expect { subject.parse("#{ctx}.-invalid") }.to raise_error Parslet::ParseFailed
+        expect { subject.parse("#{ctx}.") }.to raise_error Parslet::ParseFailed
+        expect { subject.parse(ctx) }.to raise_error Parslet::ParseFailed
+
+        expect(p.parse("#{ctx}.one.two")).to include(:context)
+      end
+    end
+  end
 end
