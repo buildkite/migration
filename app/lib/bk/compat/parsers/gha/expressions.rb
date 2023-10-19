@@ -20,7 +20,7 @@ module BK
       rule(:boolean) { str('false') | str('true') }
       rule(:null) { str('null') }
 
-      rule(:number) { signed_integer | float | hex | exp }
+      rule(:number) { hex | exp | float | signed_integer }
       rule(:integer) { match('[0-9]').repeat(1) }
       rule(:signed_integer) { str('-').maybe >> integer }
       rule(:float) { signed_integer >> str('.') >> integer }
