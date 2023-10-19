@@ -1,6 +1,6 @@
 # Buildkite Migration tool
 
-A tool to transition pipelines from other CI providers to Buildkite.
+A tool to help kick start the transition of pipelines from other CI providers, to Buildkite.
 
 ```shell
 $ buildkite-compat examples/circleci/legacy.yml
@@ -66,4 +66,4 @@ steps:
 
 ## Translation results
 
-Buildkite has its own suggested best practices, these may differ to those from other providers. Review and use the results of this tool as your stepping stone towards Buildkite adoption. Check out the [Buildkite Docs](https://buildkite.com/docs) for more information.
+Buildkite has its own suggested best practices, these may differ to those from other providers, check out the [Buildkite Docs](https://buildkite.com/docs) for more information. Review and use the results of this tool as the basis towards Buildkite adoption, the output of the migration tool is a guide and manual editing is likely to be required.
