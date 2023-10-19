@@ -67,6 +67,8 @@ module BK
       def replace_params(str)
         context, rest = str.split('.', 2)
         send("replace_context_#{context}", rest)
+      rescue NoMethodError
+        "Context element #{str} can not be translated (yet)"
       end
 
       def replace_context_env(var_name)
