@@ -18,8 +18,8 @@ module BK
         @env = env
       end
 
-      def render(**)
-        BK::Compat::Renderer.new(to_h).render(**)
+      def render(*, **)
+        BK::Compat::Renderer.new(to_h).render(*, **)
       end
 
       def to_h

@@ -153,23 +153,23 @@ module BK
         instance_variables.to_h { |v| [v.to_s.delete_prefix('@').to_sym, instance_variable_get(v)] }
       end
 
-      def instantiate(**)
+      def instantiate(*, **)
         unless @transformer.nil?
-          params = instance_attributes.transform_values { |val| recurse_to_string(val, @transformer.to_proc, **) }
+          params = instance_attributes.transform_values { |val| recurse_to_string(val, @transformer.to_proc, *, **) }
         end
         params.delete(:parameters)
 
         self.class.new(**params)
       end
 
-      def recurse_to_string(value, block, **)
+      def recurse_to_string(value, block, *, **)
         case value
         when String
-          block.call(value, **)
+          block.call(value, *, **)
         when Hash
-          value.transform_values! { |elem| recurse_to_string(elem, block, **) }
+          value.transform_values! { |elem| recurse_to_string(elem, block, *, **) }
         when Array
-          value.map! { |elem| recurse_to_string(elem, block, **) }
+          value.map! { |elem| recurse_to_string(elem, block, *, **) }
         end
       end
     end
