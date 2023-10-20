@@ -23,7 +23,7 @@ GitHub Action workflows allows you to specify one or more `jobs` - main tasks of
 The Buildkite Migration tool currently supports the following 
 
 - `runs_on`: The `runs_on` key defines the type of machine that the job will run on. Within Buildkite, this is mapped to an agent targeting [tag](https://buildkite.com/docs/agent/v3/queues#targeting-a-queue) of `runs_on`. Note that jobs that target custom `tag` names will have a `queue` target of `default`.
-- `steps`: Steps that are defined for a particular `job`. Any `run` key is supported - and at present, any action that defines a `uses` attribute currently is not supported
+- `steps`: Steps that are defined for a particular `job`. Any `run` key is supported - and at present, any action that defines a `uses` attribute currently is not supported.
 
 ## Unsupported properties
 
