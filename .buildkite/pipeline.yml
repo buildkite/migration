@@ -15,8 +15,3 @@ steps:
       - docker#v5.9.0:
           image: ruby:3.2
           workdir: /app
-
-  - wait: ~
-
-  - label: ":docker: Build image"
-    command: docker build . -t migration

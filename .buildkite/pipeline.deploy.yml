@@ -1,0 +1,39 @@
+steps:
+  # Run the tests again to make sure they pass before deploying
+  - label: ":hammer: Linting"
+    command:
+      - cd app && bundle install
+      - rubocop -l
+    plugins:
+      - docker#v5.7.0:
+          image: ruby:3.2
+
+  - label: ":rspec: Snapshot Testing"
+    command:
+      - cd app && bundle install
+      - rspec spec
+    plugins:
+      - docker#v5.9.0:
+          image: ruby:3.2
+          workdir: /app
+
+  - wait: ~
+
+  - label: ":docker: :rocket: Latest"
+    commands:
+      - docker build . -t buildkite/migration-tool
+      - docker push buildkite/migration-tool
+    plugins:
+      - docker-login#v2.1.0: ~
+    if: |
+      build.branch == 'main'
+
+
+  - label: ":docker: :rocket: Tag"
+    plugins:
+      - docker-login#v2.1.0: ~
+    commands:
+      - docker build . -t buildkite/migration-tool:${BUILDKITE_TAG}
+      - docker push buildkite/migration-tool:${BUILDKITE_TAG}
+    if: |
+      build.tag != null
