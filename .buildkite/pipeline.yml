@@ -4,7 +4,7 @@ steps:
       - cd app && bundle install
       - rubocop -l
     plugins:
-      - docker#v5.7.0:
+      - docker#v5.9.0:
           image: ruby:3.2
 
   - label: ":rspec: Snapshot Testing"
