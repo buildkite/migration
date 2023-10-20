@@ -67,3 +67,10 @@ steps:
 ## Translation results
 
 Buildkite has its own suggested best practices, these may differ to those from other providers, check out the [Buildkite Docs](https://buildkite.com/docs) for more information. Review and use the results of this tool as the basis towards Buildkite adoption, the output of the migration tool is a guide and manual editing is likely to be required.
+
+## Further Details 
+
+Further information on the currently supported attributes of CI provider pipeline translation to Buildkite pipelines can be found below (within the `/docs` directory):
+
+- [GitHub Actions](/docs/GHA.md)
+- [CircleCI](/docs/CircleCI.md)
