@@ -23,9 +23,9 @@ steps:
   matrix:
     setup:
       php:
-      -
-      -
-      -
+      - 
+      - 
+      - 
       stability:
       - prefer-lowest
       - prefer-stable
