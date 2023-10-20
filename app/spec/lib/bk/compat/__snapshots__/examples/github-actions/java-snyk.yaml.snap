@@ -12,5 +12,7 @@ steps:
   - ")"
   agents:
     runs-on: ubuntu-latest
+  env:
+    JAVA_VERSION: '11'
   label: ":github: build"
   key: build

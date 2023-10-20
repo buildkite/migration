@@ -10,6 +10,7 @@ steps:
   - build
   label: ":github: deploy-test"
   key: deploy-test
+  concurrency: 1
   concurrency_group: deploy-test
 - commands:
   - "./deploy-staging.sh"
@@ -17,6 +18,7 @@ steps:
   - deploy-test
   label: ":github: deploy-staging"
   key: deploy-staging
+  concurrency: 1
   concurrency_group: deploy-staging
 - commands:
   - "# cancel-in-progress in Buildkite is the pipeline setting Cancel Intermediate
@@ -26,4 +28,5 @@ steps:
   - deploy-staging
   label: ":github: deploy-prod"
   key: deploy-prod
+  concurrency: 1
   concurrency_group: deploy-production
