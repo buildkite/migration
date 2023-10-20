@@ -170,6 +170,9 @@ module BK
           value.transform_values! { |elem| recurse_to_string(elem, block, *, **) }
         when Array
           value.map! { |elem| recurse_to_string(elem, block, *, **) }
+        else
+          # if we don't know how to do this, do nothing
+          value
         end
       end
     end
