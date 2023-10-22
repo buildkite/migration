@@ -7,23 +7,19 @@ module BK
       private
 
       def load_orb(key, _conf)
-        translator = CircleCISteps::GenericOrb.new(key)
-        register_translator(*translator.register)
+        CircleCISteps::GenericOrb.new(key, register: method(:register_translator))
       end
     end
 
     module CircleCISteps
       # Generic orb steps/jobs (that states it is not supported)
       class GenericOrb
-        def initialize(key)
+        def initialize(key, register:)
           @prefix = key
-        end
-
-        def register
-          [
-            Regexp.new("^#{@prefix}/"),
+          register.call(
+            ->(orb, _conf) { orb.start_with?("#{key}/") },
             method(:translator)
-          ]
+          )
         end
 
         private

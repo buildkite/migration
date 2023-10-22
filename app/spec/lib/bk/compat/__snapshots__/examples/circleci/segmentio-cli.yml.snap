@@ -1,0 +1,13 @@
+---
+steps:
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - go get -v -t
+  - go vet
+  - go test -v -race
+  plugins:
+  - docker#v5.7.0:
+      image: circleci/golang
+  agents:
+    executor_type: docker
+  key: build

@@ -8,6 +8,8 @@ steps:
   - buildkite-agent metadata set "job1.output2" "$output2"
   agents:
     runs-on: ubuntu-latest
+  env:
+    GITHUB_OUTPUT: "/tmp/outputs"
   label: ":github: job1"
   key: job1
 - commands:

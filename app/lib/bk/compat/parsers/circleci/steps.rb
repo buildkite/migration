@@ -126,7 +126,7 @@ module BK
 
       # wrapper class to setup parameters
       class CircleCIStep < BK::Compat::CommandStep
-        def initialize(**)
+        def initialize(*, **)
           super
           @transformer = method(:circle_ci_params)
         end

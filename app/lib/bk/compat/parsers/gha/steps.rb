@@ -50,7 +50,7 @@ module BK
 
     # wrapper class to setup parameters
     class GHAStep < BK::Compat::CommandStep
-      def initialize(**)
+      def initialize(*, **)
         super
         @transformer = method(:gha_params)
       end
