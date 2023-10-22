@@ -1,34 +1,24 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
+require_relative '../../../../lib/bk/compat/parsers/circleci'
 
-RSpec.describe 'Circle CI Parser' do 
-  it 'runs ok' do
-    expect(1).to eql(1)
+
+RSpec.describe BK::Compat::CircleCI do
+  let(:circleci) { BK::Compat::CircleCI }
+
+  context 'it runs a snapshot test on each example' do
+    directory_path = 'examples/circleci'
+
+    Dir.glob("#{directory_path}/*").each do |file|
+      next if File.directory?(file)
+
+      it "compares the generated pipeline for #{file} to the original" do
+        gha_content = File.read(file)
+        parsed_content = circleci.new(gha_content).parse
+
+        actual = parsed_content.render(colors: false)
+        expect(actual).to match_snapshot(file)
+      end
+    end
   end
-end 
-
-# RSpec.describe BK::Compat::CircleCI do
-#   let(:circleci) { BK::Compat::CircleCI.new }
-
-#   context 'facebook-react.yml' do
-#     let(:subject) do |e| 
-#       BK::Compat::CircleCI.new("examples/circleci/#{e.example_group.description}").parse(workflow: 'stable')
-#     end
-
-#     it 'does stuff' do
-#       #puts JSON.parse(subject.to_h.to_json).to_yaml
-#     end
-#   end
-
-#   context 'segmentio-aws-okta.yml' do
-#     let(:subject) do |e|
-#       BK::Compat::CircleCI.new("examples/circleci/#{e.example_group.description}",
-#                                       workflow: 'test-dist-publish-linux')
-#     end
-
-#     it 'does stuff' do
-#       #puts JSON.parse(subject.to_h.to_json).to_yaml
-#     end
-#   end
-# end
+end

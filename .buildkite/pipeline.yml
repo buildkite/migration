@@ -4,7 +4,7 @@ steps:
       - cd app && bundle install
       - rubocop -l
     plugins:
-      - docker#v5.7.0:
+      - docker#v5.9.0:
           image: ruby:3.2
 
   - label: ":rspec: Snapshot Testing"
@@ -15,8 +15,3 @@ steps:
       - docker#v5.9.0:
           image: ruby:3.2
           workdir: /app
-
-  - wait: ~
-
-  - label: ":docker: Build image"
-    command: docker build . -t migration
