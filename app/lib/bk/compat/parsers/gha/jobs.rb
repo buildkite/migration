@@ -16,6 +16,7 @@ module BK
         bk_step.agents.update(config.slice('runs-on'))
         bk_step.depends_on = Array(config['needs'])
         bk_step << translate_outputs(config['outputs'], name)
+        bk_step << translate_uses(config) if config['uses']
         bk_step.instantiate
       end
 
@@ -45,6 +46,27 @@ module BK
         end
 
         bk_step
+      end
+
+      def translate_uses(step)
+        case step['uses']
+        when /docker\/login-action.*/
+          BK::Compat::Plugin.new(
+            name: 'docker-login',
+            config: {
+              'username' => uses['username'],
+              'password-env' => uses['password'],
+            }
+          )
+
+        when /actions\/setup-python.*/
+          BK::Compat::Plugin.new(
+            name: 'setup-python',
+            config: {
+              'version' => uses['python-version'],
+            }
+          )
+        end
       end
     end
   end
