@@ -38,8 +38,16 @@ steps:
 
 Buildkite Compat can also be used via a HTTP API using `rackup` from the `app` folder of this repository.
 
+You start the web UI with either of the following docker commands:
+
 ```sh
 docker compose up webui
+```
+
+Note: If you are using `docker run` you will have to override the entrypoint:
+
+```shell
+$ docker run --rm -ti -p 9292:9292 --entrypoint '' --workdir /app $IMAGE:$TAG rackup --port 9292
 ```
 
 After that, you can access a simple web interface at http://localhost:9292
