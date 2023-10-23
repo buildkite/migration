@@ -32,7 +32,19 @@ module BK
       end
 
       def translate_uses(step)
-        "# action #{step['uses']} can not be translated just yet"
+        case step['uses']
+        when /\Aactions\/setup-python@v\d+\z/
+          python_version = step.dig('with', 'python-version') || 'latest'
+          { 
+            "plugins" => [
+              { 
+                "docker#v5.9.0" => {
+                  "image" => "python:#{python_version}"
+                }
+              }
+            ]
+          }
+        end
       end
 
       def generate_command_string(commands: [], env: {}, workdir: nil)
