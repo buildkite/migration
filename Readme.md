@@ -39,7 +39,7 @@ steps:
 Buildkite Compat can also be used via a HTTP API using `rackup` from the `app` folder of this repository.
 
 ```sh
-docker-compose up app
+docker compose up webui
 ```
 
 After that, you can access a simple web interface at http://localhost:9292

@@ -1,6 +1,6 @@
 version: "3"
 services:
-  app:
+  webui:
     build: .
     command: rackup --port 9292
     entrypoint: ""
