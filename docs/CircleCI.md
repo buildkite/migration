@@ -12,7 +12,7 @@ The Buildkite Migration tool supports reading configuration defined from anchors
 
 ### commands
 
-A `command` defined in a CircleCI pipeline is a reusable set of instructions with parameters that can be inserted into required `job` executions. Commands can have their own set list of `steps` that are translated through to the generated [command step](https://buildkite.com/docs/pipelines/command-step)'s `commands`. If a `command` contains a `parameters` key, its default parameters that is specified within the block is passed through into the specific command if it is utilised.
+A `command` defined in a CircleCI pipeline is a reusable set of instructions with parameters that can be inserted into required `job` executions. Commands can have their own set list of `steps` that are translated through to the generated [command step](https://buildkite.com/docs/pipelines/command-step)'s `commands`. If a `command` contains a `parameters` key, its default parameters that are specified within the block is passed through into the specific command if it is utilised.
 
 ### workflows
 
@@ -36,7 +36,7 @@ The Buildkite Migration tool currently supports the following keys relative to C
 
 #### Docker
 
-- `docker`: Specifies that the `job` will run within a Docker container (by its `image` property). Translates to the use of the [Docker Buildkite Plugin](https://github.com/buildkite-plugins/docker-buildkite-plugin) with the specified image defined - and additionally: the [Docker Login Plugin](https://github.com/buildkite-plugins/docker-login-buildkite-plugin) and the [ECR Buildkite Plugin](https://github.com/buildkite-plugins/ecr-buildkite-plugin) if `auth` or `aws-auth` is specified in the `docker` parameter respectfully. The [Docker Compose Buildkite Plugin](https://github.com/buildkite-plugins/docker-compose-buildkite-plugin) will need to be used for multi-container `jobs`. Sets the [agent targeting](https://buildkite.com/docs/pipelines/defining-steps#targeting-specific-agents) for the generated [command step](https://buildkite.com/docs/pipelines/command-step) to `executor_type: docker`.
+- `docker`: Specifies that the `job` will run within a Docker container (by its `image` property) with the use of the [Docker Buildkite Plugin](https://github.com/buildkite-plugins/docker-buildkite-plugin). Additionally, the [Docker Login Plugin](https://github.com/buildkite-plugins/docker-login-buildkite-plugin) is appended if an `auth` property is defined, or the [ECR Buildkite Plugin](https://github.com/buildkite-plugins/ecr-buildkite-plugin) if an `aws-auth` property is defined within the `docker` property. Sets the [agent targeting](https://buildkite.com/docs/pipelines/defining-steps#targeting-specific-agents) for the generated [command step](https://buildkite.com/docs/pipelines/command-step) to `executor_type: docker`.
 
 #### Machine 
 
