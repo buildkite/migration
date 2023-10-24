@@ -159,8 +159,8 @@ RSpec.describe BK::Compat::ExpressionParser do
         expect(subject).to parse("#{ctx}.one")
         expect(subject).to parse("#{ctx}.one.two1")
         expect(subject).to parse("#{ctx}.*.two.thr2ee")
-        expect(subject).to parse("#{ctx}.on_e.*.three")
-        expect(subject).to parse("#{ctx}.one.tw-o.*")
+        expect(subject).to parse("#{ctx}.on_e[sd].*.three")
+        expect(subject).to parse("#{ctx}.one.tw-o[1].*")
         expect(subject).to parse("#{ctx}.*._two.*")
 
         expect { subject.parse("#{ctx}.0invalid") }.to raise_error Parslet::ParseFailed

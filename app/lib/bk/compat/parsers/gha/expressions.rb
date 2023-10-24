@@ -85,7 +85,8 @@ module BK
           str('strategy') |
           str('vars')
       end
-      rule(:atom) { str('*') | (match('[_a-zA-Z]') >> match('[a-zA-Z0-9_-]').repeat) }
+      rule(:atom) { str('*') | (match('[_a-zA-Z]') >> match('[a-zA-Z0-9_-]').repeat >> index.maybe) }
+      rule(:index) { str('[') >> match('[a-zA-Z0-9_-]').repeat >> str(']') }
 
       root(:expression)
     end
@@ -173,5 +174,14 @@ module BK
         "Invalid expression #{str}"
       end
     end
+
+    # Helpful to debug how a string is parsed
+    # From https://stackoverflow.com/a/15727569/1352026
+    # class Parslet::Atoms::Context
+    #   def lookup(obj, pos)
+    #     p obj
+    #     @cache[pos][obj.object_id]
+    #   end
+    # end
   end
 end
