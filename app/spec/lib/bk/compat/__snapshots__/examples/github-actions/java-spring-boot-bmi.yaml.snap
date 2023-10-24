@@ -18,10 +18,13 @@ steps:
   - "# action actions/cache@v3 can not be translated just yet"
   - "# action docker/setup-qemu-action@v2 can not be translated just yet"
   - "# action docker/setup-buildx-action@v2 can not be translated just yet"
-  - "# action docker/login-action@v2 can not be translated just yet"
   - "# action docker/build-push-action@v4 can not be translated just yet"
   depends_on:
   - project-build
+  plugins:
+  - docker-login#v2.1.0:
+      username: "${{ secrets.DOCKERHUB_USERNAME }}"
+      password-env: "${{ secrets.DOCKERHUB_TOKEN }}"
   agents:
     runs-on: ubuntu-latest
   label: ":github: docker-build"
