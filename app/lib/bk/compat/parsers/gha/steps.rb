@@ -35,7 +35,7 @@ module BK
         case step['uses']
         when /\Aactions\/setup-python@v\d+\z/
           python_version = step.dig('with', 'python-version') || 'latest'
-          image_string = "python: #{python_version}"
+          image_string = "python:#{python_version}"
           BK::Compat::Plugin.new(
             name: 'docker',
             config: {

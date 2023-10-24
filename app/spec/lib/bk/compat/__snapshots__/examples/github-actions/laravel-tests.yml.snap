@@ -1,7 +1,7 @@
 ---
 steps:
 - commands:
-  - "# action actions/checkout@v4 can not be translated just yet"
+  - "# action actions/checkout@v4 is not necessary in Buildkite"
   - "# action shivammathur/setup-php@v2 can not be translated just yet"
   - "# action nick-fields/retry@v2 can not be translated just yet"
   - "# action nick-fields/retry@v2 can not be translated just yet"
