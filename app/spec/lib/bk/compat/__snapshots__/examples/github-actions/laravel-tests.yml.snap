@@ -8,7 +8,7 @@ steps:
   - "# action nick-fields/retry@v2 can not be translated just yet"
   - echo '~~~ Execute tests'
   - "("
-  - DB_PORT="Context element job.services.mysql.ports[3306]  can not be translated
+  - DB_PORT="Context element job.services.mysql.ports[3306] can not be translated
     (yet)"
   - DB_USERNAME="root"
   - DYNAMODB_CACHE_TABLE="laravel_dynamodb_test"
