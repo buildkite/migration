@@ -12,10 +12,7 @@ module BK
         bk_step = generate_base_step(name, config)
         set_concurrency(bk_step, config) if config['concurrency']
         set_matrix(bk_step, config) if config['strategy']
-        config['steps'].each do |step|
-            bk_step << translate_step(step)
-            bk_step << translate_uses(step) if step['uses']
-        end
+        config['steps'].each { |step| bk_step << translate_step(step) }
         bk_step.agents.update(config.slice('runs-on'))
         bk_step.depends_on = Array(config['needs'])
         bk_step << translate_outputs(config['outputs'], name)
@@ -49,19 +46,6 @@ module BK
 
         bk_step
       end
-
-    def translate_uses(step)
-        case step['uses']
-        when /docker\/login-action.*/
-            BK::Compat::Plugin.new(
-                name: 'docker-login',
-                config: {
-                    'username' => step['with']['username'],
-                    'password-env' => step['with']['password'],
-                }
-            )
-        end
-    end
     end
   end
 end

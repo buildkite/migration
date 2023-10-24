@@ -42,6 +42,14 @@ module BK
               'image' => image_string
             }
           )
+        when /docker\/login-action.*/
+          BK::Compat::Plugin.new(
+            name: 'docker-login',
+            config: {
+              'username' => step['with']['username'],
+              'password-env' => step['with']['password'],
+            }
+          )
         when /\Aactions\/checkout@v\d+\z/
           "# action #{step['uses']} is not necessary in Buildkite"
         else
