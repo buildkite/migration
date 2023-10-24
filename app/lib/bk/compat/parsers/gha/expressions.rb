@@ -92,7 +92,7 @@ module BK
 
     # Transform a GHA expression to something that BuildKite can probably understand
     class ExpressionTransform < Parslet::Transform
-      rule(boolean: simple(:b)) { b.to_b }
+      rule(bool: simple(:b)) { b.to_s }
       rule(num: simple(:n)) { n.to_i }
       rule(str: simple(:s)) { s.to_s }
       rule(:null) { 0 }
@@ -114,6 +114,63 @@ module BK
         else
           "#{func} not currently supported with #{args}"
         end
+      end
+
+      rule(context: simple(:c)) { GithubContext.replace(c.to_s) }
+    end
+
+    class GithubContext
+      def self.replace(str)
+        context, rest = str.split('.', 2)
+        send("replace_context_#{context}", rest)
+      rescue NoMethodError
+        "Context element #{str} can not be translated (yet)"
+      end
+
+      def self.replace_context_env(var_name)
+        # env context get mapped to environment variables
+        "$#{var_name}"
+      end
+
+      def self.replace_context_vars(var_name)
+        # env context get mapped to environment variables
+        "$#{var_name}"
+      end
+
+      def self.replace_context_needs(path)
+        job, context, *rest = path.split('.')
+        case context
+        when 'results'
+          # return values are not the same, but it is a rough equivalent
+          "$(buildkite-agent step get outcome --step '#{job}')"
+        when 'outputs'
+          replace_context_needs_outputs(job, rest)
+        end
+      end
+
+      def self.replace_context_needs_outputs(job, path_list)
+        if path_list.empty?
+          # format of the resulting output is probably not the same
+          "$(for KEY in $(buildkite-agent meta-data list | grep '^#{job}.')) do" \
+            'buildkite-agent meta-data get "$KEY"; end)'
+        elsif path_list.one?
+          "$(buildkite-agent meta-data get '#{job}.#{path_list[0]}')"
+        else
+          "#{path_list} does not appear to be a valid step output"
+        end
+      end
+    end
+
+    class GithubExpressions
+      def initialize
+        @parser = ExpressionParser.new
+        @transformer = ExpressionTransform.new(raise_on_unmatched: true)
+      end
+
+      def transform(str)
+        @transformer.apply(@parser.parse(str))
+      rescue Parslet::ParseFailed
+        "Invalid expression #{str}"
       end
     end
   end

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'expressions'
+
 module BK
   module Compat
     # Implement GHA Builtin Steps
@@ -56,51 +58,12 @@ module BK
       end
 
       EXPRESSION_REGEXP = /\${{\s*(?<data>.*)\s*}}/
+      EXPRESSION_TRANSFORMER = BK::Compat::GithubExpressions.new
 
       def gha_params(value)
         value.gsub(EXPRESSION_REGEXP) do |v|
           d = EXPRESSION_REGEXP.match(v)
-          replace_params(d[:data])
-        end
-      end
-
-      def replace_params(str)
-        context, rest = str.split('.', 2)
-        send("replace_context_#{context}", rest)
-      rescue NoMethodError
-        "Context element #{str} can not be translated (yet)"
-      end
-
-      def replace_context_env(var_name)
-        # env context get mapped to environment variables
-        "$#{var_name}"
-      end
-
-      def replace_context_vars(var_name)
-        # env context get mapped to environment variables
-        "$#{var_name}"
-      end
-
-      def replace_context_needs(path)
-        job, context, *rest = path.split('.')
-        case context
-        when 'results'
-          # return values are not the same, but it is a rough equivalent
-          "$(buildkite-agent step get outcome --step '#{job}')"
-        when 'outputs'
-          replace_context_needs_outputs(job, rest)
-        end
-      end
-
-      def replace_context_needs_outputs(job, path_list)
-        if path_list.empty?
-          # format of the resulting output is probably not the same
-          "$(for KEY in $(buildkite-agent meta-data list | grep '^#{job}.')) do" \
-            'buildkite-agent meta-data get "$KEY"; end)'
-        elsif path_list.one?
-          "$(buildkite-agent meta-data get '#{job}.#{path_list[0]}')"
-        else
-          "#{path_list} does not appear to be a valid step output"
+          EXPRESSION_TRANSFORMER.transform(d[:data])
         end
       end
     end
