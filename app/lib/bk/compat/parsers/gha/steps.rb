@@ -11,7 +11,7 @@ module BK
         )
 
         register.call(
-          ->(conf) { conf.include?('uses') },
+          ->(conf) { conf.include?('uses') && supported_action?(conf['uses']) },
           method(:translate_uses)
         )
       end
@@ -31,6 +31,13 @@ module BK
         ].flatten.compact
       end
 
+      def supported_action?(action)
+        supported_actions = [
+          /\Aactions\/setup-python@v\d+\z/
+        ]
+        supported_actions.any? { |supported_action| action =~ supported_action }
+      end
+
       def translate_uses(step)
         case step['uses']
         when /\Aactions\/setup-python@v\d+\z/
@@ -43,9 +50,8 @@ module BK
             }
           )
         else
-          nil
+          return nil
         end
-
       end
 
       def generate_command_string(commands: [], env: {}, workdir: nil)
