@@ -41,7 +41,7 @@ The Buildkite Migration tool currently supports the following keys relative to C
 
 #### Machine (Execution Environment)
 
-- `machine`: Specifies that the `job` will run on a machine execution environment. The `resource_class` parameter will be utilised to specify [agent targeting](https://buildkite.com/docs/pipelines/defining-steps#targeting-specific-agents) for the generated [command step](https://buildkite.com/docs/pipelines/command-step), in addition to setting the additional tags of ``executor_type: machine` and `executor_image: self-hosted`.
+- `machine`: Specifies that the `job` will run on a machine execution environment. This translates to [agent targeting](https://buildkite.com/docs/pipelines/defining-steps#targeting-specific-agents) for the generated [command step](https://buildkite.com/docs/pipelines/command-step) through the tags of `executor_type: machine` and `executor_image: self-hosted`.
 - `resource_class`: The specification of compute that the executor will require in running a job. This is used to specify the `resource_class` [agent targeting](https://buildkite.com/docs/pipelines/defining-steps#targeting-specific-agents) tag for the corresponding [command step](https://buildkite.com/docs/pipelines/command-step).
 
 #### macOS (Execution Environment)
@@ -52,9 +52,9 @@ The Buildkite Migration tool currently supports the following keys relative to C
 
 - `windows`: Specifies that the `job` will run on a Windows based execution environment. The [agent targeting](https://buildkite.com/docs/pipelines/defining-steps#targeting-specific-agents) tags for the generated [command step](https://buildkite.com/docs/pipelines/command-step) will be set to `executor_type: windows`.
 
-Currently, these following `job` parameters are not supported by the Buildkite Migration tool:
+#### Unsupported properties
 
-#### General
+The following `job` parameters are currently not supported by the Buildkite Migration tool:
 
 - `branches`: The `branches` that will be allowed/blocked for a singular `job`. Presently, the Buildkite Migration tool supports setting `filters` in `workflows`: and in particular, `branches` and `tags` sub-properties in setting a [step conditional](https://buildkite.com/docs/pipelines/conditionals#conditionals-in-steps) in the generated pipeline.
 - `executors`: The `executor` key is currently not supported. The execution environment in Buildkite is defined by the [queues](https://buildkite.com/docs/agent/v3/queues#setting-an-agents-queue) and [tags](https://buildkite.com/docs/agent/v3/cli-start#setting-tags) applied to an agent, and [targeting](https://buildkite.com/docs/pipelines/defining-steps#targeting-specific-agents) them when creating builds.
