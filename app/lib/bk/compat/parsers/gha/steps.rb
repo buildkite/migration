@@ -42,7 +42,10 @@ module BK
               'image' => image_string
             }
           )
+        else
+          nil
         end
+
       end
 
       def generate_command_string(commands: [], env: {}, workdir: nil)
