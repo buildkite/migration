@@ -38,7 +38,14 @@ steps:
 
 Buildkite Compat can also be used via a HTTP API using `rackup` from the `app` folder of this repository.
 
-Note: If you are using the docker image you will have to override the entrypoint:
+You start the web UI with either of the following docker commands:
+
+```sh
+docker compose up webui
+```
+
+Note: If you are using `docker run` you will have to override the entrypoint:
+
 ```shell
 $ docker run --rm -ti -p 9292:9292 --entrypoint '' --workdir /app $IMAGE:$TAG rackup --port 9292
 ```
@@ -73,4 +80,4 @@ Buildkite has its own suggested best practices, these may differ to those from o
 Further information on the currently supported attributes of CI provider pipeline translation to Buildkite pipelines can be found below (within the `/docs` directory):
 
 - [GitHub Actions](/docs/GHA.md)
-- CircleCI
+- [CircleCI](/docs/CircleCI.md)

@@ -1,13 +1,15 @@
 ---
 steps:
 - commands:
-  - "# action actions/checkout@v2 can not be translated just yet"
-  - "# action actions/setup-python@v2 can not be translated just yet"
+  - "# action actions/checkout@v2 is not necessary in Buildkite"
   - echo '~~~ Install requirements'
   - pip install -r requirements.txt
   - echo '~~~ Run tests'
   - cd src
   - python manage.py test
+  plugins:
+  - docker#v5.7.0:
+      image: python:3.8
   agents:
     runs-on: ubuntu-latest
   label: ":github: simple_build"
