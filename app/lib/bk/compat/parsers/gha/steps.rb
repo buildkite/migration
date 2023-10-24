@@ -11,7 +11,7 @@ module BK
         )
 
         register.call(
-          ->(conf) { conf.include?('uses') && supported_action?(conf['uses']) },
+          ->(conf) { conf.include?('uses') },
           method(:translate_uses)
         )
       end
@@ -31,13 +31,6 @@ module BK
         ].flatten.compact
       end
 
-      def supported_action?(action)
-        supported_actions = [
-          /\Aactions\/setup-python@v\d+\z/
-        ]
-        supported_actions.any? { |supported_action| action =~ supported_action }
-      end
-
       def translate_uses(step)
         case step['uses']
         when /\Aactions\/setup-python@v\d+\z/
@@ -49,8 +42,10 @@ module BK
               'image' => image_string
             }
           )
+        when /\Aactions\/checkout@v\d+\z/
+          "# action #{step['uses']} is not necessary in Buildkite"
         else
-          return nil
+          "# action #{step['uses']} can not be translated just yet"
         end
       end
 
