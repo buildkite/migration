@@ -1,7 +1,7 @@
 ---
 steps:
 - commands:
-  - "# action actions/checkout@v3 can not be translated just yet"
+  - "# action actions/checkout@v3 is not necessary in Buildkite"
   - "# action actions/setup-go@v4 can not be translated just yet"
   - echo '~~~ Build'
   - go build -v ./...

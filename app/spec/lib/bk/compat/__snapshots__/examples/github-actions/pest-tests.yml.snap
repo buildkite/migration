@@ -1,7 +1,7 @@
 ---
 steps:
 - commands:
-  - "# action actions/checkout@v2 can not be translated just yet"
+  - "# action actions/checkout@v2 is not necessary in Buildkite"
   - "# action shivammathur/setup-php@v2 can not be translated just yet"
   - echo '~~~ Setup Problem Matches'
   - echo "::add-matcher::Context element runner.tool_cache  can not be translated

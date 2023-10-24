@@ -1,7 +1,7 @@
 ---
 steps:
 - commands:
-  - "# action actions/checkout@v3 can not be translated just yet"
+  - "# action actions/checkout@v3 is not necessary in Buildkite"
   - "# action actions/setup-java@v3 can not be translated just yet"
   - echo '~~~ Build with Maven'
   - mvn -B package --file pom.xml

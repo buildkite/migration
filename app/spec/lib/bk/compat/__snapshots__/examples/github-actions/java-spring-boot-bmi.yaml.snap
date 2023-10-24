@@ -1,7 +1,7 @@
 ---
 steps:
 - commands:
-  - "# action actions/checkout@v3 can not be translated just yet"
+  - "# action actions/checkout@v3 is not necessary in Buildkite"
   - "# action actions/setup-java@v3 can not be translated just yet"
   - "# action actions/cache@v3 can not be translated just yet"
   - echo '~~~ Install Maven dependencies'
@@ -13,7 +13,7 @@ steps:
   label: ":github: project-build"
   key: project-build
 - commands:
-  - "# action actions/checkout@v3 can not be translated just yet"
+  - "# action actions/checkout@v3 is not necessary in Buildkite"
   - "# action actions/setup-java@v3 can not be translated just yet"
   - "# action actions/cache@v3 can not be translated just yet"
   - "# action docker/setup-qemu-action@v2 can not be translated just yet"
@@ -27,7 +27,7 @@ steps:
   label: ":github: docker-build"
   key: docker-build
 - commands:
-  - "# action actions/checkout@v3 can not be translated just yet"
+  - "# action actions/checkout@v3 is not necessary in Buildkite"
   - echo '~~~ Add Server key'
   - touch key.txt && echo "Context element secrets.SERVER_KEY  can not be translated
     (yet)" > key.txt

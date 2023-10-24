@@ -32,7 +32,21 @@ module BK
       end
 
       def translate_uses(step)
-        "# action #{step['uses']} can not be translated just yet"
+        case step['uses']
+        when /\Aactions\/setup-python@v\d+\z/
+          python_version = step.dig('with', 'python-version') || 'latest'
+          image_string = "python:#{python_version}"
+          BK::Compat::Plugin.new(
+            name: 'docker',
+            config: {
+              'image' => image_string
+            }
+          )
+        when /\Aactions\/checkout@v\d+\z/
+          "# action #{step['uses']} is not necessary in Buildkite"
+        else
+          "# action #{step['uses']} can not be translated just yet"
+        end
       end
 
       def generate_command_string(commands: [], env: {}, workdir: nil)
