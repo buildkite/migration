@@ -48,7 +48,7 @@ module BK
         bk_step
       end
 
-      def parse_services(bk_step, config)
+      def parse_services(_bk_step, config)
         config['services'].each do |key, service|
             if key == 'env'
                 service['environment'] = service['env']
