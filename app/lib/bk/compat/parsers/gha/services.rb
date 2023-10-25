@@ -17,14 +17,15 @@ module BK
       def docker_cmds(services)
         services.map do |name, config|
           # All options map directly to a docker `create` command
-          envs = config.fetch('env', {}).map { |k, v| "--env \"#{k}='#{v}'\"" }.join(' ')
-          ports = config.fetch('ports', []).map { |p| "--expose '#{p}'" }.join(' ')
-          vols = config.fetch('volumes', []).map { |v| "--volume '#{v}'" }.join(' ')
+          envs = config.fetch('env', {}).map { |k, v| "--env \"#{k}='#{v}'\"" }
+          ports = config.fetch('ports', []).map { |p| "--expose '#{p}'" }
+          vols = config.fetch('volumes', []).map { |v| "--volume '#{v}'" }
 
+          opts = [envs, ports, vols, config.fetch('options', [])].flatten.join(' ')
           [
             "echo 'Starting #{name} service'",
             config.include?('credentials') ? '# Warning: you should use the docker-login plugin to authenticate' : nil,
-            "docker start --rm -d --name #{name} #{envs} #{ports} #{vols} #{config['options']} #{config['image']}"
+            "docker start --rm -d --name #{name} #{opts} #{config['image']}"
           ]
         end
       end
