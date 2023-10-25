@@ -2,11 +2,13 @@
 steps:
 - commands:
   - "# action actions/checkout@v3 is not necessary in Buildkite"
-  - "# action actions/setup-go@v4 can not be translated just yet"
   - echo '~~~ Build'
   - go build -v ./...
   - echo '~~~ Test'
   - go test -v ./...
+  plugins:
+  - docker#v5.7.0:
+      image: golang:latest
   agents:
     runs-on: ubuntu-latest
   label: ":github: build"
