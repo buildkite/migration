@@ -42,6 +42,19 @@ module BK
               'image' => image_string
             }
           )
+        when /\Aactions\/setup-node@v\d+\z/
+            node_version = step.dig('with', 'node-version') || 'latest'
+            match = node_version.match /(\d+)\.x/
+            if match
+                node_version = match[1]
+            end
+            image_string = "node:#{node_version}"
+            BK::Compat::Plugin.new(
+            name: 'docker',
+            config: {
+                'image' => image_string
+            }
+            )
         when /docker\/login-action.*/
           BK::Compat::Plugin.new(
             name: 'docker-login',
