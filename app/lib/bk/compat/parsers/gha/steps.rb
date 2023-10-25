@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'uses/java'
+
 module BK
   module Compat
     # Implement GHA Builtin Steps
@@ -36,6 +38,16 @@ module BK
         when /\Aactions\/setup-python@v\d+\z/
           python_version = step.dig('with', 'python-version') || 'latest'
           image_string = "python:#{python_version}"
+          BK::Compat::Plugin.new(
+            name: 'docker',
+            config: {
+              'image' => image_string
+            }
+          )
+        when /\Aactions\/setup-java@v\d+\z/
+          java_version = step.dig('with', 'java-version') || '21'
+          distribution = step.dig('with', 'distribution') || 'temurin'
+          image_string = obtain_java_distribution_image(distribution, java_version)
           BK::Compat::Plugin.new(
             name: 'docker',
             config: {
