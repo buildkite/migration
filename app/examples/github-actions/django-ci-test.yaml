@@ -26,3 +26,16 @@ jobs:
         run: |
             cd src
             python manage.py test
+      - name: Store artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: logs
+          path: |
+            vendor/output/bin/
+            vendor/output/test-results
+            !vendor/**/*.tmp
+      - name: Store artifacts 2
+        uses: actions/upload-artifact@v3
+        with:
+          name: logs
+          path:  vendor2/output/bin/*.log
