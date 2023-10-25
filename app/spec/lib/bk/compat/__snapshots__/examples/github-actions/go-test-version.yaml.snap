@@ -1,0 +1,15 @@
+---
+steps:
+- commands:
+  - "# action actions/checkout@v3 is not necessary in Buildkite"
+  - echo '~~~ Build'
+  - go build -v ./...
+  - echo '~~~ Test'
+  - go test -v ./...
+  plugins:
+  - docker#v5.7.0:
+      image: golang:1.13.1
+  agents:
+    runs-on: ubuntu-latest
+  label: ":github: build"
+  key: build
