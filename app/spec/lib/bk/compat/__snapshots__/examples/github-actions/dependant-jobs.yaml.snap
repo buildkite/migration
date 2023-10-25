@@ -1,13 +1,13 @@
 ---
 steps:
 - commands:
-  - "./setup_server.sh"
+  - echo ./setup_server.sh
   agents:
     runs-on: ubuntu-latest
   label: ":github: setup"
   key: setup
 - commands:
-  - "./build_server.sh"
+  - echo ./build_server.sh
   depends_on:
   - setup
   agents:
@@ -15,7 +15,7 @@ steps:
   label: ":github: build"
   key: build
 - commands:
-  - "./test_server.sh"
+  - echo ./test_server.sh
   depends_on:
   - build
   agents:
