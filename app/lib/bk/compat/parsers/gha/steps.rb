@@ -12,11 +12,6 @@ module BK
           ->(conf) { conf.include?('run') },
           method(:translate_run)
         )
-
-        register.call(
-          ->(conf) { conf.include?('uses') },
-          method(:translate_uses)
-        )
       end
 
       private
@@ -33,68 +28,6 @@ module BK
             id: step['id']
           )
         ].flatten.compact
-      end
-
-      def translate_uses(step)
-        case step['uses']
-        when /\Aactions\/setup-python@v\d+\z/
-          python_version = step.dig('with', 'python-version') || 'latest'
-          image_string = "python:#{python_version}"
-          BK::Compat::Plugin.new(
-            name: 'docker',
-            config: {
-              'image' => image_string
-            }
-          )
-        when /\Aactions\/setup-node@v\d+\z/
-            node_version = step.dig('with', 'node-version') || 'latest'
-            match = node_version.match(/(\d+)\.x/)
-            if match
-                node_version = match[1]
-            end
-            image_string = "node:#{node_version}"
-            BK::Compat::Plugin.new(
-            name: 'docker',
-            config: {
-                'image' => image_string
-            }
-            )
-        when /\Aactions\/setup-java@v\d+\z/
-          java_version = step.dig('with', 'java-version') || '21'
-          distribution = step.dig('with', 'distribution') || 'temurin'
-          image_string = obtain_java_distribution_image(distribution, java_version)
-          BK::Compat::Plugin.new(
-            name: 'docker',
-            config: {
-              'image' => image_string
-            }
-          )
-        when /\Aactions\/setup-go@v\d+\z/
-          go_version = step.dig('with', 'go-version').gsub!(/[>=^]/,'') || 'latest'
-          image_string = "golang:#{go_version}"
-          BK::Compat::Plugin.new(
-            name: 'docker',
-            config: {
-              'image' => image_string
-            }
-          )
-        when /docker\/login-action.*/
-          BK::Compat::Plugin.new(
-            name: 'docker-login',
-            config: {
-              'username' => step['with']['username'],
-              'password-env' => step['with']['password'],
-            }
-          )
-        when /\Aactions\/upload-artifact@v\d+\z/
-          BK::Compat::ArtifactPaths.new(
-            paths: step['with']['path']
-          )
-        when /\Aactions\/checkout@v\d+\z/
-          "# action #{step['uses']} is not necessary in Buildkite"
-        else
-          "# action #{step['uses']} can not be translated just yet"
-        end
       end
 
       def generate_command_string(commands: [], env: {}, workdir: nil, id: nil)
