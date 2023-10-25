@@ -42,6 +42,15 @@ module BK
               'image' => image_string
             }
           )
+        when /\Aactions\/setup-go@v\d+\z/
+          go_version = step.dig('with', 'go-version').gsub!(/[>=^]/,'') || 'latest'
+          image_string = "golang:#{go_version}"
+          BK::Compat::Plugin.new(
+            name: 'docker',
+            config: {
+              'image' => image_string
+            }
+          )
         when /docker\/login-action.*/
           BK::Compat::Plugin.new(
             name: 'docker-login',
