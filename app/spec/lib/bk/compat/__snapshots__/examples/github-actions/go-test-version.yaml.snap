@@ -8,7 +8,7 @@ steps:
   - go test -v ./...
   plugins:
   - docker#v5.7.0:
-      image: golang:latest
+      image: golang:1.13.1
   agents:
     runs-on: ubuntu-latest
   label: ":github: build"
