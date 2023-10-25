@@ -48,11 +48,11 @@ module BK
     # basic command step
     class CommandStep
       attr_accessor :agents, :concurrency, :concurrency_group, :conditional, :depends_on, :key, :label,
-                    :matrix, :parameters, :plugins, :soft_fail, :timeout_in_minutes, :transformer
+                    :matrix, :parameters, :plugins, :soft_fail, :timeout_in_minutes, :transformer, :artifact_paths
 
       attr_reader :commands, :env # we define special writers
 
-      LIST_ATTRIBUTES = %w[commands depends_on plugins].freeze
+      LIST_ATTRIBUTES = %w[commands depends_on plugins artifact_paths].freeze
       HASH_ATTRIBUTES = %w[agents env matrix parameters].freeze
 
       def initialize(**kwargs)
@@ -84,14 +84,14 @@ module BK
                else
                  BK::Compat::Environment.new(value)
                end
-      end
+      end 
 
       def to_h
         clean_attributes.tap do |h|
           # special handling
           h[:plugins] = @plugins.map(&:to_h)
-          h[:env] = @env&.to_h
-
+          h[:env] = @env&.to_h  
+          
           # remove empty and nil values
           h.delete_if { |_, v| v.nil? || (v.is_a?(Enumerable) && v.empty?) }
         end
@@ -116,6 +116,8 @@ module BK
           merge!(other)
         when BK::Compat::Plugin
           @plugins << other
+        when BK::Compat::ArtifactPaths 
+          @artifact_paths |= other.paths
         else
           add_commands(*other) unless other.nil?
         end
@@ -133,6 +135,8 @@ module BK
           end
         when BK::Compat::Plugin
           @plugins.prepend(other)
+        when BK::Compat::ArtifactPaths
+          @artifact_paths.prepend(other.paths)
         else
           prepend_commands(*other) unless other.nil?
         end

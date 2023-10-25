@@ -17,7 +17,8 @@ steps:
   - AWS_SECRET_ACCESS_KEY="randomSecret"
   - vendor/bin/phpunit --display-deprecation
   - ")"
-  - "# action actions/upload-artifact@v3 can not be translated just yet"
+  artifact_paths:
+  - vendor/orchestra/testbench-core/laravel/storage/logs/**/*
   agents:
     runs-on: ubuntu-22.04
   matrix:

@@ -58,7 +58,11 @@ module BK
               'username' => step['with']['username'],
               'password-env' => step['with']['password'],
             }
-          )
+          ) 
+        when /\Aactions\/upload-artifact@v\d+\z/  
+          BK::Compat::ArtifactPaths.new(
+            paths: step['with']['path'] 
+          ) 
         when /\Aactions\/checkout@v\d+\z/
           "# action #{step['uses']} is not necessary in Buildkite"
         else
