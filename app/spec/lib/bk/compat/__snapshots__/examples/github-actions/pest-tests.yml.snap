@@ -4,19 +4,17 @@ steps:
   - "# action actions/checkout@v2 is not necessary in Buildkite"
   - "# action shivammathur/setup-php@v2 can not be translated just yet"
   - echo '~~~ Setup Problem Matches'
-  - echo "::add-matcher::Context element runner.tool_cache  can not be translated
-    (yet)/php.json"
-  - echo "::add-matcher::Context element runner.tool_cache  can not be translated
-    (yet)/phpunit.json"
+  - echo "::add-matcher::Context element runner.tool_cache can not be translated (yet)/php.json"
+  - echo "::add-matcher::Context element runner.tool_cache can not be translated (yet)/phpunit.json"
   - echo '~~~ Install PHP dependencies'
-  - composer update --Context element matrix.dependency-version  can not be translated
+  - composer update --Context element matrix.dependency-version can not be translated
     (yet) --no-interaction --no-progress --ansi
   - echo '~~~ Unit Tests'
   - composer test:unit
   - echo '~~~ Unit Tests in Parallel'
   - composer test:parallel
   agents:
-    runs-on: Context element matrix.os  can not be translated (yet)
+    runs-on: Context element matrix.os can not be translated (yet)
   matrix:
     setup:
       os:
