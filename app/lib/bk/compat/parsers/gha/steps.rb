@@ -44,7 +44,7 @@ module BK
           )
         when /\Aactions\/setup-node@v\d+\z/
             node_version = step.dig('with', 'node-version') || 'latest'
-            match = node_version.match /(\d+)\.x/
+            match = node_version.match(/(\d+)\.x/)
             if match
                 node_version = match[1]
             end
