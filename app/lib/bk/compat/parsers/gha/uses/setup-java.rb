@@ -2,7 +2,8 @@
 
 module BK
   module Compat
-    class GitHubActions
+    class GHABuiltins
+
       def obtain_java_distribution_image(distribution, java_version)
         case distribution
         # seemru, adopt-openj9 (moved to seemru)
