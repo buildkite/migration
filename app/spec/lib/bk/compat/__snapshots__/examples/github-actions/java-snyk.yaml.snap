@@ -2,7 +2,6 @@
 steps:
 - commands:
   - "# action actions/checkout@v3 is not necessary in Buildkite"
-  - "# action actions/setup-java@v3 can not be translated just yet"
   - echo '~~~ Build with Maven'
   - mvn -B package --file pom.xml
   - echo '~~~ Print name'
@@ -10,6 +9,9 @@ steps:
   - BUILD="We are currently running the Build job"
   - echo "Hello $NAME. $BUILD. Using Java Version $JAVA_VERSION"
   - ")"
+  plugins:
+  - docker#v5.7.0:
+      image: eclipse-temurin:${{env.JAVA_VERSION}}-jdk-alpine
   agents:
     runs-on: ubuntu-latest
   env:
