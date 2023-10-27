@@ -6,14 +6,10 @@ steps:
   - commands:
     - "# No need for checkout, the agent takes care of that"
     - echo '~~~ Nodejs Version'
-    - (
     - node --version
-    - )
     - "# `restore_cache` not implemented yet"
     - echo '~~~ Install Packages'
-    - (
     - yarn --frozen-lockfile
-    - )
     - "# `save_cache` not implemented yet"
     plugins:
     - docker#v5.7.0: &2
@@ -27,9 +23,7 @@ steps:
     - "# No need for checkout, the agent takes care of that"
     - "# `restore_cache` not implemented yet"
     - echo '~~~ Install Packages'
-    - (
     - yarn --frozen-lockfile
-    - )
     - node ./scripts/prettier/index
     - node ./scripts/tasks/eslint
     - "./scripts/circleci/check_license.sh"
@@ -48,9 +42,7 @@ steps:
     - "# No need for checkout, the agent takes care of that"
     - "# `restore_cache` not implemented yet"
     - echo '~~~ Install Packages'
-    - (
     - yarn --frozen-lockfile
-    - )
     - node ./scripts/tasks/flow-ci
     depends_on:
     - setup
@@ -65,9 +57,7 @@ steps:
     - "# No need for checkout, the agent takes care of that"
     - "# `restore_cache` not implemented yet"
     - echo '~~~ Install Packages'
-    - (
     - yarn --frozen-lockfile
-    - )
     - (
     - RELEASE_CHANNEL='stable'
     - yarn test --maxWorkers=2
@@ -85,9 +75,7 @@ steps:
     - "# No need for checkout, the agent takes care of that"
     - "# `restore_cache` not implemented yet"
     - echo '~~~ Install Packages'
-    - (
     - yarn --frozen-lockfile
-    - )
     - (
     - RELEASE_CHANNEL='stable'
     - yarn test-prod --maxWorkers=2
@@ -105,9 +93,7 @@ steps:
     - "# No need for checkout, the agent takes care of that"
     - "# `restore_cache` not implemented yet"
     - echo '~~~ Install Packages'
-    - (
     - yarn --frozen-lockfile
-    - )
     - (
     - RELEASE_CHANNEL='stable'
     - yarn test-persistent --maxWorkers=2
@@ -125,9 +111,7 @@ steps:
     - "# No need for checkout, the agent takes care of that"
     - "# `restore_cache` not implemented yet"
     - echo '~~~ Install Packages'
-    - (
     - yarn --frozen-lockfile
-    - )
     - (
     - RELEASE_CHANNEL='stable'
     - "./scripts/circleci/add_build_info_json.sh"
@@ -155,9 +139,7 @@ steps:
     - buildkite agent artifact download *
     - "# `restore_cache` not implemented yet"
     - echo '~~~ Install Packages'
-    - (
     - yarn --frozen-lockfile
-    - )
     - node ./scripts/rollup/consolidateBundleSizes.js
     - "./scripts/circleci/upload_build.sh"
     - "./scripts/circleci/pack_and_store_artifact.sh"
@@ -185,9 +167,7 @@ steps:
     - buildkite agent artifact download *
     - "# `restore_cache` not implemented yet"
     - echo '~~~ Install Packages'
-    - (
     - yarn --frozen-lockfile
-    - )
     - node ./scripts/rollup/consolidateBundleSizes.js
     - (
     - RELEASE_CHANNEL='stable'
@@ -210,9 +190,7 @@ steps:
     - buildkite agent artifact download *
     - "# `restore_cache` not implemented yet"
     - echo '~~~ Install Packages'
-    - (
     - yarn --frozen-lockfile
-    - )
     - yarn lint-build
     - scripts/circleci/check_minified_errors.sh
     depends_on:
@@ -232,9 +210,7 @@ steps:
     - buildkite agent artifact download *
     - "# `restore_cache` not implemented yet"
     - echo '~~~ Install Packages'
-    - (
     - yarn --frozen-lockfile
-    - )
     - (
     - RELEASE_CHANNEL='stable'
     - yarn test-build --maxWorkers=2
@@ -256,9 +232,7 @@ steps:
     - buildkite agent artifact download *
     - "# `restore_cache` not implemented yet"
     - echo '~~~ Install Packages'
-    - (
     - yarn --frozen-lockfile
-    - )
     - (
     - RELEASE_CHANNEL='stable'
     - yarn test-build-prod --maxWorkers=2
@@ -280,9 +254,7 @@ steps:
     - buildkite agent artifact download *
     - "# `restore_cache` not implemented yet"
     - echo '~~~ Install Packages'
-    - (
     - yarn --frozen-lockfile
-    - )
     - (
     - RELEASE_CHANNEL='stable'
     - yarn test-build --maxWorkers=2
@@ -326,14 +298,10 @@ steps:
   - commands:
     - "# No need for checkout, the agent takes care of that"
     - echo '~~~ Nodejs Version'
-    - (
     - node --version
-    - )
     - "# `restore_cache` not implemented yet"
     - echo '~~~ Install Packages'
-    - (
     - yarn --frozen-lockfile
-    - )
     - "# `save_cache` not implemented yet"
     plugins:
     - docker#v5.7.0: *2
@@ -344,9 +312,7 @@ steps:
     - "# No need for checkout, the agent takes care of that"
     - "# `restore_cache` not implemented yet"
     - echo '~~~ Install Packages'
-    - (
     - yarn --frozen-lockfile
-    - )
     - (
     - RELEASE_CHANNEL='experimental'
     - yarn test --maxWorkers=2
@@ -364,9 +330,7 @@ steps:
     - "# No need for checkout, the agent takes care of that"
     - "# `restore_cache` not implemented yet"
     - echo '~~~ Install Packages'
-    - (
     - yarn --frozen-lockfile
-    - )
     - (
     - RELEASE_CHANNEL='experimental'
     - "./scripts/circleci/add_build_info_json.sh"
@@ -394,9 +358,7 @@ steps:
     - buildkite agent artifact download *
     - "# `restore_cache` not implemented yet"
     - echo '~~~ Install Packages'
-    - (
     - yarn --frozen-lockfile
-    - )
     - node ./scripts/rollup/consolidateBundleSizes.js
     - "./scripts/circleci/upload_build.sh"
     - "./scripts/circleci/pack_and_store_artifact.sh"
@@ -424,9 +386,7 @@ steps:
     - buildkite agent artifact download *
     - "# `restore_cache` not implemented yet"
     - echo '~~~ Install Packages'
-    - (
     - yarn --frozen-lockfile
-    - )
     - node ./scripts/rollup/consolidateBundleSizes.js
     - (
     - RELEASE_CHANNEL='experimental'
@@ -449,9 +409,7 @@ steps:
     - buildkite agent artifact download *
     - "# `restore_cache` not implemented yet"
     - echo '~~~ Install Packages'
-    - (
     - yarn --frozen-lockfile
-    - )
     - (
     - RELEASE_CHANNEL='experimental'
     - yarn test-build --maxWorkers=2
@@ -473,9 +431,7 @@ steps:
     - buildkite agent artifact download *
     - "# `restore_cache` not implemented yet"
     - echo '~~~ Install Packages'
-    - (
     - yarn --frozen-lockfile
-    - )
     - (
     - RELEASE_CHANNEL='experimental'
     - yarn test-build-prod --maxWorkers=2
@@ -497,9 +453,7 @@ steps:
     - buildkite agent artifact download *
     - "# `restore_cache` not implemented yet"
     - echo '~~~ Install Packages'
-    - (
     - yarn --frozen-lockfile
-    - )
     - yarn lint-build
     - scripts/circleci/check_minified_errors.sh
     depends_on:
@@ -515,14 +469,10 @@ steps:
   - commands:
     - "# No need for checkout, the agent takes care of that"
     - echo '~~~ Nodejs Version'
-    - (
     - node --version
-    - )
     - "# `restore_cache` not implemented yet"
     - echo '~~~ Install Packages'
-    - (
     - yarn --frozen-lockfile
-    - )
     - "# `save_cache` not implemented yet"
     plugins:
     - docker#v5.7.0: *2
@@ -533,14 +483,10 @@ steps:
     - "# No need for checkout, the agent takes care of that"
     - "# `restore_cache` not implemented yet"
     - echo '~~~ Install Packages'
-    - (
     - yarn --frozen-lockfile
-    - )
     - echo '~~~ Run fuzz tests'
-    - (
     - FUZZ_TEST_SEED=$RANDOM yarn test fuzz --maxWorkers=2
     - FUZZ_TEST_SEED=$RANDOM yarn test-prod fuzz --maxWorkers=2
-    - )
     depends_on:
     - setup
     plugins:
