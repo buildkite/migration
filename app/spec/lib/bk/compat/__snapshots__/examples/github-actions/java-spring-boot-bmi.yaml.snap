@@ -35,13 +35,13 @@ steps:
 - commands:
   - "# action actions/checkout@v3 is not necessary in Buildkite"
   - echo '~~~ Add Server key'
-  - touch key.txt && echo "$$SERVER_KEY" > key.txt
+  - touch key.txt && echo "$$GITHUB_SECRET_SERVER_KEY" > key.txt
   - chmod 600 key.txt
   - echo '~~~ Deploy the application'
   - "("
-  - SERVER_HOST="$$SERVER_HOST"
-  - SERVER_PORT="$$SERVER_PORT"
-  - SERVER_USER="$$SERVER_USER"
+  - SERVER_HOST="$$GITHUB_SECRET_SERVER_HOST"
+  - SERVER_PORT="$$GITHUB_SECRET_SERVER_PORT"
+  - SERVER_USER="$$GITHUB_SECRET_SERVER_USER"
   - set -e
   - "./deploy.sh"
   - ")"

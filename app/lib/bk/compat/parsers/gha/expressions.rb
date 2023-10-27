@@ -140,7 +140,7 @@ module BK
 
       def self.replace_context_secrets(var_name)
         # secrets context get mapped to environment variables
-        "$$#{var_name.upcase}"
+        "$$GITHUB_SECRET_#{var_name.upcase}"
       end
 
       def self.replace_context_needs(path)
