@@ -3,6 +3,7 @@
 require_relative 'concurrency'
 require_relative 'matrix'
 require_relative 'branches'
+require_relative 'services'
 require_relative 'steps'
 
 module BK
@@ -17,7 +18,11 @@ module BK
         config['steps'].each { |step| bk_step << translate_step(step) }
         bk_step.agents.update(config.slice('runs-on'))
         bk_step.depends_on = Array(config['needs'])
+
+        # these two should be last because they need to execute at the end
         bk_step << translate_outputs(config['outputs'], name)
+        set_services(bk_step, config['services'])
+
         bk_step.instantiate
       end
 

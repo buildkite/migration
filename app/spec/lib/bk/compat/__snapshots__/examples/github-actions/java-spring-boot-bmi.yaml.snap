@@ -2,12 +2,14 @@
 steps:
 - commands:
   - "# action actions/checkout@v3 is not necessary in Buildkite"
-  - "# action actions/setup-java@v3 can not be translated just yet"
   - "# action actions/cache@v3 can not be translated just yet"
   - echo '~~~ Install Maven dependencies'
   - mvn install
   - echo '~~~ Run tests'
   - mvn --batch-mode --update-snapshots verify
+  plugins:
+  - docker#v5.7.0:
+      image: eclipse-temurin:11-jdk-alpine
   agents:
     runs-on: ubuntu-latest
   label: ":github: project-build"
@@ -15,7 +17,6 @@ steps:
   branches: main
 - commands:
   - "# action actions/checkout@v3 is not necessary in Buildkite"
-  - "# action actions/setup-java@v3 can not be translated just yet"
   - "# action actions/cache@v3 can not be translated just yet"
   - "# action docker/setup-qemu-action@v2 can not be translated just yet"
   - "# action docker/setup-buildx-action@v2 can not be translated just yet"
@@ -23,6 +24,8 @@ steps:
   depends_on:
   - project-build
   plugins:
+  - docker#v5.7.0:
+      image: eclipse-temurin:11-jdk-alpine
   - docker-login#v2.1.0:
       username: "${{ secrets.DOCKERHUB_USERNAME }}"
       password-env: "${{ secrets.DOCKERHUB_TOKEN }}"
