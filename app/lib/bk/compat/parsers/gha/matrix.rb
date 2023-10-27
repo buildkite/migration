@@ -19,11 +19,8 @@ module BK
           value.transform_values! { |elem| convert_to_string(elem) }
         when Array
           value.map! { |elem| convert_to_string(elem) }
-        when Numeric
-          "#{value}"
         else
-          # if we don't know how to do this, do nothing
-          value
+          value.to_s
         end
       end
     end
