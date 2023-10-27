@@ -121,6 +121,18 @@ module BK
     end
 
     class GithubContext
+      @github_bk_context_mapping = {
+        "action" => "BUILDKITE_PIPELINE_NAME",
+        "actor" => "BUILDKITE_BUILD_AUTHOR",
+        "job" => "BUILDKITE_JOB_ID",
+        "sha" => "BUILDKITE_COMMIT",
+        "run_attempt" => "BUILDKITE_RETRY_COUNT",
+        "run_id" => "BUILDKITE_BUILD_ID",
+        "run_number" => "BUILDKITE_BUILD_NUMBER",
+        "triggering_actor" => "BUILDKITE_BUILD_CREATOR",
+        "workflow" => "BUILDKITE_PIPELINE_NAME"
+      }
+
       def self.replace(str)
         context, rest = str.split('.', 2)
         send("replace_context_#{context}", rest)
@@ -154,20 +166,14 @@ module BK
         end
       end
 
-      def self.replace_context_github(var_name)
-        github_context_map = {
-          "action" => "BUILDKITE_PIPELINE_NAME",
-          "actor" => "BUILDKITE_BUILD_AUTHOR",
-          "job" => "BUILDKITE_JOB_ID",
-          "sha" => "BUILDKITE_COMMIT",
-          "run_attempt" => "BUILDKITE_RETRY_COUNT",
-          "run_id" => "BUILDKITE_BUILD_ID",
-          "run_number" => "BUILDKITE_BUILD_NUMBER",
-          "triggering_actor" => "BUILDKITE_BUILD_CREATOR",
-          "workflow" => "BUILDKITE_PIPELINE_NAME"
-        }
-        
-        "$#{github_context_map[var_name]}"
+      def self.replace_context_github(var_name)  
+        translated_var = @github_bk_context_mapping[var_name]
+        case translated_var
+        when String
+          "$#{translated_var}"
+        when nil
+          raise NoMethodError
+        end
       end
 
       def self.replace_context_needs_outputs(job, path_list)
