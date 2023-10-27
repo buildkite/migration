@@ -11,3 +11,4 @@ steps:
     runs-on: ubuntu-latest
   label: ":github: build"
   key: build
+  branches: master
