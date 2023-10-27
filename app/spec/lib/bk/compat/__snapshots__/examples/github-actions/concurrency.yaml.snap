@@ -4,6 +4,7 @@ steps:
   - "./build.sh"
   label: ":github: build"
   key: build
+  branches: main
 - commands:
   - "./deploy-test.sh"
   depends_on:
@@ -12,6 +13,7 @@ steps:
   key: deploy-test
   concurrency: 1
   concurrency_group: deploy-test
+  branches: main
 - commands:
   - "./deploy-staging.sh"
   depends_on:
@@ -20,6 +22,7 @@ steps:
   key: deploy-staging
   concurrency: 1
   concurrency_group: deploy-staging
+  branches: main
 - commands:
   - "# cancel-in-progress in Buildkite is the pipeline setting Cancel Intermediate
     Builds"
@@ -30,3 +33,4 @@ steps:
   key: deploy-prod
   concurrency: 1
   concurrency_group: deploy-production
+  branches: main

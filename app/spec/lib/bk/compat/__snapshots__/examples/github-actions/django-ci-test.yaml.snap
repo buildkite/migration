@@ -18,3 +18,4 @@ steps:
     runs-on: ubuntu-latest
   label: ":github: simple_build"
   key: simple_build
+  branches: main

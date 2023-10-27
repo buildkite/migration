@@ -2,6 +2,7 @@
 
 require_relative 'concurrency'
 require_relative 'matrix'
+require_relative 'branches'
 require_relative 'steps'
 
 module BK
@@ -12,6 +13,7 @@ module BK
         bk_step = generate_base_step(name, config)
         set_concurrency(bk_step, config) if config['concurrency']
         set_matrix(bk_step, config) if config['strategy']
+        set_branch_filters(bk_step, config) if config['workflow_triggers']
         config['steps'].each { |step| bk_step << translate_step(step) }
         bk_step.agents.update(config.slice('runs-on'))
         bk_step.depends_on = Array(config['needs'])

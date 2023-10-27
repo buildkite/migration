@@ -4,7 +4,7 @@ require_relative '../error'
 require_relative '../translator'
 require_relative '../pipeline'
 require_relative 'gha/jobs'
-require_relative 'gha/steps'
+require_relative 'gha/steps' 
 
 module BK
   module Compat
@@ -22,7 +22,7 @@ module BK
       end
 
       def self.matches?(text)
-        config = YAML.safe_load(text)
+        config = YAML.safe_load(text)      
         # YAML translates the `on` key in YAML to ruby's `true` boolean
         mandatory_keys = ['jobs', true]
 
@@ -38,11 +38,18 @@ module BK
 
       def parse
         # Pipeline with steps defined as jobs
-        defaults = @config.fetch('defaults', {})
+        defaults = @config.fetch('defaults', {}) 
+        #move on push data into the jobs, `on` key in YAML is translated to ruby's `true` boolean
+        workflow_triggers = @config.fetch(true, {})
+        jobs = @config.fetch('jobs', {})
+
+        #add the workflow triggers to each job as workflow_triggers
+        jobs.each do |key, config| config['workflow_triggers'] = workflow_triggers end  
+
         Pipeline.new(
-          steps: @config.fetch('jobs', {}).map { |key, config| parse_job(key, defaults.merge(config)) },
+          steps: jobs.map { |key, config| parse_job(key, defaults.merge(config)) },
           env: @config.fetch('env', {})
-        )
+        )  
       end
     end
   end

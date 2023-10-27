@@ -16,3 +16,4 @@ steps:
     JAVA_VERSION: '11'
   label: ":github: build"
   key: build
+  branches: master
