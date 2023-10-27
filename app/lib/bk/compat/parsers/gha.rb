@@ -43,8 +43,8 @@ module BK
         workflow_triggers = @config.fetch(true, {})
         jobs = @config.fetch('jobs', {})
 
-        #add the workflow triggers to each job as workflow_triggers
-        jobs.each do |key, config| config['workflow_triggers'] = workflow_triggers end  
+        #add the workflow triggers to each job as workflow_triggers 
+        jobs.transform_values { |value| value['workflow_triggers'] = workflow_triggers }
 
         Pipeline.new(
           steps: jobs.map { |key, config| parse_job(key, defaults.merge(config)) },
