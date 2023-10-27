@@ -122,7 +122,6 @@ module BK
 
     class GithubContext
       @github_bk_context_mapping = {
-        "action" => "BUILDKITE_PIPELINE_NAME",
         "actor" => "BUILDKITE_BUILD_AUTHOR",
         "job" => "BUILDKITE_JOB_ID",
         "ref_name" => "BUILDKITE_BRANCH",
