@@ -138,10 +138,10 @@ module BK
         "$#{var_name}"
       end
 
-    def self.replace_context_secrets(var_name)
+      def self.replace_context_secrets(var_name)
         # secrets context get mapped to environment variables
         "$$#{var_name.upcase}"
-    end
+      end
 
       def self.replace_context_needs(path)
         job, context, *rest = path.split('.')
