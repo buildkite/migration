@@ -125,10 +125,11 @@ module BK
         "action" => "BUILDKITE_PIPELINE_NAME",
         "actor" => "BUILDKITE_BUILD_AUTHOR",
         "job" => "BUILDKITE_JOB_ID",
-        "sha" => "BUILDKITE_COMMIT",
+        "ref_name" => "BUILDKITE_BRANCH",
         "run_attempt" => "BUILDKITE_RETRY_COUNT",
         "run_id" => "BUILDKITE_BUILD_ID",
         "run_number" => "BUILDKITE_BUILD_NUMBER",
+        "sha" => "BUILDKITE_COMMIT",
         "triggering_actor" => "BUILDKITE_BUILD_CREATOR",
         "workflow" => "BUILDKITE_PIPELINE_NAME"
       }
