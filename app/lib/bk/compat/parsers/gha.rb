@@ -38,11 +38,18 @@ module BK
 
       def parse
         # Pipeline with steps defined as jobs
-        defaults = @config.fetch('defaults', {})
+        defaults = @config.fetch('defaults', {}) 
+        #move on push data into the jobs, `on` key in YAML is translated to ruby's `true` boolean
+        workflow_triggers = @config.fetch(true, {})
+        jobs = @config.fetch('jobs', {})
+
+        #add the workflow triggers to each job as workflow_triggers 
+        jobs.transform_values { |value| value['workflow_triggers'] = workflow_triggers }
+
         Pipeline.new(
-          steps: @config.fetch('jobs', {}).map { |key, config| parse_job(key, defaults.merge(config)) },
+          steps: jobs.map { |key, config| parse_job(key, defaults.merge(config)) },
           env: @config.fetch('env', {})
-        )
+        )  
       end
     end
   end

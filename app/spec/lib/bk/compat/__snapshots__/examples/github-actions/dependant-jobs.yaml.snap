@@ -6,6 +6,7 @@ steps:
     runs-on: ubuntu-latest
   label: ":github: setup"
   key: setup
+  branches: master
 - commands:
   - echo ./build_server.sh
   depends_on:
@@ -14,6 +15,7 @@ steps:
     runs-on: ubuntu-latest
   label: ":github: build"
   key: build
+  branches: master
 - commands:
   - echo ./test_server.sh
   depends_on:
@@ -22,3 +24,4 @@ steps:
     runs-on: ubuntu-latest
   label: ":github: test"
   key: test
+  branches: master
