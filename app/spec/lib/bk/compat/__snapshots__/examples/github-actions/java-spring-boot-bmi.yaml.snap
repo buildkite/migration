@@ -35,14 +35,13 @@ steps:
 - commands:
   - "# action actions/checkout@v3 is not necessary in Buildkite"
   - echo '~~~ Add Server key'
-  - touch key.txt && echo "Context element secrets.SERVER_KEY can not be translated
-    (yet)" > key.txt
+  - touch key.txt && echo "$$SERVER_KEY" > key.txt
   - chmod 600 key.txt
   - echo '~~~ Deploy the application'
   - "("
-  - SERVER_HOST="Context element secrets.SERVER_HOST can not be translated (yet)"
-  - SERVER_PORT="Context element secrets.SERVER_PORT can not be translated (yet)"
-  - SERVER_USER="Context element secrets.SERVER_USER can not be translated (yet)"
+  - SERVER_HOST="$$SERVER_HOST"
+  - SERVER_PORT="$$SERVER_PORT"
+  - SERVER_USER="$$SERVER_USER"
   - set -e
   - "./deploy.sh"
   - ")"
