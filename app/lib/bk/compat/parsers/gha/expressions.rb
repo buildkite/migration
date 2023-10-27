@@ -138,6 +138,38 @@ module BK
         "$#{var_name}"
       end
 
+      def self.replace_context_matrix(github_matrix)
+        matrix = github_matrix[:matrix] || input[:strategy][:matrix]
+
+        lists = matrix.reject { | k, _ | k == :include }
+        includes = matrix[:include]
+
+        if lists.keys.length == 1 && lists.values.first.is_a?(Array)
+          return { matrix: lists.values.first }
+        end
+
+        setup = {}
+        lists.each do | key, value |
+          setup[key] = value
+        end
+
+        adjustments = []
+        if includes
+          includes.each do | item |
+            with_hash = {}
+            item.each do | key, value |
+              with_hash[key] = value unless [:adjustments, :with].include?(key)
+            end
+
+            adjustments << { with: with_hash }
+          end
+        end
+
+        output = { matrix: { setup: setup } }
+        output[:matrix][:adjustments] = adjustments unless adjustments.empty?
+        output
+      end
+
       def self.replace_context_needs(path)
         job, context, *rest = path.split('.')
         case context
