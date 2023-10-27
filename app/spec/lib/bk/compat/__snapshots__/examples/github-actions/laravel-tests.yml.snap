@@ -46,3 +46,4 @@ steps:
     adjustments: []
   label: ":github: linux_tests"
   key: linux_tests
+  branches: master *.x

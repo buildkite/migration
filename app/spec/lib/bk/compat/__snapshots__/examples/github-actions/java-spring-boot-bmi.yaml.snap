@@ -14,6 +14,7 @@ steps:
     runs-on: ubuntu-latest
   label: ":github: project-build"
   key: project-build
+  branches: main
 - commands:
   - "# action actions/checkout@v3 is not necessary in Buildkite"
   - "# action actions/cache@v3 can not be translated just yet"
@@ -32,6 +33,7 @@ steps:
     runs-on: ubuntu-latest
   label: ":github: docker-build"
   key: docker-build
+  branches: main
 - commands:
   - "# action actions/checkout@v3 is not necessary in Buildkite"
   - echo '~~~ Add Server key'
@@ -52,3 +54,4 @@ steps:
     runs-on: ubuntu-latest
   label: ":github: deploy"
   key: deploy
+  branches: main
