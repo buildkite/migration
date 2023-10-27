@@ -13,11 +13,11 @@ steps:
   label: ":github: job1"
   key: job1
 - commands:
-  - "("
+  - (
   - OUTPUT1="$(buildkite-agent meta-data get 'job1.output1')"
   - OUTPUT2="$(buildkite-agent meta-data get 'job1.output2')"
   - echo "$OUTPUT1 $OUTPUT2"
-  - ")"
+  - )
   depends_on:
   - job1
   agents:
