@@ -7,4 +7,3 @@ steps:
     runs-on: ubuntu-latest
   label: ":github: explore"
   key: explore
-  branches: ''

@@ -31,4 +31,3 @@ steps:
     adjustments: []
   label: ":github: ci"
   key: ci
-  branches: ''

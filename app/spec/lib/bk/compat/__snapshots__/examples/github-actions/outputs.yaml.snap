@@ -12,7 +12,6 @@ steps:
     GITHUB_OUTPUT: "/tmp/outputs"
   label: ":github: job1"
   key: job1
-  branches: ''
 - commands:
   - "("
   - OUTPUT1="$(buildkite-agent meta-data get 'job1.output1')"
@@ -25,4 +24,3 @@ steps:
     runs-on: ubuntu-latest
   label: ":github: job2"
   key: job2
-  branches: ''

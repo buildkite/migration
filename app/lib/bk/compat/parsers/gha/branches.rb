@@ -6,7 +6,7 @@ module BK
       def set_branch_filters(bk_step, config)
         workflow_triggers = config.fetch('workflow_triggers', {})  
         on_push = extract_branch_filters(workflow_triggers, 'push') 
-        bk_step.branches =  on_push&.join(" ")
+        bk_step.branches =  on_push&.join(" ") unless on_push.nil? || on_push.empty?
       end 
  
       def extract_branch_filters(workflows, event)
