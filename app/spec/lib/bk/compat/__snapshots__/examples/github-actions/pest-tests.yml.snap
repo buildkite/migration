@@ -4,8 +4,8 @@ steps:
   - "# action actions/checkout@v2 is not necessary in Buildkite"
   - "# action shivammathur/setup-php@v2 can not be translated just yet"
   - echo '~~~ Setup Problem Matches'
-  - echo "::add-matcher::$$TMPDIR/php.json"
-  - echo "::add-matcher::$$TMPDIR/phpunit.json"
+  - echo "::add-matcher::/usr/local/bin/php.json"
+  - echo "::add-matcher::/usr/local/bin/phpunit.json"
   - echo '~~~ Install PHP dependencies'
   - composer update --Context element matrix.dependency-version can not be translated
     (yet) --no-interaction --no-progress --ansi
