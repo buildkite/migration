@@ -151,9 +151,7 @@ module BK
           "$$BUILDKITE_AGENT_META_DATA_OS"
         when "arch"
           "$$BUILDKITE_AGENT_META_DATA_ARCHITECTURE"
-        when "temp"
-          "$$TMPDIR"
-        when "tool_cache"
+        when /(temp|tool_cache)/
           "$$TMPDIR"
         else
           ""
