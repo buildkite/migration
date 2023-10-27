@@ -139,7 +139,10 @@ module BK
       end
 
       def self.replace_context_matrix(github_matrix)
-        matrix = github_matrix[:matrix] || input[:strategy][:matrix]
+        matrix = input[:matrix] || (input[:strategy] && input[:strategy][:matrix])
+
+        # Handle no matrix used
+        return {} unless matrix
 
         lists = matrix.reject { | k, _ | k == :include }
         includes = matrix[:include]
