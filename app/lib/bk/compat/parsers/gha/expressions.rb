@@ -143,6 +143,22 @@ module BK
         "$$GITHUB_SECRET_#{var_name.upcase}"
       end
 
+      def self.replace_context_runner(var_name)
+        case var_name
+        when "name"
+          "$$BUILDKITE_AGENT_NAME"
+        when "os"
+          "$$BUILDKITE_AGENT_META_DATA_OS"
+        when "arch"
+          "$$BUILDKITE_AGENT_META_DATA_ARCHITECTURE"
+        when "temp"
+        when "tool_cache"
+          "$$TMPDIR"
+        else
+          ""
+        end
+      end
+
       def self.replace_context_needs(path)
         job, context, *rest = path.split('.')
         case context
