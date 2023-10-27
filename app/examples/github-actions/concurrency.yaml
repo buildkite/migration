@@ -10,26 +10,26 @@ on:
 
 jobs:
   build:
-    steps:  
-    - run: ./build.sh
+    steps:
+    - run: echo ./build.sh
 
   deploy-test:
     needs: build
     concurrency:
       group: deploy-test
-    steps: 
-      - run: ./deploy-test.sh
+    steps:
+      - run: echo ./deploy-test.sh
 
   deploy-staging:
     needs: deploy-test
     concurrency: deploy-staging
-    steps:  
-      - run: ./deploy-staging.sh
+    steps:
+      - run: echo ./deploy-staging.sh
 
   deploy-prod:
     needs: deploy-staging
     concurrency:
       group: deploy-production
       cancel-in-progress: true
-    steps:  
-      - run: ./deploy-prod.sh
+    steps:
+      - run: echo ./deploy-prod.sh

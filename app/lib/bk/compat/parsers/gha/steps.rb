@@ -45,6 +45,19 @@ module BK
               'image' => image_string
             }
           )
+        when /\Aactions\/setup-node@v\d+\z/
+            node_version = step.dig('with', 'node-version') || 'latest'
+            match = node_version.match(/(\d+)\.x/)
+            if match
+                node_version = match[1]
+            end
+            image_string = "node:#{node_version}"
+            BK::Compat::Plugin.new(
+            name: 'docker',
+            config: {
+                'image' => image_string
+            }
+            )
         when /\Aactions\/setup-java@v\d+\z/
           java_version = step.dig('with', 'java-version') || '21'
           distribution = step.dig('with', 'distribution') || 'temurin'
@@ -71,11 +84,11 @@ module BK
               'username' => step['with']['username'],
               'password-env' => step['with']['password'],
             }
-          ) 
-        when /\Aactions\/upload-artifact@v\d+\z/  
+          )
+        when /\Aactions\/upload-artifact@v\d+\z/
           BK::Compat::ArtifactPaths.new(
-            paths: step['with']['path'] 
-          ) 
+            paths: step['with']['path']
+          )
         when /\Aactions\/checkout@v\d+\z/
           "# action #{step['uses']} is not necessary in Buildkite"
         else
