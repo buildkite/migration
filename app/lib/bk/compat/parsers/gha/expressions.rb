@@ -139,7 +139,7 @@ module BK
       end
 
       def self.replace_context_matrix(var_name)
-        var_name.gsub(/\$\{\{\s*(matrix\.[\w.-]+|matrix)\s*\}\}/, '{{\1}}')
+        "{{matrix.#{var_name}}}"
       end
 
       def self.replace_context_secrets(var_name)
