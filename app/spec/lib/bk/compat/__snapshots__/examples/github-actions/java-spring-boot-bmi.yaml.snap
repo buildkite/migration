@@ -2,19 +2,20 @@
 steps:
 - commands:
   - "# action actions/checkout@v3 is not necessary in Buildkite"
-  - "# action actions/setup-java@v3 can not be translated just yet"
   - "# action actions/cache@v3 can not be translated just yet"
   - echo '~~~ Install Maven dependencies'
   - mvn install
   - echo '~~~ Run tests'
   - mvn --batch-mode --update-snapshots verify
+  plugins:
+  - docker#v5.7.0:
+      image: eclipse-temurin:11-jdk-alpine
   agents:
     runs-on: ubuntu-latest
   label: ":github: project-build"
   key: project-build
 - commands:
   - "# action actions/checkout@v3 is not necessary in Buildkite"
-  - "# action actions/setup-java@v3 can not be translated just yet"
   - "# action actions/cache@v3 can not be translated just yet"
   - "# action docker/setup-qemu-action@v2 can not be translated just yet"
   - "# action docker/setup-buildx-action@v2 can not be translated just yet"
@@ -22,6 +23,8 @@ steps:
   depends_on:
   - project-build
   plugins:
+  - docker#v5.7.0:
+      image: eclipse-temurin:11-jdk-alpine
   - docker-login#v2.1.0:
       username: "${{ secrets.DOCKERHUB_USERNAME }}"
       password-env: "${{ secrets.DOCKERHUB_TOKEN }}"
@@ -32,14 +35,14 @@ steps:
 - commands:
   - "# action actions/checkout@v3 is not necessary in Buildkite"
   - echo '~~~ Add Server key'
-  - touch key.txt && echo "Context element secrets.SERVER_KEY  can not be translated
+  - touch key.txt && echo "Context element secrets.SERVER_KEY can not be translated
     (yet)" > key.txt
   - chmod 600 key.txt
   - echo '~~~ Deploy the application'
   - "("
-  - SERVER_HOST="Context element secrets.SERVER_HOST  can not be translated (yet)"
-  - SERVER_PORT="Context element secrets.SERVER_PORT  can not be translated (yet)"
-  - SERVER_USER="Context element secrets.SERVER_USER  can not be translated (yet)"
+  - SERVER_HOST="Context element secrets.SERVER_HOST can not be translated (yet)"
+  - SERVER_PORT="Context element secrets.SERVER_PORT can not be translated (yet)"
+  - SERVER_USER="Context element secrets.SERVER_USER can not be translated (yet)"
   - set -e
   - "./deploy.sh"
   - ")"

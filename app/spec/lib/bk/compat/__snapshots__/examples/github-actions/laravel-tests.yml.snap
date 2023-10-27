@@ -1,6 +1,18 @@
 ---
 steps:
 - commands:
+  - "# It may be a good idea to use docker compose to start up job-specific services"
+  - echo 'Starting memcached service'
+  - docker start --rm -d --name memcached --expose '11211:11211' memcached:1.6-alpine
+  - echo 'Starting mysql service'
+  - docker start --rm -d --name mysql --env "MYSQL_ALLOW_EMPTY_PASSWORD='true'" --env
+    "MYSQL_DATABASE='forge'" --expose '33306:3306' --health-cmd="mysqladmin ping"
+    --health-interval=10s --health-timeout=5s --health-retries=3 mysql:5.7
+  - echo 'Starting redis service'
+  - docker start --rm -d --name redis --expose '6379:6379' --entrypoint redis-server
+    redis:7.0
+  - echo 'Starting dynamodb service'
+  - docker start --rm -d --name dynamodb --expose '8888:8000' amazon/dynamodb-local:2.0.0
   - "# action actions/checkout@v4 is not necessary in Buildkite"
   - "# action shivammathur/setup-php@v2 can not be translated just yet"
   - "# action nick-fields/retry@v2 can not be translated just yet"
@@ -8,7 +20,7 @@ steps:
   - "# action nick-fields/retry@v2 can not be translated just yet"
   - echo '~~~ Execute tests'
   - "("
-  - DB_PORT="Context element job.services.mysql.ports[3306]  can not be translated
+  - DB_PORT="Context element job.services.mysql.ports[3306] can not be translated
     (yet)"
   - DB_USERNAME="root"
   - DYNAMODB_CACHE_TABLE="laravel_dynamodb_test"
@@ -17,7 +29,9 @@ steps:
   - AWS_SECRET_ACCESS_KEY="randomSecret"
   - vendor/bin/phpunit --display-deprecation
   - ")"
-  - "# action actions/upload-artifact@v3 can not be translated just yet"
+  - docker stop memcached mysql redis dynamodb
+  artifact_paths:
+  - vendor/orchestra/testbench-core/laravel/storage/logs/**/*
   agents:
     runs-on: ubuntu-22.04
   matrix:
