@@ -139,7 +139,15 @@ module BK
       end
 
       def self.replace_context_matrix(github_matrix)
-        matrix = github_matrix[:matrix] || (github_matrix[:strategy] && github_matrix[:strategy][:matrix])
+        return {} unless github_matrix.is_a?(Hash)
+
+        matrix = if github_matrix.has_key?(:matrix)
+                   github_matrix[:matrix]
+                 elsif github_matrix.has_key?(:strategy) && github_matrix[:strategy].is_a?(Hash)
+                   github_matrix[:strategy][:matrix]
+                 else
+                   nil
+                 end
 
         # Handle no matrix used
         return {} unless matrix
