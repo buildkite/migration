@@ -8,12 +8,12 @@ module BK
     class GitHubActions
       def generate_matrix(matrix)
         # first delete the keys that are extra configurations (if present)
-        inc = matrix.delete('include')
-        exc = matrix.delete('exclude')
+        inc = matrix.delete('include') || []
+        exc = matrix.delete('exclude') || []
 
         {
           setup: convert_to_string(matrix),
-          adjustments: generate_adjustments(matrix, inc, exc)
+          adjustments: generate_inclusions(matrix, inc) + generate_exclusions(matrix, exc)
         }
       end
 
@@ -28,16 +28,21 @@ module BK
         end
       end
 
-      def generate_adjustments(matrix, _inclusions, exclusions)
-        # TODO: manage inclusions
-        return [] if exclusions.nil? || exclusions.empty?
-
-        # assume all exclusions are complete
+      def generate_exclusions(_matrix, exclusions)
         exclusions.map do |comb|
           {
             with: convert_to_string(comb),
             skip: true
           }
+        end
+      end
+
+      def generate_inclusions(_matrix, inclusions)
+        # translation is simple but resulting adjustment will be invalid
+        # if inclusions have new keys not in matrix
+        # or are missing any keys
+        inclusions.map do |comb|
+          { with: convert_to_string(comb) }
         end
       end
     end
