@@ -4,12 +4,12 @@ require_relative '../../pipeline/step'
 
 module BK
   module Compat
+    # Translate matrix configurations
     class GitHubActions
-      def set_matrix(bk_step, config)
-        matrix = convert_to_string(config['strategy']['matrix'])
-        bk_step.matrix = {
-          'setup' => matrix,
-          'adjustments' => []
+      def generate_matrix(matrix)
+        {
+          setup: convert_to_string(matrix),
+          adjustments: []
         }
       end
 
