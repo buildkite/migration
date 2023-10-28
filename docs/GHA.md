@@ -37,6 +37,7 @@ The Buildkite Migration tool currently supports the following
 
 - `runs_on`: The `runs_on` key defines the type of machine that the job will run on. Within Buildkite, this is mapped to an agent targeting [tag](https://buildkite.com/docs/agent/v3/queues#targeting-a-queue) of `runs_on`. Note that jobs that target custom `tag` names will have a `queue` target of `default`.
 - `steps`: Steps that are defined for a particular `job`. Any `run` key is supported - and at present, any action that defines a `uses` attribute currently is not supported.
+- `strategy`: `matrix` key will be translated to [Buildkite build matrix](https://buildkite.com/docs/pipelines/build-matrix), and its `include` and `exclude` keys will add the appropriate exclusions in its `adjustments` properties (**important:** values in `include` are not valid in Buildkite pipelines if they include additional keys or do not have all matrix keys defined).
 
 ## Unsupported properties (No direct translation)
 
