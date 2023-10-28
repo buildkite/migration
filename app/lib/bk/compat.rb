@@ -25,5 +25,13 @@ module BK
         "#{first}#{second}"
       end
     end
+
+    # ensure string is a valid(ish) shell variable name
+    def self.var_name(id, prefix = nil)
+      [
+        prefix,
+        id.gsub(/[^A-Za-z0-9_]/, '_').upcase
+      ].compact.join('_')
+    end
   end
 end
