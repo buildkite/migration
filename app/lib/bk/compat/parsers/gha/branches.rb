@@ -2,38 +2,22 @@
 
 module BK
   module Compat
+    # translate branches
     class GitHubActions
-      def set_branch_filters(bk_step, config)
-        workflow_triggers = config.fetch('workflow_triggers', {})  
-        on_push = extract_branch_filters(workflow_triggers, 'push') 
-        bk_step.branches =  on_push&.join(" ") unless on_push.nil? || on_push.empty?
-      end 
- 
-      def extract_branch_filters(workflows, event)
-        case workflows
-        when Hash
-          # Return the group name/cancel-in-progress values from the hash
-          on_event = workflows.fetch(event, {}).nil? ? [] : workflows.fetch(event, {}) 
-          return [] if on_event.empty?
+      def translate_branch_filters(triggers)
+        return [] unless triggers.is_a?(Hash)
 
-          branches = transform_to_array(on_event.fetch('branches', {})) +
-            transform_to_array(on_event.fetch('branches-ignore', {})).map { |branch| "!#{branch}" }  unless on_event.empty?
-          branches.compact
-        else
-          []
-        end
+        push_trigger = triggers.fetch('push', {})
+
+        # apparently "push:" is a valid syntax
+        return [] if push_trigger.nil?
+
+        inc = [push_trigger.fetch('branches', [])].flatten
+        exc = [push_trigger.fetch('branches-ignore', [])].flatten
+
+        branches = inc + exc.map { |branch| "!#{branch}" }
+        branches.join(' ')
       end
-
-      def transform_to_array(value)
-        case value
-        when String
-          [value] 
-        else
-          # if we don't know how to do this, do nothing
-          value
-        end
-      end
-
     end
   end
 end
