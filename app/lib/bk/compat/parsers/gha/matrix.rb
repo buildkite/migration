@@ -7,9 +7,13 @@ module BK
     # Translate matrix configurations
     class GitHubActions
       def generate_matrix(matrix)
+        # first delete the keys that are extra configurations (if present)
+        inc = matrix.delete('include')
+        exc = matrix.delete('exclude')
+
         {
           setup: convert_to_string(matrix),
-          adjustments: []
+          adjustments: generate_adjustments(matrix, inc, exc)
         }
       end
 
@@ -21,6 +25,19 @@ module BK
           value.map! { |elem| convert_to_string(elem) }
         else
           value.to_s
+        end
+      end
+
+      def generate_adjustments(matrix, _inclusions, exclusions)
+        # TODO: manage inclusions
+        return [] if exclusions.nil? || exclusions.empty?
+
+        # assume all exclusions are complete
+        exclusions.map do |comb|
+          {
+            with: convert_to_string(comb),
+            skip: true
+          }
         end
       end
     end
