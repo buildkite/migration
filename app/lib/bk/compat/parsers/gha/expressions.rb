@@ -138,6 +138,10 @@ module BK
         "$#{var_name}"
       end
 
+      def self.replace_context_matrix(var_name)
+        "{{matrix.#{var_name}}}"
+      end
+
       def self.replace_context_secrets(var_name)
         # secrets context get mapped to environment variables
         "$$GITHUB_SECRET_#{var_name.upcase}"
