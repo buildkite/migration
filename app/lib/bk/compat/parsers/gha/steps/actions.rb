@@ -77,8 +77,14 @@ module BK
       end
 
       def translate_actions_upload_artifact(step)
-        BK::Compat::ArtifactPaths.new(
-          paths: step['with']['path']
+        paths = step['with']['path'].lines(chomp: true).map do |path|
+          next nil if path.empty? || path.start_with?('!')
+
+          path.end_with?('/') ? "#{path}**/*" : path
+        end
+
+        BK::Compat::GHAStep.new(
+          artifact_paths: paths.compact
         )
       end
 
