@@ -2,7 +2,6 @@
 
 require_relative '../../../../lib/bk/compat/parsers/circleci'
 
-
 RSpec.describe BK::Compat::CircleCI do
   let(:circleci) { BK::Compat::CircleCI }
 
