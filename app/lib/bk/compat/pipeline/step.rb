@@ -105,6 +105,7 @@ module BK
           h.delete(:parameters)
           h.delete(:transformer)
           h.delete(:soft_fail) if h[:soft_fail] == false
+          h.delete(:branches) if h[:branches]&.empty?
         end
       end
 
@@ -148,9 +149,12 @@ module BK
         HASH_ATTRIBUTES.each { |a| send(a).merge!(new_step.send(a)) }
 
         @conditional = BK::Compat.xxand(conditional, new_step.conditional)
-
+        @concurrency = [@concurrency, new_step.concurrency].compact.min
+        @concurrency_group ||= new_step.concurrency_group
+        @branches = "#{@branches} #{new_step.branches}".strip
+        @timeout_in_minutes = [@timeout_in_minutes, new_step.timeout_in_minutes].compact.max
         # TODO: these could be a hash with exit codes
-        @soft_fail = soft_fail || new_step.soft_fail
+        @soft_fail ||= new_step.soft_fail
       end
 
       def instance_attributes
