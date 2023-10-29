@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative 'expressions'
-require_relative 'uses/setup-java'
 
 module BK
   module Compat
