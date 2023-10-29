@@ -118,8 +118,6 @@ module BK
           merge!(other)
         when BK::Compat::Plugin
           @plugins << other
-        when BK::Compat::ArtifactPaths
-          @artifact_paths |= other.paths
         else
           add_commands(*other) unless other.nil?
         end
@@ -137,8 +135,6 @@ module BK
           end
         when BK::Compat::Plugin
           @plugins.prepend(other)
-        when BK::Compat::ArtifactPaths
-          @artifact_paths.prepend(other.paths)
         else
           prepend_commands(*other) unless other.nil?
         end
