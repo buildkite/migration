@@ -1,6 +1,8 @@
 ---
 steps:
-- commands:
+- artifact_paths:
+  - vendor/orchestra/testbench-core/laravel/storage/logs
+  commands:
   - "# It may be a good idea to use docker compose to start up job-specific services"
   - echo 'Starting memcached service'
   - docker start --rm -d --name memcached --expose '11211:11211' memcached:1.6-alpine
@@ -30,8 +32,6 @@ steps:
   - vendor/bin/phpunit --display-deprecation
   - )
   - docker stop memcached mysql redis dynamodb
-  artifact_paths:
-  - vendor/orchestra/testbench-core/laravel/storage/logs
   agents:
     runs-on: ubuntu-22.04
   matrix:
