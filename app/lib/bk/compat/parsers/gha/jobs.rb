@@ -11,7 +11,7 @@ module BK
     class GitHubActions
       def parse_job(name, config)
         bk_step = generate_base_step(name, config)
-        set_concurrency(bk_step, config) if config['concurrency']
+        bk_step << translate_concurrency(config['concurrency'])
         bk_step.matrix = generate_matrix(config['strategy']['matrix']) if config['strategy']
         config['steps'].each { |step| bk_step << translate_step(step) }
         bk_step.agents.update(config.slice('runs-on'))

@@ -1,17 +1,29 @@
 # frozen_string_literal: true
 
+require_relative 'steps'
+
 module BK
   module Compat
+    # translate concurrency configurations
     class GitHubActions
-      def set_concurrency(bk_step, config)
-        group, cancel_in_progress = normalize_concurrency(config['concurrency']) 
-        # If cancel-in-progress was defined in the steps' concurrency hash
-        bk_step.add_commands("# cancel-in-progress in Buildkite is the pipeline setting Cancel Intermediate Builds") unless cancel_in_progress.nil?
-        # Set concurrency/concurrency_group
-        bk_step.concurrency = 1 
-        bk_step.concurrency_group = group
+      def translate_concurrency(config)
+        return [] if config.nil?
+
+        group, cancel_in_progress = normalize_concurrency(config)
+
+        BK::Compat::GHAStep.new(
+          concurrency: 1,
+          concurrency_group: group
+        ).tap do |bk_step|
+          unless cancel_in_progress.nil?
+            # If cancel-in-progress was defined in the steps' concurrency hash
+            bk_step.add_commands(
+              '# cancel-in-progress in Buildkite is the pipeline setting Cancel Intermediate Builds'
+            )
+          end
+        end
       end
-  
+
       def normalize_concurrency(concurrency)
         case concurrency
         when String
@@ -23,8 +35,7 @@ module BK
         else
           raise TypeError, 'Invalid concurrency configuration'
         end
-      end 
+      end
     end
   end
 end
-  
