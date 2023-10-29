@@ -7,6 +7,8 @@ module BK
     # Translate matrix configurations
     class GitHubActions
       def generate_matrix(matrix)
+        return {} if matrix.nil?
+
         # first delete the keys that are extra configurations (if present)
         inc = matrix.delete('include') || []
         exc = matrix.delete('exclude') || []
