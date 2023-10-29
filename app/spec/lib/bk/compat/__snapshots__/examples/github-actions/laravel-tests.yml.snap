@@ -31,7 +31,7 @@ steps:
   - )
   - docker stop memcached mysql redis dynamodb
   artifact_paths:
-  - vendor/orchestra/testbench-core/laravel/storage/logs/**/*
+  - vendor/orchestra/testbench-core/laravel/storage/logs
   agents:
     runs-on: ubuntu-22.04
   matrix:
