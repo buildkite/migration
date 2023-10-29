@@ -120,19 +120,8 @@ module BK
       rule(context: simple(:c)) { GithubContext.replace(c.to_s) }
     end
 
+    # Mapping out contexts
     class GithubContext
-      @github_bk_context_mapping = {
-        "actor" => "BUILDKITE_BUILD_AUTHOR",
-        "job" => "BUILDKITE_JOB_ID",
-        "ref_name" => "BUILDKITE_BRANCH",
-        "run_attempt" => "BUILDKITE_RETRY_COUNT",
-        "run_id" => "BUILDKITE_BUILD_ID",
-        "run_number" => "BUILDKITE_BUILD_NUMBER",
-        "sha" => "BUILDKITE_COMMIT",
-        "triggering_actor" => "BUILDKITE_BUILD_CREATOR",
-        "workflow" => "BUILDKITE_PIPELINE_NAME"
-      }
-
       def self.replace(str)
         context, rest = str.split('.', 2)
         send("replace_context_#{context}", rest)
@@ -160,20 +149,18 @@ module BK
       end
 
       def self.replace_context_runner(var_name)
-        case var_name
-        when 'name'
-          '$$BUILDKITE_AGENT_NAME'
-        when 'os'
-          '$$BUILDKITE_AGENT_META_DATA_OS'
-        when 'arch'
-          '$$BUILDKITE_AGENT_META_DATA_ARCHITECTURE'
-        when 'temp'
-          '$$TMPDIR'
-        when 'tool_cache'
-          '/usr/local/bin'
-        else
-          "There is no translation for runner.#{var_name}"
-        end
+        runner_bk_context_mapping = {
+          name: '$$BUILDKITE_AGENT_NAME',
+          os: '$$BUILDKITE_AGENT_META_DATA_OS',
+          arch: '$$BUILDKITE_AGENT_META_DATA_ARCHITECTURE',
+          temp: '$$TMPDIR',
+          tool_cache: '/usr/local/bin'
+        }
+
+        runner_bk_context_mapping.fetch(
+          var_name.to_sym,
+          "There is no test translation for runner.#{var_name}"
+        )
       end
 
       def self.replace_context_needs(path)
@@ -187,10 +174,24 @@ module BK
         end
       end
 
-      def self.replace_context_github(var_name)  
-        raise NoMethodError unless @github_bk_context_mapping.include?(var_name)
-        
-        "$$#{@github_bk_context_mapping[var_name]}"
+      def self.replace_context_github(var_name)
+        github_bk_context_mapping = {
+          actor: 'BUILDKITE_BUILD_AUTHOR',
+          job: 'BUILDKITE_JOB_ID',
+          ref_name: 'BUILDKITE_BRANCH',
+          run_attempt: 'BUILDKITE_RETRY_COUNT',
+          run_id: 'BUILDKITE_BUILD_ID',
+          run_number: 'BUILDKITE_BUILD_NUMBER',
+          sha: 'BUILDKITE_COMMIT',
+          triggering_actor: 'BUILDKITE_BUILD_CREATOR',
+          workflow: 'BUILDKITE_PIPELINE_NAME'
+        }
+
+        translated_var = github_bk_context_mapping[var_name]
+
+        raise NoMethodError if translated_var.nil?
+
+        "$$#{translated_var}"
       end
 
       def self.replace_context_needs_outputs(job, path_list)
@@ -215,6 +216,7 @@ module BK
       end
     end
 
+    # Utility class to put everything together
     class GithubExpressions
       def initialize
         @parser = ExpressionParser.new
