@@ -188,13 +188,9 @@ module BK
       end
 
       def self.replace_context_github(var_name)  
-        translated_var = @github_bk_context_mapping[var_name]
-        case translated_var
-        when String
-          "$#{translated_var}"
-        when nil
-          raise NoMethodError
-        end
+        raise NoMethodError unless @github_bk_context_mapping.include?(var_name)
+        
+        "$$#{@github_bk_context_mapping[var_name]}"
       end
 
       def self.replace_context_needs_outputs(job, path_list)
