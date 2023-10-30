@@ -153,6 +153,7 @@ module BK
         @concurrency_group ||= new_step.concurrency_group
         @branches = "#{@branches} #{new_step.branches}".strip
         @timeout_in_minutes = [@timeout_in_minutes, new_step.timeout_in_minutes].compact.max
+
         # TODO: these could be a hash with exit codes
         @soft_fail ||= new_step.soft_fail
 
