@@ -34,6 +34,7 @@ steps:
   label: ":github: docker-build"
   key: docker-build
   branches: main
+  if: Context element github.ref can not be translated (yet) == refs/heads/main
 - commands:
   - "# action actions/checkout@v3 is not necessary in Buildkite"
   - echo '~~~ Add Server key'
@@ -54,3 +55,4 @@ steps:
   label: ":github: deploy"
   key: deploy
   branches: main
+  if: Context element github.ref can not be translated (yet) == refs/heads/main

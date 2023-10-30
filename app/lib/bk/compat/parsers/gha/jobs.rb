@@ -18,6 +18,7 @@ module BK
         config['steps'].each { |step| bk_step << translate_step(step) }
         bk_step.agents.update(config.slice('runs-on'))
         bk_step.depends_on = Array(config['needs'])
+        bk_step.conditional = generate_if(config['if']) if config['if']
 
         # these two should be last because they need to execute at the end
         bk_step << translate_outputs(config['outputs'], name)
@@ -35,6 +36,11 @@ module BK
           timeout_in_minutes: config['timeout-minutes'],
           soft_fail: config['continue-on-error']
         )
+      end
+
+      def generate_if(str)
+        # if is an expression but it can be missing the enclosing ${{}}
+        str.strip.start_with?('${{') ? str : "${{ #{str} }}"
       end
 
       def translate_outputs(outputs, job_name)

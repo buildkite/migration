@@ -39,3 +39,5 @@ steps:
       skip: true
   label: ":github: ci"
   key: ci
+  if: Context element github.event_name can not be translated (yet) != schedule ||
+    Context element github.repository can not be translated (yet) == pestphp/pest
