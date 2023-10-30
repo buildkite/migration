@@ -6,6 +6,7 @@ require_relative '../pipeline'
 require_relative 'gha/branches'
 require_relative 'gha/jobs'
 require_relative 'gha/steps'
+require_relative 'gha/steps/actions'
 
 module BK
   module Compat
@@ -35,6 +36,7 @@ module BK
         @options = options
 
         GHABuiltins.new(register: method(:register_translator))
+        GHAActions.new(register: method(:register_translator))
       end
 
       def parse
