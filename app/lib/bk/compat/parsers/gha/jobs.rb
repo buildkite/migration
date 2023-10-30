@@ -15,7 +15,6 @@ module BK
         bk_step.matrix = generate_matrix(config['strategy']['matrix']) if config['strategy']
         config['steps'].each { |step| bk_step << translate_step(step) }
         bk_step.agents.update(config.slice('runs-on'))
-        bk_step.depends_on = Array(config['needs'])
         bk_step.conditional = generate_if(config['if']) if config['if']
 
         # these two should be last because they need to execute at the end
@@ -29,7 +28,7 @@ module BK
         BK::Compat::GHAStep.new(
           label: ":github: #{name}",
           key: name,
-          depends_on: config.fetch('needs', []),
+          depends_on: Array(config.fetch('needs', [])),
           env: config.fetch('env', {}),
           timeout_in_minutes: config['timeout-minutes'],
           soft_fail: config['continue-on-error']
