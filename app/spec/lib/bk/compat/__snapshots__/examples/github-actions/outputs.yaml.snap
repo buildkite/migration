@@ -2,7 +2,9 @@
 steps:
 - commands:
   - echo "test=hello" >> "$GITHUB_OUTPUT"
+  - GHA_STEP_STEP1="$$?"
   - echo "test=world" >> "$GITHUB_OUTPUT"
+  - GHA_STEP_STEP2="$$?"
   - source $GITHUB_OUTPUT
   - buildkite-agent metadata set "job1.output1" "$output1"
   - buildkite-agent metadata set "job1.output2" "$output2"
@@ -18,6 +20,8 @@ steps:
   - OUTPUT2="$(buildkite-agent meta-data get 'job1.output2')"
   - echo "$OUTPUT1 $OUTPUT2"
   - )
+  - echo "$$GHA_STEP_STEP1"
+  - echo "$$GHA_STEP_STEP2"
   depends_on:
   - job1
   agents:

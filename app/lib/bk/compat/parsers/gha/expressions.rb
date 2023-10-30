@@ -204,6 +204,15 @@ module BK
           "#{path_list} does not appear to be a valid step output"
         end
       end
+
+      def self.replace_context_steps(path)
+        id, action, *_rest = path.split('.', 3)
+        if action == 'outputs'
+          'Step outputs not currently supported'
+        elsif %w[conclussion outcome].include?(action)
+          "$$#{BK::Compat.var_name(id, 'GHA_STEP')}"
+        end
+      end
     end
 
     class GithubExpressions

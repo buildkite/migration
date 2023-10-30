@@ -29,7 +29,8 @@ module BK
           generate_command_string(
             commands: step['run'],
             env: step.fetch('env', {}),
-            workdir: step['working-directory']
+            workdir: step['working-directory'],
+            id: step['id']
           )
         ].flatten.compact
       end
@@ -96,15 +97,17 @@ module BK
         end
       end
 
-      def generate_command_string(commands: [], env: {}, workdir: nil)
+      def generate_command_string(commands: [], env: {}, workdir: nil, id: nil)
         vars = env.map { |k, v| "#{k}=\"#{v}\"" }
-        avoid_parens = vars.empty? && workdir.nil?
+        cmds = commands.lines(chomp: true)
+        avoid_parens = vars.empty? && workdir.nil? && (id.nil? || cmds.one?)
         [
           avoid_parens ? nil : '(',
           workdir.nil? ? nil : "cd '#{workdir}'",
           vars.empty? ? nil : vars,
-          commands.lines(chomp: true),
-          avoid_parens ? nil : ')'
+          cmds,
+          avoid_parens ? nil : ')',
+          id.nil? ? nil : "#{BK::Compat.var_name(id, 'GHA_STEP')}=\"$$?\""
         ].compact
       end
     end
