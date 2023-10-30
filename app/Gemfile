@@ -4,10 +4,10 @@ source 'https://rubygems.org'
 
 git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
 
+gem 'parslet'
 gem 'rack'
 gem 'rackup' # necessary for starting the HTTP interface
 gem 'rouge'
-gem 'parslet'
 
 group :development, :test do
   gem 'rspec'
