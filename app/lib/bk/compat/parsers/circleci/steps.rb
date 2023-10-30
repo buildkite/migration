@@ -87,11 +87,12 @@ module BK
         def generate_command_string(commands: [], env: {}, background: false)
           vars = env.map { |k, v| "#{k}='#{v}'" }
           bg = background ? '&' : ''
+          use_parens = !vars.empty? || background
           [
-            '(',
+            use_parens ? '(' : nil,
             vars.empty? ? nil : vars.join(' '),
             commands.lines(chomp: true),
-            ") #{bg}".strip
+            use_parens ? ") #{bg}".strip : nil
           ].compact
         end
 

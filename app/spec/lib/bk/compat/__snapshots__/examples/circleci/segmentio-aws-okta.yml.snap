@@ -3,16 +3,11 @@ steps:
 - commands:
   - "# No need for checkout, the agent takes care of that"
   - echo '~~~ Install linux dependencies - libusb'
-  - "("
   - sudo apt update -q
   - sudo apt install -yq libusb-dev libusb-1.0.0-dev
-  - ")"
   - echo '~~~ Test'
-  - "("
   - make test
-  - ")"
   - echo '~~~ Check modules are tidy and checked in'
-  - "("
   - export GO111MODULE=on
   - go mod tidy
   - go mod vendor
@@ -22,7 +17,6 @@ steps:
   - "  git status"
   - "  exit 1"
   - fi
-  - ")"
   - cd /go/src/github.com/segmentio/aws-okta
   plugins:
   - docker#v5.7.0:
@@ -33,15 +27,11 @@ steps:
 - commands:
   - "# No need for checkout, the agent takes care of that"
   - echo '~~~ Install linux dependencies - libusb'
-  - "("
   - sudo apt update -q
   - sudo apt install -yq libusb-dev libusb-1.0.0-dev
-  - ")"
   - echo '~~~ Test'
-  - "("
   - go build -mod=vendor
   - "./aws-okta version"
-  - ")"
   plugins:
   - docker#v5.7.0:
       image: circleci/golang:1.12
@@ -51,18 +41,12 @@ steps:
 - commands:
   - "# No need for checkout, the agent takes care of that"
   - echo '~~~ Install nfpm, rpmbuild'
-  - "("
   - sudo make -f Makefile.tools nfpm-debian rpmbuild-debian
-  - ")"
   - echo '~~~ Install libusb'
-  - "("
   - sudo apt update -q
   - sudo apt install -yq libusb-dev libusb-1.0.0-dev
-  - ")"
   - echo '~~~ Make distributables'
-  - "("
   - make -f Makefile.release dist-linux
-  - ")"
   - cd .
   - buildkite-agent artifact upload 'dist/*'
   - cd -
@@ -80,7 +64,6 @@ steps:
   - cd '.'
   - buildkite agent artifact download *
   - echo '~~~ Install tools'
-  - "("
   - make -f Makefile.tools github-release
   - "# this is all for package_cloud :/"
   - sudo apt update -q
@@ -89,7 +72,6 @@ steps:
   - sudo gem install rake
   - sudo make -f Makefile.tools package_cloud
   - make -f Makefile.release publish-packagecloud
-  - ")"
   - cd /go/src/github.com/segmentio/aws-okta
   depends_on:
   - dist-linux
@@ -106,10 +88,8 @@ steps:
   - cd '.'
   - buildkite agent artifact download *
   - echo '~~~ Install tools'
-  - "("
   - make -f Makefile.tools github-release
   - make -f Makefile.release publish-github-linux
-  - ")"
   - cd /go/src/github.com/segmentio/aws-okta
   depends_on:
   - dist-linux

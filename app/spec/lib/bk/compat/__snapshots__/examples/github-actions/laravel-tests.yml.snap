@@ -19,7 +19,7 @@ steps:
   - "# action nick-fields/retry@v2 can not be translated just yet"
   - "# action nick-fields/retry@v2 can not be translated just yet"
   - echo '~~~ Execute tests'
-  - "("
+  - (
   - DB_PORT="Context element job.services.mysql.ports[3306] can not be translated
     (yet)"
   - DB_USERNAME="root"
@@ -28,7 +28,7 @@ steps:
   - AWS_ACCESS_KEY_ID="randomKey"
   - AWS_SECRET_ACCESS_KEY="randomSecret"
   - vendor/bin/phpunit --display-deprecation
-  - ")"
+  - )
   - docker stop memcached mysql redis dynamodb
   artifact_paths:
   - vendor/orchestra/testbench-core/laravel/storage/logs/**/*

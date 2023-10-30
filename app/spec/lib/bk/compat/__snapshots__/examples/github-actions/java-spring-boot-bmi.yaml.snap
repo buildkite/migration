@@ -40,13 +40,13 @@ steps:
   - touch key.txt && echo "$$GITHUB_SECRET_SERVER_KEY" > key.txt
   - chmod 600 key.txt
   - echo '~~~ Deploy the application'
-  - "("
+  - (
   - SERVER_HOST="$$GITHUB_SECRET_SERVER_HOST"
   - SERVER_PORT="$$GITHUB_SECRET_SERVER_PORT"
   - SERVER_USER="$$GITHUB_SECRET_SERVER_USER"
   - set -e
   - "./deploy.sh"
-  - ")"
+  - )
   depends_on:
   - docker-build
   agents:
