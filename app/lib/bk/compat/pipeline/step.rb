@@ -148,6 +148,8 @@ module BK
         HASH_ATTRIBUTES.each { |a| send(a).merge!(new_step.send(a)) }
 
         @conditional = BK::Compat.xxand(conditional, new_step.conditional)
+        @concurrency = [@concurrency, new_step.concurrency].compact.min
+        @concurrency_group ||= new_step.concurrency_group
 
         # TODO: these could be a hash with exit codes
         @soft_fail = soft_fail || new_step.soft_fail
