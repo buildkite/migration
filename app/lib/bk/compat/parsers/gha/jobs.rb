@@ -12,12 +12,12 @@ module BK
       def parse_job(name, config)
         bk_step = generate_base_step(name, config)
         bk_step << translate_concurrency(config['concurrency'])
-        bk_step.matrix = generate_matrix(config['strategy']['matrix']) if config['strategy']
+        bk_step.matrix = generate_matrix(config['strategy']&.fetch('matrix'))
         config['steps'].each { |step| bk_step << translate_step(step) }
         bk_step.agents.update(config.slice('runs-on'))
-        bk_step.conditional = generate_if(config['if']) if config['if']
+        bk_step.conditional = generate_if(config['if'])
 
-        # these two should be last because they need to execute at the end
+        # these two should be last because they need to execute commands at the end
         bk_step << translate_outputs(config['outputs'], name)
         set_services(bk_step, config['services'])
 
@@ -28,7 +28,7 @@ module BK
         BK::Compat::GHAStep.new(
           label: ":github: #{name}",
           key: name,
-          depends_on: Array(config.fetch('needs', [])),
+          depends_on: Array(config['needs']),
           env: config.fetch('env', {}),
           timeout_in_minutes: config['timeout-minutes'],
           soft_fail: config['continue-on-error']
@@ -36,6 +36,8 @@ module BK
       end
 
       def generate_if(str)
+        return nil if str.nil?
+
         # if is an expression but it can be missing the enclosing ${{}}
         str.strip.start_with?('${{') ? str : "${{ #{str} }}"
       end

@@ -85,14 +85,14 @@ module BK
                else
                  BK::Compat::Environment.new(value)
                end
-      end 
+      end
 
       def to_h
         clean_attributes.tap do |h|
           # special handling
           h[:plugins] = @plugins.map(&:to_h)
-          h[:env] = @env&.to_h  
-          
+          h[:env] = @env&.to_h
+
           # remove empty and nil values
           h.delete_if { |_, v| v.nil? || (v.is_a?(Enumerable) && v.empty?) }
         end
@@ -105,6 +105,7 @@ module BK
           h.delete(:parameters)
           h.delete(:transformer)
           h.delete(:soft_fail) if h[:soft_fail] == false
+          h.delete(:branches) if h[:branches] == ''
         end
       end
 
@@ -117,7 +118,7 @@ module BK
           merge!(other)
         when BK::Compat::Plugin
           @plugins << other
-        when BK::Compat::ArtifactPaths 
+        when BK::Compat::ArtifactPaths
           @artifact_paths |= other.paths
         else
           add_commands(*other) unless other.nil?
@@ -150,9 +151,13 @@ module BK
         @conditional = BK::Compat.xxand(conditional, new_step.conditional)
         @concurrency = [@concurrency, new_step.concurrency].compact.min
         @concurrency_group ||= new_step.concurrency_group
+        @branches = "#{@branches} #{new_step.branches}".strip
+        @timeout_in_minutes = [@timeout_in_minutes, new_step.timeout_in_minutes].compact.max
 
         # TODO: these could be a hash with exit codes
-        @soft_fail = soft_fail || new_step.soft_fail
+        @soft_fail ||= new_step.soft_fail
+
+        nil
       end
 
       def instance_attributes
