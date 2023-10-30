@@ -1,6 +1,6 @@
-# Buildkite Migration tool
+# Buildkite Migration tool [![Build status](https://badge.buildkite.com/5db82bf94b2c528cb9723cdd222b60baca00c6328265c8427c.svg)](https://buildkite.com/buildkite/migration-tool)
 
-A tool to help kick start the transition of pipelines from other CI providers, to Buildkite.
+A tool to help kick start the transition of pipelines from other CI providers to Buildkite.
 
 ```shell
 $ buildkite-compat examples/circleci/legacy.yml
