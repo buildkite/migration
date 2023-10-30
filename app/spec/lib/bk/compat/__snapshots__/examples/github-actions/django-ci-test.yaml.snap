@@ -12,7 +12,7 @@ steps:
       image: python:3.8
   artifact_paths:
   - vendor/output/bin/**/*
-  - vendor/output/test-results/**/*
+  - vendor/output/test-results
   - vendor2/output/bin/*.log
   agents:
     runs-on: ubuntu-latest
