@@ -53,8 +53,17 @@ module BK
         alias visit_Symbol visit_symbol
       end
 
+      # prevent quoting single parenthesis in a line (used for commants)
+      class CustomEmitter < Psych::TreeBuilder
+        def scalar(*, **)
+          s = super(*, **)
+          s.style = Psych::Nodes::Scalar::PLAIN if s.value.match(/^[()]$/)
+          s
+        end
+      end
+
       def text_yaml
-        visitor = SymbolToStringYamlTreeVisitor.create
+        visitor = SymbolToStringYamlTreeVisitor.create({}, CustomEmitter.new)
         visitor << @structure
         visitor.tree.yaml
       end

@@ -28,6 +28,16 @@ steps:
       dependency-version:
       - prefer-lowest
       - prefer-stable
-    adjustments: []
+    adjustments:
+    - with:
+        os: windows-xp
+        php: '8.3'
+        dependency-version: prefer-lowest
+    - with:
+        os: macos-latest
+        php: '8.1'
+      skip: true
   label: ":github: ci"
   key: ci
+  if: Context element github.event_name can not be translated (yet) != schedule ||
+    Context element github.repository can not be translated (yet) == pestphp/pest

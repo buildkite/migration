@@ -121,6 +121,18 @@ module BK
     end
 
     class GithubContext
+      @github_bk_context_mapping = {
+        "actor" => "BUILDKITE_BUILD_AUTHOR",
+        "job" => "BUILDKITE_JOB_ID",
+        "ref_name" => "BUILDKITE_BRANCH",
+        "run_attempt" => "BUILDKITE_RETRY_COUNT",
+        "run_id" => "BUILDKITE_BUILD_ID",
+        "run_number" => "BUILDKITE_BUILD_NUMBER",
+        "sha" => "BUILDKITE_COMMIT",
+        "triggering_actor" => "BUILDKITE_BUILD_CREATOR",
+        "workflow" => "BUILDKITE_PIPELINE_NAME"
+      }
+
       def self.replace(str)
         context, rest = str.split('.', 2)
         send("replace_context_#{context}", rest)
@@ -173,6 +185,12 @@ module BK
         when 'outputs'
           replace_context_needs_outputs(job, rest)
         end
+      end
+
+      def self.replace_context_github(var_name)  
+        raise NoMethodError unless @github_bk_context_mapping.include?(var_name)
+        
+        "$$#{@github_bk_context_mapping[var_name]}"
       end
 
       def self.replace_context_needs_outputs(job, path_list)

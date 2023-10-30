@@ -34,19 +34,20 @@ steps:
   label: ":github: docker-build"
   key: docker-build
   branches: main
+  if: Context element github.ref can not be translated (yet) == refs/heads/main
 - commands:
   - "# action actions/checkout@v3 is not necessary in Buildkite"
   - echo '~~~ Add Server key'
   - touch key.txt && echo "$$GITHUB_SECRET_SERVER_KEY" > key.txt
   - chmod 600 key.txt
   - echo '~~~ Deploy the application'
-  - "("
+  - (
   - SERVER_HOST="$$GITHUB_SECRET_SERVER_HOST"
   - SERVER_PORT="$$GITHUB_SECRET_SERVER_PORT"
   - SERVER_USER="$$GITHUB_SECRET_SERVER_USER"
   - set -e
   - "./deploy.sh"
-  - ")"
+  - )
   depends_on:
   - docker-build
   agents:
@@ -54,3 +55,4 @@ steps:
   label: ":github: deploy"
   key: deploy
   branches: main
+  if: Context element github.ref can not be translated (yet) == refs/heads/main
