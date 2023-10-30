@@ -3,6 +3,7 @@
 require_relative '../error'
 require_relative '../translator'
 require_relative '../pipeline'
+require_relative 'gha/branches'
 require_relative 'gha/jobs'
 require_relative 'gha/steps'
 
@@ -38,18 +39,22 @@ module BK
 
       def parse
         # Pipeline with steps defined as jobs
-        defaults = @config.fetch('defaults', {}) 
-        #move on push data into the jobs, `on` key in YAML is translated to ruby's `true` boolean
-        workflow_triggers = @config.fetch(true, {})
-        jobs = @config.fetch('jobs', {})
+        defaults = @config.fetch('defaults', {})
 
-        #add the workflow triggers to each job as workflow_triggers 
-        jobs.transform_values { |value| value['workflow_triggers'] = workflow_triggers }
+        # push data for branch filtering
+        # `on` key in YAML is translated to ruby's `true` boolean
+        branches = translate_branch_filters(@config.fetch(true, {}))
+
+        steps = @config.fetch('jobs', []).map do |key, config|
+          parse_job(key, defaults.merge(config)).tap do |bk_step|
+            bk_step.branches = branches
+          end
+        end
 
         Pipeline.new(
-          steps: jobs.map { |key, config| parse_job(key, defaults.merge(config)) },
+          steps: steps,
           env: @config.fetch('env', {})
-        )  
+        )
       end
     end
   end
