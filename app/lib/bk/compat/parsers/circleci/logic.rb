@@ -29,25 +29,31 @@ module BK
         raise 'A condition operator must be a single-keyed dictionary' unless tree.length == 1
 
         op = tree.keys.first
-        case op
-        when 'and'
-          tree[op].map { |elem| parse_condition(elem) }.join(' && ')
-        when 'or'
-          tree[op].map { |elem| parse_condition(elem) }.join(' || ')
-        when 'not'
-          val = parse_condition(tree[op])
-          "!(#{val})"
-        when 'equal'
-          condition_equal(*tree[op])
-        when 'matches'
-          "/#{tree[op]['pattern']}/ ~= #{tree[op]['value']}"
-        else
-          raise "Invalid conditional operation #{op}"
-        end
+        send("condition_#{op}", tree[op])
+      rescue NoMethodError
+        raise "Invalid conditional operation #{op}"
       end
 
-      def self.condition_equal(first_val, *rest)
+      def self.condition_and(elems)
+        elems.map { |elem| parse_condition(elem) }.join(' && ')
+      end
+
+      def self.condition_or(elems)
+        elems.map { |elem| parse_condition(elem) }.join(' || ')
+      end
+
+      def self.condition_not(elem)
+        val = parse_condition(elem)
+        "!(#{val})"
+      end
+
+      def self.condition_equal(elems)
+        first_val, *rest = *elems
         rest.product([first_val]).map { |a, b| "\"#{string_or_key(a)}\" == \"#{string_or_key(b)}\"" }.join(' && ')
+      end
+
+      def self.condition_matches(match)
+        "/#{match['pattern']}/ ~= #{match['value']}"
       end
 
       def self.string_or_list(object)
