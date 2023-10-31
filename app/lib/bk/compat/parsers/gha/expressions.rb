@@ -140,7 +140,7 @@ module BK
       end
 
       def self.replace_context_matrix(var_name)
-        "{{matrix.#{var_name}}}"
+        "{{ matrix.#{var_name} }}"
       end
 
       def self.replace_context_secrets(var_name)
