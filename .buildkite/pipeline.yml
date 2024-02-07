@@ -5,7 +5,7 @@ steps:
       - rubocop -l
     plugins:
       - docker#v5.9.0:
-          image: ruby:3.2
+          image: ruby:3.3
 
   - label: ":rspec: Snapshot Testing"
     command:
@@ -13,5 +13,5 @@ steps:
       - rspec spec
     plugins:
       - docker#v5.9.0:
-          image: ruby:3.2
+          image: ruby:3.3
           workdir: /app
