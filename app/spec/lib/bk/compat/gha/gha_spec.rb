@@ -4,7 +4,7 @@ require_relative '../../../../../lib/bk/compat'
 
 RSpec.describe BK::Compat::GitHubActions do
   context 'it runs a snapshot test on each example' do
-    directory_path = 'examples/github-actions'
+    directory_path = 'spec/lib/bk/compat/gha/examples'
 
     Dir.glob("#{directory_path}/*").each do |file|
       next if File.directory?(file)
