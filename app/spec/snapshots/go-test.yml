@@ -1,9 +1,0 @@
-steps:
-  - label: Set up Go, Build, Test
-    if: build.branch == "master"
-    command: 
-    - go build -v ./...
-    - go test -v ./...
-    plugins:
-      - docker#v5.9.0:
-          image: golang:1.20
