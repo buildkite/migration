@@ -2,7 +2,25 @@
 
 The Buildkite Migration tool's currently supported, partially supported and unsupported properties in translation CircleCI pipelines to Buildkite pipelines are listed below:
 
-## Supported properties
+## Properties
+
+### Commands (`commands`)
+
+| Key | Supported? | Notes |
+| --- | --- | --- |
+| `commands` | 🟢 | A `command` defined in a CircleCI pipeline is a reusable set of instructions with parameters that can be inserted into required `job` executions. Commands can have their own set list of `steps` that are translated through to the generated [command step](https://buildkite.com/docs/pipelines/command-step)'s `commands`. If a `command` contains a `parameters` key, they are respected when used in jobs/workflows and their defaults values used when not specified. |
+
+### Setup (`setup`)
+
+### Orbs (`orbs`)
+
+### Parameters (`parameters`)
+
+### Version (`version`)
+
+### Workflows (`workflows`)
+
+## Notes
 
 ### aliases
 
@@ -10,9 +28,11 @@ An `alias` is a definition of a reusable snippet of a CircleCI pipeline. Defined
 
 The Buildkite Migration tool supports reading configuration defined from anchors and utilised through the use of an `alias`.
 
+## Supported properties
+
 ### commands
 
-A `command` defined in a CircleCI pipeline is a reusable set of instructions with parameters that can be inserted into required `job` executions. Commands can have their own set list of `steps` that are translated through to the generated [command step](https://buildkite.com/docs/pipelines/command-step)'s `commands`. If a `command` contains a `parameters` key, they are respected when used in jobs/workflows and their defaults values used when not specified.
+
 
 ### workflows
 
