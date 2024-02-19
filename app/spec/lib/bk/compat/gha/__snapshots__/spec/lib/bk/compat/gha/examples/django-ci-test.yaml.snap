@@ -12,7 +12,7 @@ steps:
   - cd src
   - python manage.py test
   plugins:
-  - docker#v5.7.0:
+  - docker#v5.10.0:
       image: python:3.8
   agents:
     runs-on: ubuntu-latest
