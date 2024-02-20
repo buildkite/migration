@@ -19,7 +19,7 @@ steps:
   - fi
   - cd /go/src/github.com/segmentio/aws-okta
   plugins:
-  - docker#v5.7.0:
+  - docker#v5.10.0:
       image: circleci/golang:1.13
   agents:
     executor_type: docker
@@ -33,7 +33,7 @@ steps:
   - go build -mod=vendor
   - "./aws-okta version"
   plugins:
-  - docker#v5.7.0:
+  - docker#v5.10.0:
       image: circleci/golang:1.12
   agents:
     executor_type: docker
@@ -52,7 +52,7 @@ steps:
   - cd -
   - cd /go/src/github.com/segmentio/aws-okta
   plugins:
-  - docker#v5.7.0:
+  - docker#v5.10.0:
       image: circleci/golang:1.13
   agents:
     executor_type: docker
@@ -76,7 +76,7 @@ steps:
   depends_on:
   - dist-linux
   plugins:
-  - docker#v5.7.0:
+  - docker#v5.10.0:
       image: circleci/golang:1.13
   agents:
     executor_type: docker
@@ -94,7 +94,7 @@ steps:
   depends_on:
   - dist-linux
   plugins:
-  - docker#v5.7.0:
+  - docker#v5.10.0:
       image: circleci/golang:1.13
   agents:
     executor_type: docker

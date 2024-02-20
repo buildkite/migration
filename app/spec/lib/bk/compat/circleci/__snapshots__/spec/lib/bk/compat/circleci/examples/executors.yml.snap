@@ -14,7 +14,7 @@ steps:
 - commands:
   - Hello from docker
   plugins:
-  - docker#v5.7.0:
+  - docker#v5.10.0:
       image: circleci/python:3.6.2
   agents:
     executor_type: docker

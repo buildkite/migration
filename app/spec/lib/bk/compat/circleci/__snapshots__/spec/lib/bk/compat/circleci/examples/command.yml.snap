@@ -3,7 +3,7 @@ steps:
 - commands:
   - echo "Hello My-Name"
   plugins:
-  - docker#v5.7.0:
+  - docker#v5.10.0:
       image: cimg/base:stable
   agents:
     executor_type: docker

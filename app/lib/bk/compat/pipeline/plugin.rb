@@ -3,9 +3,9 @@
 module BK
   module Compat
     DEFAULT_VERSIONS = {
-      'docker' => 'v5.7.0',
-      'docker-compose' => 'v4.14.0',
-      'docker-login' => 'v2.1.0',
+      'docker' => 'v5.10.0',
+      'docker-compose' => 'v5.0.0',
+      'docker-login' => 'v3.0.0',
       'ecr' => 'v2.7.0'
     }.to_h do |p, v|
       env_friendly = p.upcase.tr('^A-Z0-9', '_')
