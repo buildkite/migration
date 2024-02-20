@@ -6,7 +6,7 @@ steps:
   - npm run build --if-present
   - npm test
   plugins:
-  - docker#v5.7.0:
+  - docker#v5.10.0:
       image: node:20
   agents:
     runs-on: ubuntu-latest

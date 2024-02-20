@@ -10,7 +10,7 @@ steps:
   - echo "Hello $NAME. $BUILD. Using Java Version $JAVA_VERSION"
   - )
   plugins:
-  - docker#v5.7.0:
+  - docker#v5.10.0:
       image: eclipse-temurin:${{env.JAVA_VERSION}}-jdk-alpine
   agents:
     runs-on: ubuntu-latest

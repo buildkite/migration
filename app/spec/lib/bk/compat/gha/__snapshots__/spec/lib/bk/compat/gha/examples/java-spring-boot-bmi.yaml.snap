@@ -8,7 +8,7 @@ steps:
   - echo '~~~ Run tests'
   - mvn --batch-mode --update-snapshots verify
   plugins:
-  - docker#v5.7.0:
+  - docker#v5.10.0:
       image: eclipse-temurin:11-jdk-alpine
   agents:
     runs-on: ubuntu-latest
@@ -24,9 +24,9 @@ steps:
   depends_on:
   - project-build
   plugins:
-  - docker#v5.7.0:
+  - docker#v5.10.0:
       image: eclipse-temurin:11-jdk-alpine
-  - docker-login#v2.1.0:
+  - docker-login#v3.0.0:
       username: "${{ secrets.DOCKERHUB_USERNAME }}"
       password-env: "${{ secrets.DOCKERHUB_TOKEN }}"
   agents:
