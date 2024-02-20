@@ -1,6 +1,27 @@
 # GitHub Actions
 
-The Buildkite Migration tool's currently supported, partially supported and unsupported properties in translation GitHub Actions workflows to Buildkite pipelines are listed below:
+## name
+
+
+## run-name
+
+| Key | Supported? | Notes |
+| --- | ---------- | ----- |
+| `run-name` | 🔴 | `run_name` is specific to GitHub Action workflow syntax for naming a action run. In Buildkite, a build message can be specified and is set as the `BUILDKITE_MESSAGE` environment variable. The value is empty when a message is not set - and on events from source control, is the commit's title. A build message can also be set when creating a build through the [REST](https://buildkite.com/docs/apis/rest-api/builds#create-a-build) and the [GraphQL](https://buildkite.com/docs/apis/graphql/schemas/mutation/buildcreate) APIs. |
+
+## on
+
+
+## env
+
+
+## defaults
+
+
+## concurrency
+
+
+## jobs 
 
 ## Supported properties
 
@@ -57,4 +78,4 @@ The `permissions` key allows for the interaction with commit `statuses`. For Bui
 
 ### run_name
 
-This key sets the name of a GitHub Action workflow's run. A `run_name` is specific to this integration: within Buildkite, when pipeline builds are created - a build message can be specified (contained in each job's environment as `BUILDKITE_MESSAGE`). The value is empty when a message is not set - and on events from source control, is the commit's title. A build message can also be set when creating a build through the [REST](https://buildkite.com/docs/apis/rest-api/builds#create-a-build) and [GraphQL](https://buildkite.com/docs/apis/graphql/schemas/mutation/buildcreate) APIs.
+This key sets the name of a GitHub Action workflow's run. 
