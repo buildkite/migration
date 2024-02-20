@@ -6,7 +6,7 @@ steps:
   - go vet
   - go test -v -race
   plugins:
-  - docker#v5.7.0:
+  - docker#v5.10.0:
       image: circleci/golang
   agents:
     executor_type: docker
