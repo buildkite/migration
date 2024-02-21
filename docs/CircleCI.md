@@ -2,7 +2,7 @@
 
 ### Logical Operators/Helper Keys
 
-| Key | Supported? | Notes |
+| <div style="width:20%">Key</div> | <div style="width:10%">Supported?</div> | <div style="width:70%">Notes</div> |
 | --- | --- | --- |
 | `aliases` | 🟢 | A list of reusable YAML snippets of a CircleCI pipeline.
 | `aliases.&<name>` | 🟢 | A singular alias describing a resusable snippet of YAML to apply to a specific point in a CircleCI pipeline. Defined with a `&` (anchor) - these blocks are substituted into configuration with `*`: for example, `*tests`.
@@ -12,7 +12,7 @@
 
 ### Commands (`commands`)
 
-| Key | Supported? | Notes |
+| <div style="width:20%">Key</div> | <div style="width:10%">Supported?</div> | <div style="width:70%">Notes</div> |
 | --- | --- | --- |
 | `commands` | 🟢 | A `command` defined in a CircleCI pipeline is a reusable set of instructions with parameters that can be inserted into required `job` executions. Commands can have their own set list of `steps` that are translated through to the generated [command step](https://buildkite.com/docs/pipelines/command-step)'s `commands`. If a `command` contains a `parameters` key, they are respected when used in jobs/workflows and their defaults values used when not specified. |
 
@@ -20,9 +20,9 @@
 
 | Key | Supported? | Notes |
 | --- | --- | --- |
-| `executors` | 🔴 | : The `executor` key is currently not supported. The execution environment in Buildkite is defined by the [queues](https://buildkite.com/docs/agent/v3/queues#setting-an-agents-queue) and [tags](https://buildkite.com/docs/agent/v3/cli-start#setting-tags) applied to an agent, and [targeting](https://buildkite.com/docs/pipelines/defining-steps#targeting-specific-agents) them when creating builds. |
+| `executors` | 🔴 | The `executor` key is currently not supported. The execution environment in Buildkite is defined by the [queues](https://buildkite.com/docs/agent/v3/queues#setting-an-agents-queue) and [tags](https://buildkite.com/docs/agent/v3/cli-start#setting-tags) applied to an agent, and [targeting](https://buildkite.com/docs/pipelines/defining-steps#targeting-specific-agents) them when creating builds. |
 
-### Jobs (`jobs)
+### Jobs (`jobs`)
 
 | Key | Supported? | Notes |
 | --- | --- | --- |
