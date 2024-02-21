@@ -1,11 +1,14 @@
 # CircleCI
 
-### Logical/Helper Keys
+### Logical Operators/Helper Keys
 
 | Key | Supported? | Notes |
 | --- | --- | --- |
 | `aliases` | 🟢 | A list of reusable YAML snippets of a CircleCI pipeline.
 | `aliases.&<name>` | 🟢 | A singular alias describing a resusable snippet of YAML to apply to a specific point in a CircleCI pipeline. Defined with a `&` (anchor) - these blocks are substituted into configuration with `*`: for example, `*tests`.
+| `and` | 🟡 | Logical operator for denoting all inputs required to be true. Supported with the utilisation of the `when` key within setting up conditional `workflow` runs. |
+| `or` |  🟡 | Logical operator for describing if any of the inputs are true. Supported with the utilisation of the `when` key within setting up conditional `workflow` runs. |
+| `not` | 🟡 | Logical operator for negating input. Supported with the utilisation of the `when` key within setting up conditional `workflow` runs. |
 
 ### Commands (`commands`)
 
@@ -74,3 +77,4 @@
 | `workflows.<name>.jobs.<name>.filters.branches`| 🟢 | The specific `branches` that are applicable to the `job`'s filter. Translated to a [step conditional](https://buildkite.com/docs/pipelines/conditionals#conditionals-in-steps). |
 | `workflows.<name>.jobs.<name>.filters.tags` | 🟢 |  The specific `tags` that are applicable to the `job`'s filter. Translated to a [step conditional](https://buildkite.com/docs/pipelines/conditionals#conditionals-in-steps).|
 | `workflows.<name>.jobs.<name>.requires` | 🟢 | A list of `jobs` that require this `job` to start. Translated to explicit [step dependencies](https://buildkite.com/docs/pipelines/dependencies#defining-explicit-dependencies) with the `depends_on` key. | 
+| `workflows.<name>.when` | 🟢 | Conditionals that allow for running a workflow under certain conditions. The Buildkite Migration tool allows for the speicification using Logical operators `and`, `or` and `not` in creating command conditionals |
