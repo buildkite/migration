@@ -5,7 +5,7 @@ steps:
       - cd app && bundle install
       - rubocop -l
     plugins:
-      - docker#v5.9.0:
+      - docker#v5.10.0:
           image: ruby:3.2
 
   - label: ":rspec: Snapshot Testing"
@@ -13,7 +13,7 @@ steps:
       - cd app && bundle install
       - rspec spec
     plugins:
-      - docker#v5.9.0:
+      - docker#v5.10.0:
           image: ruby:3.2
           workdir: /app
 
@@ -24,14 +24,14 @@ steps:
       - docker build . -t buildkite/migration-tool
       - docker push buildkite/migration-tool
     plugins:
-      - docker-login#v2.2.0: ~
+      - docker-login#v3.0.0: ~
     if: |
       build.branch == 'main'
 
 
   - label: ":docker: :rocket: Tag"
     plugins:
-      - docker-login#v2.2.0: ~
+      - docker-login#v3.0.0: ~
     commands:
       - docker build . -t buildkite/migration-tool:${BUILDKITE_TAG}
       - docker push buildkite/migration-tool:${BUILDKITE_TAG}
