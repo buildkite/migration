@@ -3,25 +3,25 @@
 > [!NOTE]  
 > The Buildkite Migration tool does not currently support [GitHub secrets](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions) stored within GitHub organizations or repositories (such as `{{ secrets.FOO }}`). For securely storing secrets that can be used within a Buildkite pipeline - the [S3 Secrets Buildkite plugin](https://github.com/buildkite/elastic-ci-stack-s3-secrets-hooks) can be setup/installed within a Buildkite agent (installed automatically within [Elastic CI Stack](https://github.com/buildkite/elastic-ci-stack-for-aws) setups). Additionally, Buildkite supports using a [secret storage service](https://buildkite.com/docs/pipelines/secrets#using-a-secrets-storage-service) through the use of dedicated plugins such as [HashiCorp Vault](https://github.com/buildkite-plugins/vault-secrets-buildkite-plugin) and [AWS Systems Manager Parameter Store](https://github.com/buildkite-plugins/aws-ssm-buildkite-plugin).
 
-## concurrency
+## Concurrency (`concurrency`)
 
 | Key | Supported? | Notes |
 | --- | ---------- | ----- |
 | `concurrency` | 🔴 | The Buildkite Migration tool supports the transition of the `concurrency` key (and `group`/`cancel-in-progress`) keys in job definitions that make up a workflow. |
 
-## defaults
+## Defaults (`defaults`)
 
 | Key | Supported? | Notes |
 | --- | ---------- | ----- |
 | `defaults.run` | 🔴 | Buildkite pipeline definitions allow for common pipeline configuration to be applied with [YAML anchors](https://buildkite.com/docs/plugins/using#using-yaml-anchors-with-plugins), as well as setting up customised [agent](https://buildkite.com/docs/agent/v3/hooks#agent-lifecycle-hooks) and [job](https://buildkite.com/docs/agent/v3/hooks#job-lifecycle-hooks) lifecycle hooks. |
 
-## env
+## Environment (`env`)
 
 | Key | Supported? | Notes |
 | --- | ---------- | ----- |
 | `env` | 🟢 | Environment variables that are defined at the top of a workflow will be transition to [build level](https://buildkite.com/docs/pipelines/environment-variables#environment-variable-precedence) environment variables in the generated Buildkite pipeline |
 
-## jobs 
+## Jobs (`jobs`) 
 
 > [!NOTE]  
 > When Buildkite builds are ran; each created command step inside the pipeline are ran as a [job](https://buildkite.com/docs/pipelines/defining-steps#job-states) that will be distributed and assigned to the matching agents meeting its specific queue and/or tag [targeting](h.ttps://buildkite.com/docs/pipelines/defining-steps#targeting-specific-agents). Each job is run within its own seperate environment, with potentially different environment variables (for example those defined at [step](https://buildkite.com/docs/pipelines/command-step#command-step-attributes) level) - and is not always gauarnteed to run on the same agent depending on targeting rules specified/agent fleet setup.
@@ -40,24 +40,24 @@
 | `jobs.<id>.steps.strategy.matrix.exclude`| 🟢 | Key/value pairs to exclude in the generated [matrix](https://buildkite.com/docs/pipelines/build-matrix)'s combinations (`skip`). | 
 | `jobs.<id>.steps.uses` | 🔴 | `uses` defines a seperate action to use within the context of a action's job, and is currently not supported. |
 
-## name
+## Name (`name`)
 
 | Key | Supported? | Notes |
 | --- | ---------- | ----- |
 | `name` | 🔴 | The `name` key sets the name of the action as it will appear in the GitHub repository's "Actions" tab. When creating a Buildkite pipeline, it's name is set through the UI when first creating the pipeline - and can be altered within its pipeline settings, or via the [REST](https://buildkite.com/docs/apis/rest-api/pipelines#update-a-pipeline) or [GraphQL](https://buildkite.com/docs/apis/graphql/schemas/input-object/pipelineupdateinput) APIs. |
 
-## on
+## On (`on`)
 | Key | Supported? | Notes |
 | --- | ---------- | ----- |
 | `on` | 🔴 | The `on` key allows for triggering a GitHub Action workflow. In Buildkite pipelines - this capability is defined within a `trigger` [step](https://buildkite.com/docs/pipelines/trigger-step) - where utilized within a pipeline, will create a build on the specified pipeline with additional properties. |
 
-## permissions
+## Permissions (`permissions`)
 
 | Key | Supported? | Notes |
 | --- | ---------- | ----- |
 | `permissions` | 🔴 | [API Access Tokens](https://buildkite.com/docs/apis/managing-api-tokens) can be used within the context of a pipelines' build to interact with various Buildkite resources such as pipelines, artifacts, users, Test suites and more. Each token has a specified [token scope](https://buildkite.com/docs/apis/managing-api-tokens#token-scopes) that applies to interactions with the [REST](https://buildkite.com/docs/apis/rest-api) API, and can be configured with permission to interact with Buildkite's [GraphQL](https://buildkite.com/docs/apis/graphql-api) API. The `permissions` key allows for the interaction with commit `statuses`. For Buildkite to publish commit statuses for builds based on commits and pull requests on pipeline builds: the [GitHub App](https://buildkite.com/docs/integrations/github#connect-your-buildkite-account-to-github-using-the-github-app) must be added to the respective GitHub organization for statuses to appear based on a build's outcome. The GitHub App can be configured with access to all repositories within a GitHub organization - or a select number. |
 
-## run-name
+## Run Name (`run-name`)
 
 | Key | Supported? | Notes |
 | --- | ---------- | ----- |
