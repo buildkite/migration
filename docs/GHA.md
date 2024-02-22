@@ -1,5 +1,7 @@
 # GitHub Actions
 
+The Buildkite Migration tool's currently supported (🟢), partially supported (🟡) and unsupported (🔴) properties in translation of GitHub Action workflows to Buildkite pipelines are listed below.
+
 > [!NOTE]  
 > The Buildkite Migration tool does not currently support [GitHub secrets](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions) stored within GitHub organizations or repositories (such as `{{ secrets.FOO }}`). For securely storing secrets that can be used within a Buildkite pipeline - the [S3 Secrets Buildkite plugin](https://github.com/buildkite/elastic-ci-stack-s3-secrets-hooks) can be setup/installed within a Buildkite agent (installed automatically within [Elastic CI Stack](https://github.com/buildkite/elastic-ci-stack-for-aws) setups). Additionally, Buildkite supports using a [secret storage service](https://buildkite.com/docs/pipelines/secrets#using-a-secrets-storage-service) through the use of dedicated plugins such as [HashiCorp Vault](https://github.com/buildkite-plugins/vault-secrets-buildkite-plugin) and [AWS Systems Manager Parameter Store](https://github.com/buildkite-plugins/aws-ssm-buildkite-plugin).
 
