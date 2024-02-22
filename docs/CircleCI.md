@@ -1,5 +1,7 @@
 # CircleCI
 
+The Buildkite Migration tool's currently supported (🟢), partially supported (🟡) and unsupported (🔴) properties in translation of CircleCI pipelines to Buildkite pipelines are listed below.
+
 ### Logical Operators/Helper Keys
 
 | Key | Supported? | Notes |
