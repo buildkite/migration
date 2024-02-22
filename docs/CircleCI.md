@@ -2,7 +2,7 @@
 
 ### Logical Operators/Helper Keys
 
-| <div style="width:20%">Key</div> | <div style="width:10%">Supported?</div> | <div style="width:70%">Notes</div> |
+| Key | Supported? | Notes |
 | --- | --- | --- |
 | `aliases` | 🟢 | A list of reusable YAML snippets of a CircleCI pipeline.
 | `aliases.&<name>` | 🟢 | A singular alias describing a resusable snippet of YAML to apply to a specific point in a CircleCI pipeline. Defined with a `&` (anchor) - these blocks are substituted into configuration with `*`: for example, `*tests`.
@@ -12,7 +12,7 @@
 
 ### Commands (`commands`)
 
-| <div style="width:20%">Key</div> | <div style="width:10%">Supported?</div> | <div style="width:70%">Notes</div> |
+| Key | Supported? | Notes |
 | --- | --- | --- |
 | `commands` | 🟢 | A `command` defined in a CircleCI pipeline is a reusable set of instructions with parameters that can be inserted into required `job` executions. Commands can have their own set list of `steps` that are translated through to the generated [command step](https://buildkite.com/docs/pipelines/command-step)'s `commands`. If a `command` contains a `parameters` key, they are respected when used in jobs/workflows and their defaults values used when not specified. |
 
@@ -75,6 +75,6 @@
 | `workflows.<name>.jobs.<name>.branches` | 🔴 | The `branches` that will be allowed/blocked for a singular `job`. Presently, the Buildkite Migration tool supports setting `filters` within `workflows`: and in particular, `branches` and `tags` sub-properties in setting a [step conditional](https://buildkite.com/docs/pipelines/conditionals#conditionals-in-steps) in the generated pipeline. |
 | `workflows.<name>.jobs.<name>.filters` | 🟢 | The `branches` and `tag` filters that will determine the eligibility for a CircleCI to run. |
 | `workflows.<name>.jobs.<name>.filters.branches`| 🟢 | The specific `branches` that are applicable to the `job`'s filter. Translated to a [step conditional](https://buildkite.com/docs/pipelines/conditionals#conditionals-in-steps). |
-| `workflows.<name>.jobs.<name>.filters.tags` | 🟢 |  The specific `tags` that are applicable to the `job`'s filter. Translated to a [step conditional](https://buildkite.com/docs/pipelines/conditionals#conditionals-in-steps).|
+| `workflows.<name>.jobs.<name>.filters.tags` | 🟢 |  The specific `tags` that are applicable to the `job`'s filter. Translated to a [step conditional](https://buildkite.com/docs/pipelines/conditionals#conditionals-in-steps). |
 | `workflows.<name>.jobs.<name>.requires` | 🟢 | A list of `jobs` that require this `job` to start. Translated to explicit [step dependencies](https://buildkite.com/docs/pipelines/dependencies#defining-explicit-dependencies) with the `depends_on` key. | 
-| `workflows.<name>.when` | 🟢 | Conditionals that allow for running a workflow under certain conditions. The Buildkite Migration tool allows for the speicification using Logical operators `and`, `or` and `not` in creating command conditionals |
+| `workflows.<name>.when` | 🟢 | Conditionals that allow for running a workflow under certain conditions. The Buildkite Migration tool allows for the speicification using Logical operators `and`, `or` and `not` in creating command conditionals. |
