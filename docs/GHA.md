@@ -9,7 +9,7 @@ The Buildkite Migration tool's currently supported (🟢), partially supported (
 
 | Key | Supported? | Notes |
 | --- | ---------- | ----- |
-| `concurrency` | 🔴 | The Buildkite Migration tool supports the transition of the `concurrency` key (and `group`/`cancel-in-progress`) keys in job definitions that make up a workflow. |
+| `concurrency` | 🔴 | The Buildkite Migration tool supports the transition of the `concurrency` key (and `group`/`cancel-in-progress`) keys in `job` definitions that are mapped to specific [command steps](https://buildkite.com/docs/pipelines/command-step) of a [Buildkite pipeline](https://buildkite.com/docs/pipelines/controlling-concurrency#concurrency-groups). This isn't applicable to the entire pipeline and its steps which this key respects within GitHub Action workflows specifically. |
 
 ## Defaults (`defaults`)
 
@@ -30,7 +30,7 @@ The Buildkite Migration tool's currently supported (🟢), partially supported (
 
 | Key | Supported? | Notes |
 | --- | ---------- | ----- |
-| `jobs.<id>.concurrency` | 🟡 | The `group` name inside a `concurrency` definition inside a job maps to the `concurrency_group` [key](https://buildkite.com/docs/pipelines/controlling-concurrency#concurrency-groups) available within Buildkite. The `cancel-in-progress` optional value maps to the Buildkite pipeline setting of [Cancel Intermediate Builds](https://buildkite.com/docs/pipelines/skipping#cancel-running-intermediate-builds)  Buildkite also allows a upper limit on how much jobs are created through a single step  definition with the `concurrency` key: which is set as `1` by default (there isn't a translatable key within a GitHub Action workflow). |
+| `jobs.<id>.concurrency` | 🟡 | The `group` name inside a `concurrency` definition inside a job maps to the `concurrency_group` [key](https://buildkite.com/docs/pipelines/controlling-concurrency#concurrency-groups) available within Buildkite. The `cancel-in-progress` optional value maps to the Buildkite pipeline setting of [Cancel Intermediate Builds](https://buildkite.com/docs/pipelines/skipping#cancel-running-intermediate-builds). Buildkite also allows a upper limit on how much jobs are created through a single step  definition with the `concurrency` key: which is set as `1` by default (there isn't a translatable key within a GitHub Action workflow). |
 | `jobs.<id>.env` | 🟢 | Environment variables defined within the context of each of a workflow's `jobs` are transitioned to [step level](https://buildkite.com/docs/pipelines/environment-variables#runtime-variable-interpolation) environment variables. |
 | `jobs.<id>.runs-on` | 🟢 | This attribute is mapped to the agent targeting [tag](https://buildkite.com/docs/agent/v3/queues#targeting-a-queue) `runs-on`. Jobs that target custom `tag` names will have a `queue` target of `default`. |
 | `jobs.<id>.steps`| 🟢 | Steps that make up a particular action's `job`. |
