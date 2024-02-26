@@ -43,7 +43,7 @@ The Buildkite Migration tool's currently supported (âœ…), partially supported (â
 #### Executors 
 
 > [!NOTE]  
-> While the Buildkite Migration Tool will translate the below executor types listed; the prerequisite of using the generated steps will require the relevant OS, dependencies and tooling (for example, Docker, XCode etc) on targeted agents. Buildkite offers the [Elastic CI Stack for AWS](https://github.com/buildkite/elastic-ci-stack-for-aws?tab=readme-ov-file#supported-features) as a fully scalable Buildkite agent fleet on AWS with a suite of tooling installed by default. Additionally, customised agents can be [setup](https://buildkite.com/docs/agent/v3/configuration) to target builds on requiring specific OSes/tooling.
+> While the Buildkite Migration Tool will translate the below executor types listed; the prerequisite of using the generated steps will require the relevant OS, dependencies and tooling (for example, Docker, XCode etc) on targeted agents. Buildkite offers the [Elastic CI Stack for AWS](https://github.com/buildkite/elastic-ci-stack-for-aws?tab=readme-ov-file#supported-features) as a fully scalable Buildkite agent fleet on AWS with a suite of tooling installed by default. Additionally, customised agents can be [setup](https://buildkite.com/docs/agent/v3/configuration) to target builds that require specific OSes/tooling.
 
 | Key | Supported? | Notes |
 | --- | --- | --- |
