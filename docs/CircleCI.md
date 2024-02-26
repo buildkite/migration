@@ -4,10 +4,11 @@ The Buildkite Migration tool's currently supported (✅), partially supported (�
 
 ### Logical Operators/Helper Keys
 
+> [!NOTE]  
+> The Buildkite Migration tool supports the use of YAML aliases - re-usable snippets of configuration to apply to a specific point in a CircleCI pipeline. These are defined with a `&` (anchor) within the top-level `aliases` key and substituted into CircleCI pipeline configuration with `*`: for example, `*tests`. Configuration defined by an alias will be respected and parsed accordingly at the specified section of the pipeline.
+
 | Key | Supported? | Notes |
 | --- | --- | --- |
-| `aliases` | ✅ | A list of reusable YAML snippets of a CircleCI pipeline.
-| `aliases.&<name>` | ✅ | A singular alias describing a resusable snippet of YAML to apply to a specific point in a CircleCI pipeline. Defined with a `&` (anchor) - these blocks are substituted into configuration with `*`: for example, `*tests`.
 | `and` | ⚠️ | Logical operator for denoting all inputs required to be true. Supported with the utilisation of the `when` key within setting up conditional `workflow` runs. |
 | `or` | ⚠️ | Logical operator for describing if any of the inputs are true. Supported with the utilisation of the `when` key within setting up conditional `workflow` runs. |
 | `not` | ⚠️ | Logical operator for negating input. Supported with the utilisation of the `when` key within setting up conditional `workflow` runs. |
