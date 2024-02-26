@@ -9,7 +9,7 @@ The Buildkite Migration tool's currently supported (✅), partially supported (�
 
 | Key | Supported? | Notes |
 | --- | ---------- | ----- |
-| `concurrency` | ❌ | The Buildkite Migration tool supports the transition of the `concurrency` key (and `group`/`cancel-in-progress`) keys in `job` definitions that are mapped to specific [command steps](https://buildkite.com/docs/pipelines/command-step) of a [Buildkite pipeline](https://buildkite.com/docs/pipelines/controlling-concurrency#concurrency-groups). This isn't applicable to the entire pipeline and its steps which this key respects within GitHub Action workflows specifically. |
+| `concurrency` | ❌ | [Buildkite concurrency groups](https://buildkite.com/docs/pipelines/controlling-concurrency#concurrency-groups) don't apply to whole pipelines but steps so there is no direct translation of this configuration. Refer to the support of the job-level configuration for more information: [`jobs.<id>.concurrency`](#jobs-jobs). |
 
 ## Defaults (`defaults`)
 
