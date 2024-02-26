@@ -42,6 +42,9 @@ The Buildkite Migration tool's currently supported (✅), partially supported (�
 
 #### Executors 
 
+> [!NOTE]  
+> While the Buildkite Migration Tool will translate the below executor types listed; the prerequisite of using the generated steps will require the relevant OS, dependencies and tooling (for example, Docker, XCode etc) on targeted agents. Buildkite offers the [Elastic CI Stack for AWS](https://github.com/buildkite/elastic-ci-stack-for-aws?tab=readme-ov-file#supported-features) as a fully scalable Buildkite agent fleet on AWS with a suite of tooling installed by default. Additionally, customised agents can be [setup](https://buildkite.com/docs/agent/v3/configuration) to target builds on requiring specific OSes/tooling.
+
 | Key | Supported? | Notes |
 | --- | --- | --- |
 | `jobs.<name>.docker` | ✅ | Specifies that the `job` will run within a Docker container (by its `image` property) with the use of the [Docker Buildkite Plugin](https://github.com/buildkite-plugins/docker-buildkite-plugin). Additionally, the [Docker Login Plugin](https://github.com/buildkite-plugins/docker-login-buildkite-plugin) is appended if an `auth` property is defined, or the [ECR Buildkite Plugin](https://github.com/buildkite-plugins/ecr-buildkite-plugin) if an `aws-auth` property is defined within the `docker` property. Sets the [agent targeting](https://buildkite.com/docs/pipelines/defining-steps#targeting-specific-agents) for the generated [command step](https://buildkite.com/docs/pipelines/command-step) to `executor_type: docker`. |
