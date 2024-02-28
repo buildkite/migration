@@ -1,0 +1,37 @@
+---
+steps:
+- commands:
+  - "# It may be a good idea to use docker compose to start up job-specific services"
+  - echo 'Starting postgres service'
+  - docker start --rm -d --name postgres --env "POSTGRES_USER='postgres'" --env "POSTGRES_PASSWORD=''"
+    --env "POSTGRES_DB='postgres'" --expose '5432:5432' --mount type=tmpfs,destination=/var/lib/postgresql/data
+    --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries
+    5 postgres:10.8
+  - echo 'Starting redis service'
+  - docker start --rm -d --name redis --expose '6379:6379' --entrypoint redis-server
+    redis
+  - "# action actions/checkout@v2 is not necessary in Buildkite"
+  - "# action ruby/setup-ruby@v1 can not be translated just yet"
+  - echo '~~~ Create DB'
+  - bin/rails db:prepare
+  - echo '~~~ Run tests'
+  - (
+  - KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC="$$GITHUB_SECRET_KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC"
+  - KNAPSACK_PRO_CI_NODE_TOTAL="{{matrix.ci_node_total}}"
+  - KNAPSACK_PRO_CI_NODE_INDEX="{{matrix.ci_node_index}}"
+  - KNAPSACK_PRO_LOG_LEVEL="info"
+  - KNAPSACK_PRO_FIXED_QUEUE_SPLIT="true"
+  - KNAPSACK_PRO_RSPEC_SPLIT_BY_TEST_EXAMPLES="true"
+  - bundle exec rake knapsack_pro:queue:rspec
+  - )
+  - docker stop postgres redis
+  agents:
+    runs-on: ubuntu-latest
+  env:
+    RAILS_ENV: test
+    GEMFILE_RUBY_VERSION: 3.2.2
+    PGHOST: localhost
+    PGUSER: postgres
+    TZ: Europe/Warsaw
+  label: ":github: test"
+  key: test

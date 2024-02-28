@@ -1,0 +1,23 @@
+name: xcode-build
+
+on:
+  pull_request:
+
+jobs:
+  build_project:
+    runs-on: xcode
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: SwiftFormat
+        run: swiftformat . --lint
+      - name: SwiftLint
+        run: swiftlint lint --strict
+      - name: Build and Test
+        run: |
+          xcodebuild \
+           -project Test-App \
+           -scheme MyScheme \
+           -sdk iphonesimulator \
+           -destination 'platform=iOS Simulator,name=iPhone 14,OS=16.2' \
+            test || exit 1

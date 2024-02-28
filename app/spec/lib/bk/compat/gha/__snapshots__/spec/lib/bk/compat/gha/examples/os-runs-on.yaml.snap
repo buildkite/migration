@@ -1,0 +1,27 @@
+---
+steps:
+- commands:
+  - "# action actions/checkout@v4 is not necessary in Buildkite"
+  - npm help
+  plugins:
+  - docker#v5.10.0:
+      image: node:14
+  agents:
+    runs-on: ubuntu-latest
+  label: ":github: Run-npm-on-Ubuntu"
+  key: Run-npm-on-Ubuntu
+  branches: main
+- commands:
+  - "# action actions/checkout@v4 is not necessary in Buildkite"
+  - echo '~~~ Install PSScriptAnalyzer module'
+  - "# Shell is determined in the agent"
+  - Set-PSRepository PSGallery -InstallationPolicy Trusted
+  - Install-Module PSScriptAnalyzer -ErrorAction Stop
+  - echo '~~~ Get list of rules'
+  - "# Shell is determined in the agent"
+  - Get-ScriptAnalyzerRule
+  agents:
+    runs-on: windows-latest
+  label: ":github: Run-PSScriptAnalyzer-on-Windows"
+  key: Run-PSScriptAnalyzer-on-Windows
+  branches: main
