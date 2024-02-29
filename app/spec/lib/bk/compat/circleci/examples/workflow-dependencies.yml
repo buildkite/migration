@@ -1,0 +1,41 @@
+version: 2.1
+
+aliases:
+  - &docker
+    - image: ubuntu:jammy
+
+jobs:
+  build:
+    docker: *docker
+    steps:
+      - checkout
+      - run: ./scripts/build.sh
+  test1:
+    docker: *docker
+    steps:
+      - checkout
+      - run: ./scripts/test-discover.sh
+  test2:
+    docker: *docker
+    steps:
+      - checkout
+      - run: ./scripts/test-full.sh
+  deploy:
+    docker: *docker
+    steps:
+      - checkout
+      - run: ./scripts/deploy.sh
+
+workflows:
+  build-test-and-approval-deploy:
+    jobs:
+      - build  
+      - test1: 
+          requires:
+            - build
+      - test2:
+          requires:
+            - test1
+      - deploy:
+          requires:
+            - test2

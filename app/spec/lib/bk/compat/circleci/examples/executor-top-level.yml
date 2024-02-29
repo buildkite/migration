@@ -1,0 +1,57 @@
+version: 2.1
+
+executors:
+  xenial-docker:
+    docker:
+      - image: ubuntu:xenial
+
+  noble-docker-multi:
+    docker:
+      - image: ubuntu:noble
+      - image: circleci/python:3.9-stretch-browsers
+
+  osx:
+    macos:
+      xcode: 14.2.0
+
+  self-hosted:
+    machine: true
+    resource_class: win/default
+
+  windows:
+    windows: server
+
+jobs:
+  docker-xenial:
+    executor: xenial-docker
+    steps:
+      - run: some-tests
+
+  docker-noble-multi:
+    executor: noble-docker-multi
+    steps:
+      - run: apt-update
+
+  macos:
+    executor: osx
+    steps:
+      - run: xcodebuild -help
+
+  self-hosted:
+    executor: self-hosted
+    steps:
+      - run: echo 1
+
+  win-server:
+    executor: windows
+    steps:
+      - run: Get-Help ls -Detailed
+
+workflows:
+  workflow:
+    jobs:
+      - docker-xenial
+      - docker-noble-multi
+      - macos
+      - self-hosted
+      - win-server
