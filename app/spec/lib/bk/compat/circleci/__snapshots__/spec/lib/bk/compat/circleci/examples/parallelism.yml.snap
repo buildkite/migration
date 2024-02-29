@@ -1,0 +1,12 @@
+---
+steps:
+- commands:
+  - go test -v $(go list ./... | circleci tests split)
+  - cd ~/my-app
+  plugins:
+  - docker#v5.10.0:
+      image: cimg/base:2022.09
+  agents:
+    resource_class: large
+    executor_type: docker
+  key: build
