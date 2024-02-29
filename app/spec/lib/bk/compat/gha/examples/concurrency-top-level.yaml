@@ -1,0 +1,31 @@
+# .github/workflows/main-api.yml
+name: main-app
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: deploy-group
+  cancel-in-progress: true
+
+jobs:
+  build:
+    steps:
+    - run: echo ./build.sh
+
+  deploy-test:
+    needs: build
+    steps:
+      - run: echo ./deploy-test.sh
+
+  deploy-staging:
+    needs: deploy-test
+    steps:
+      - run: echo ./deploy-staging.sh
+
+  deploy-prod:
+    needs: deploy-staging
+    steps:
+      - run: echo ./deploy-prod.sh
