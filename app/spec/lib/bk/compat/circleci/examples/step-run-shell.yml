@@ -1,0 +1,16 @@
+version: 2.1
+
+jobs:
+  my-job:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - run:
+          shell: /bin/sh
+          command: "echo 'Hello from bin/sh"
+
+workflows:
+  my-workflow:
+    jobs:
+      - my-job
+

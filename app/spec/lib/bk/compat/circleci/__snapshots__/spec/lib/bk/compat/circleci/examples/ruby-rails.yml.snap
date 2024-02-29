@@ -1,0 +1,39 @@
+---
+steps:
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - "# ruby/install-deps is part of orb ruby which is not supported and should be
+    translated by hand"
+  - "# node/install-packages is part of orb node which is not supported and should
+    be translated by hand"
+  plugins:
+  - docker#v5.10.0:
+      image: cimg/ruby:2.7-node
+  agents:
+    executor_type: docker
+  key: build
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - "# ruby/install-deps is part of orb ruby which is not supported and should be
+    translated by hand"
+  - "# node/install-packages is part of orb node which is not supported and should
+    be translated by hand"
+  - echo '~~~ Wait for DB'
+  - dockerize -wait tcp://localhost:5432 -timeout 1m
+  - echo '~~~ Database setup'
+  - bundle exec rails db:schema:load --trace
+  - "# ruby/rspec-test is part of orb ruby which is not supported and should be translated
+    by hand"
+  - "# ruby/rubocop-check is part of orb ruby which is not supported and should be
+    translated by hand"
+  - Need to use Docker Compose for multiple image execution :(
+  depends_on:
+  - build
+  env:
+    BUNDLE_JOBS: '3'
+    BUNDLE_RETRY: '3'
+    PGHOST: 127.0.0.1
+    PGUSER: circleci-demo-ruby
+    PGPASSWORD: ''
+    RAILS_ENV: test
+  key: test
