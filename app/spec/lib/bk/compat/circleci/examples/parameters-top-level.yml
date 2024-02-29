@@ -1,0 +1,20 @@
+version: 2.1
+
+parameters:
+  image-tag:
+    type: string
+    default: "current"
+  workingdir:
+    type: string
+    default: "~/main"
+
+jobs:
+  build:
+    docker:
+      - image: ubuntu:latest
+    environment:
+      IMAGETAG: << pipeline.parameters.image-tag >>
+    working_directory: << pipeline.parameters.workingdir >>
+    steps:
+      - run: echo "Image tag used was ${IMAGETAG}"
+      - run: echo "$(pwd) == << pipeline.parameters.workingdir >>"
