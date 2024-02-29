@@ -1,0 +1,16 @@
+---
+env:
+  DAY_OF_WEEK: Monday
+steps:
+- commands:
+  - echo '~~~ Say Hello Mona it's Monday'
+  - (
+  - First_Name="Mona"
+  - echo "$Greeting $First_Name. Today is $DAY_OF_WEEK!"
+  - )
+  agents:
+    runs-on: ubuntu-latest
+  env:
+    Greeting: Hello
+  label: ":github: greeting_job"
+  key: greeting_job
