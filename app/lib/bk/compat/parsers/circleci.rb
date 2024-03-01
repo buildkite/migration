@@ -79,7 +79,6 @@ module BK
 
         # If there ended up being only 1 workflow, skip the group and just
         # pull the steps out.
-        
         groups = groups.first.steps.each { |step| step.conditional = groups.first.conditional } if groups.length == 1
 
         groups
