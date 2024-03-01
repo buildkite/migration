@@ -21,11 +21,12 @@ module BK
 
     # simple block step
     class BlockStep
-      attr_accessor :depends_on, :key
+      attr_accessor :conditional, :depends_on, :key, :conditional
 
-      def initialize(key:, depends_on: [])
+      def initialize(conditional: nil, key:, depends_on: [])
         @key = key
         @depends_on = depends_on
+        @conditional = conditional
       end
 
       def <<(_obj)
@@ -33,18 +34,15 @@ module BK
       end
 
       def to_h
-        {
-          block: @key,
-          key: @key,
-          depends_on: @depends_on
-        }
+        { block: @key, key: @key, depends_on: @depends_on }.tap do |h| 
+          h[:if] = @conditional unless @conditional.nil?
+        end
       end
 
       def instantiate
         dup
       end
     end
-
     # basic command step
     class CommandStep
       attr_accessor :agents, :artifact_paths, :branches, :concurrency, :concurrency_group,
