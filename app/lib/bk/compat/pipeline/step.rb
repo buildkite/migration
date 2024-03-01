@@ -21,7 +21,7 @@ module BK
 
     # simple block step
     class BlockStep
-      attr_accessor :conditional, :depends_on, :key, :conditional
+      attr_accessor :conditional, :depends_on, :key
 
       def initialize(conditional: nil, key:, depends_on: [])
         @key = key
