@@ -144,7 +144,7 @@ module BK
  #       puts "new step"
  #       p new_step.commands
         LIST_ATTRIBUTES.each { |a| 
-          if a == "commands" && new_step.commands.length == 1 && new_step.commands[0].start_with?("cd")
+          if a.eql?("commands") && new_step.commands.length > 0 && new_step.commands[0].start_with?("cd")
             @commands.unshift(new_step.commands[0])
           else
             send(a).concat(new_step.send(a))
