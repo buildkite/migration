@@ -141,15 +141,8 @@ module BK
       end
 
       def merge!(new_step)
- #       puts "new step"
- #       p new_step.commands
-        LIST_ATTRIBUTES.each { |a| 
-          if a.eql?("commands") && new_step.commands.length == 1 && new_step.commands[0].start_with?("cd")
-            @commands.unshift(new_step.commands[0])
-          else
-            send(a).concat(new_step.send(a))
-          end 
-        }
+        # Merge list / hash attributes
+        LIST_ATTRIBUTES.each { |a| a.eql?("commands") ? merge_command_attribute(new_step) : send(a).concat(new_step.send(a))}
         HASH_ATTRIBUTES.each { |a| send(a).merge!(new_step.send(a)) }
 
         @conditional = BK::Compat.xxand(conditional, new_step.conditional)
@@ -162,6 +155,15 @@ module BK
         @soft_fail ||= new_step.soft_fail
 
         nil
+      end
+
+      def merge_command_attributes(new_step) 
+        # If we've generated a new step with cd (working_directory) - unshift it to @commands, otherwise concat as normal
+        if new_step.commands.length == 1 && new_step.commands[0].start_with?("cd")
+          @commands.unshift(new_step.commands[0])
+        else
+          @commands.concat(new_step.commands)
+        end
       end
 
       def instance_attributes
