@@ -9,6 +9,30 @@ jobs:
             equal: [ main, << pipeline.git.branch >> ]
           steps:
             - run: echo 'Running in main'
+  build-and-package:
+    environment:
+      DEPLOY_ENV: staging
+    docker:
+      - image: "cimg/base:stable"
+        environment:
+          - "DEPLOY_ENV"
+    steps:
+      - checkout
+      - run: ./scripts/build-package.sh
+
+  publish:
+    environment:
+      DEPLOY_ENV: staging
+    working_directory: ~/repo
+    docker:
+      - image: "cimg/base:stable"
+        environment:
+          - "DEPLOY_ENV"
+    steps:
+      - checkout
+      - run:
+          name: Publish binary
+          command: ./scripts/publish.sh
 
 workflows:
   my-workflow:
@@ -23,3 +47,15 @@ workflows:
             - << pipeline.parameters.deploy-canary >>
     jobs:
       - test
+  my-workflow-2:
+    when:
+      equal: [ "main", BUILDKITE_BRANCH ]
+    jobs:
+      - build-and-package
+      - gate:
+          type: approval
+          requires:
+            - build-and-package
+      - publish:
+          requires:
+            - gate

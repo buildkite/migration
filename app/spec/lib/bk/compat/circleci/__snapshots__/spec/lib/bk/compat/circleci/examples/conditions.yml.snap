@@ -1,11 +1,52 @@
 ---
 steps:
-- commands:
-  - echo 'Hello'
-  - "# when condition translation may not be compatible with your shell"
-  - if [ "<< pipeline.git.branch >>" == "main" ]; then
-  - echo 'Running in main'
-  - fi
-  key: test
+- group: ":circleci: my-workflow"
+  key: my-workflow
+  steps:
+  - commands:
+    - echo 'Hello'
+    - "# when condition translation may not be compatible with your shell"
+    - if [ "<< pipeline.git.branch >>" == "main" ]; then
+    - echo 'Running in main'
+    - fi
+    key: test
   if: '!(/^main$/ ~= << pipeline.git.branch >>) && "<< pipeline.git.tag >>" == "canary"
     || << pipeline.parameters.deploy-canary >>'
+- group: ":circleci: my-workflow-2"
+  key: my-workflow-2
+  steps:
+  - commands:
+    - "# No need for checkout, the agent takes care of that"
+    - "./scripts/build-package.sh"
+    plugins:
+    - docker#v5.10.0:
+        image: cimg/base:stable
+        environment:
+        - DEPLOY_ENV
+    agents:
+      executor_type: docker
+    env:
+      DEPLOY_ENV: staging
+    key: build-and-package
+  - block: gate
+    key: gate
+    depends_on:
+    - build-and-package
+  - commands:
+    - "# No need for checkout, the agent takes care of that"
+    - echo '~~~ Publish binary'
+    - "./scripts/publish.sh"
+    - cd ~/repo
+    depends_on:
+    - gate
+    plugins:
+    - docker#v5.10.0:
+        image: cimg/base:stable
+        environment:
+        - DEPLOY_ENV
+    agents:
+      executor_type: docker
+    env:
+      DEPLOY_ENV: staging
+    key: publish
+  if: '"BUILDKITE_BRANCH" == "main"'
