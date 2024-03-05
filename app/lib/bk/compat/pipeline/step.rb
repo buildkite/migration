@@ -157,7 +157,7 @@ module BK
         nil
       end
 
-      def merge_command_attributes(new_step) 
+      def merge_command_attribute(new_step) 
         # If we've generated a new step with cd (working_directory) - unshift it to @commands, otherwise concat as normal
         if new_step.commands.length == 1 && new_step.commands[0].start_with?("cd")
           @commands.unshift(new_step.commands[0])
