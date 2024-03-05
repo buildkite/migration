@@ -43,7 +43,7 @@ module BK
         dup
       end
     end
-    
+
     # basic command step
     class CommandStep
       attr_accessor :agents, :artifact_paths, :branches, :concurrency, :concurrency_group,
