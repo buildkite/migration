@@ -26,7 +26,7 @@ module BK
         # jobs are commands + some additional configs
         parse_command(name, config).tap do |bk_step|
           # TODO: move this logic to executor module
-          bk_step << if config.include?('executor')
+          bk_step >> if config.include?('executor')
                        exc_name = config['executor'].is_a?(Hash) ? config['executor'].keys.first : config['executor']
                        @executors[exc_name] || "# executor #{config['executor']} not supported yet"
                      else
