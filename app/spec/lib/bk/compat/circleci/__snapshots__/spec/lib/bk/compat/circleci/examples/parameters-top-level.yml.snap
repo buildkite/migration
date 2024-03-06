@@ -1,9 +1,9 @@
 ---
 steps:
 - commands:
+  - cd << pipeline.parameters.workingdir >>
   - echo "Image tag used was ${IMAGETAG}"
   - echo "$(pwd) == << pipeline.parameters.workingdir >>"
-  - cd << pipeline.parameters.workingdir >>
   plugins:
   - docker#v5.10.0:
       image: ubuntu:latest

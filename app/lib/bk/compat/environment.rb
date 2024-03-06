@@ -28,12 +28,14 @@ module BK
         variables[key] = value
       end
 
+      def merge(other)
+        other_env = other.is_a?(self.class) ? other : self.class.new(other)
+
+        other_env.to_h.merge(self.to_h)
+      end
+
       def merge!(other)
-        other_env = if other.is_a?(self.class)
-                      other
-                    else
-                      self.class.new(other)
-                    end
+        other_env = other.is_a?(self.class) ? other : self.class.new(other)
 
         other_env.each do |(key, value)|
           set(key, value)

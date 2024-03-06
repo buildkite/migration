@@ -1,8 +1,8 @@
 ---
 steps:
 - commands:
-  - Hello, Orb Executor
   - '# executor {"name"=>"win/default", "size"=>"medium"} not supported yet'
+  - Hello, Orb Executor
   key: orb-executor
 - commands:
   - Hello, self runner
@@ -20,8 +20,8 @@ steps:
     executor_type: docker
   key: docker
 - commands:
-  - Hello from multi-image docker
   - Need to use Docker Compose for multiple image execution :(
+  - Hello from multi-image docker
   key: multi-docker
 - commands:
   - Hello from OS X
