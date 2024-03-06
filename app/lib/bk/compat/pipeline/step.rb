@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../environment'
-
 module BK
   module Compat
     # simple waiting step
