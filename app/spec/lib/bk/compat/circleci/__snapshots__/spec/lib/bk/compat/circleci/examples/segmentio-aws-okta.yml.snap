@@ -1,6 +1,7 @@
 ---
 steps:
 - commands:
+  - cd /go/src/github.com/segmentio/aws-okta
   - "# No need for checkout, the agent takes care of that"
   - echo '~~~ Install linux dependencies - libusb'
   - sudo apt update -q
@@ -17,7 +18,6 @@ steps:
   - "  git status"
   - "  exit 1"
   - fi
-  - cd /go/src/github.com/segmentio/aws-okta
   plugins:
   - docker#v5.10.0:
       image: circleci/golang:1.13
@@ -39,6 +39,7 @@ steps:
     executor_type: docker
   key: test-build-golang-prev
 - commands:
+  - cd /go/src/github.com/segmentio/aws-okta
   - "# No need for checkout, the agent takes care of that"
   - echo '~~~ Install nfpm, rpmbuild'
   - sudo make -f Makefile.tools nfpm-debian rpmbuild-debian
@@ -50,7 +51,6 @@ steps:
   - cd .
   - buildkite-agent artifact upload 'dist/*'
   - cd -
-  - cd /go/src/github.com/segmentio/aws-okta
   plugins:
   - docker#v5.10.0:
       image: circleci/golang:1.13
@@ -58,6 +58,7 @@ steps:
     executor_type: docker
   key: dist-linux
 - commands:
+  - cd /go/src/github.com/segmentio/aws-okta
   - "# No need for checkout, the agent takes care of that"
   - "# :circleci: attach_workspace "
   - if [ ! -d '.' ]; then mkdir '.'; fi
@@ -72,7 +73,6 @@ steps:
   - sudo gem install rake
   - sudo make -f Makefile.tools package_cloud
   - make -f Makefile.release publish-packagecloud
-  - cd /go/src/github.com/segmentio/aws-okta
   depends_on:
   - dist-linux
   plugins:
@@ -82,6 +82,7 @@ steps:
     executor_type: docker
   key: publish-packagecloud
 - commands:
+  - cd /go/src/github.com/segmentio/aws-okta
   - "# No need for checkout, the agent takes care of that"
   - "# :circleci: attach_workspace "
   - if [ ! -d '.' ]; then mkdir '.'; fi
@@ -90,7 +91,6 @@ steps:
   - echo '~~~ Install tools'
   - make -f Makefile.tools github-release
   - make -f Makefile.release publish-github-linux
-  - cd /go/src/github.com/segmentio/aws-okta
   depends_on:
   - dist-linux
   plugins:
