@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative 'renderer'
-require_relative 'environment'
 
 # for easier usage (modules just have to import)
 require_relative 'pipeline/plugin'
