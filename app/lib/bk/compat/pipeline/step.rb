@@ -129,10 +129,7 @@ module BK
         when BK::Compat::WaitStep
           raise 'Can not add a wait step to another step'
         when self.class
-          other.merge!(self).tap do |step|
-            step.key = key
-            step.label = label
-          end
+          pre_merge!(other)
         when BK::Compat::Plugin
           @plugins.prepend(other)
         else
@@ -140,20 +137,32 @@ module BK
         end
       end
 
-      def merge!(new_step)
-        LIST_ATTRIBUTES.each { |a| send(a).concat(new_step.send(a)) }
-        HASH_ATTRIBUTES.each { |a| send(a).merge!(new_step.send(a)) }
+      def merge!(other)
+        LIST_ATTRIBUTES.each { |a| send(a).concat(other.send(a)) }
+        HASH_ATTRIBUTES.each { |a| send(a).merge!(other.send(a)) }
 
-        @conditional = BK::Compat.xxand(conditional, new_step.conditional)
-        @concurrency = [@concurrency, new_step.concurrency].compact.min
-        @concurrency_group ||= new_step.concurrency_group
-        @branches = "#{@branches} #{new_step.branches}".strip
-        @timeout_in_minutes = [@timeout_in_minutes, new_step.timeout_in_minutes].compact.max
+        update_attributes!(other)
+      end
+
+      def pre_merge!(other)
+        # almost the same as merge but self/other are reversed here
+        LIST_ATTRIBUTES.each { |a| send("#{a}=", other.send(a).concat(send(a))) }
+        HASH_ATTRIBUTES.each { |a| send("#{a}=", other.send(a).merge(send(a))) }
+
+        update_attributes!(other)
+      end
+
+      def update_attributes!(other)
+        @conditional = BK::Compat.xxand(conditional, other.conditional)
+        @concurrency = [@concurrency, other.concurrency].compact.min
+        @concurrency_group ||= other.concurrency_group
+        @branches = "#{@branches} #{other.branches}".strip
+        @timeout_in_minutes = [@timeout_in_minutes, other.timeout_in_minutes].compact.max
 
         # TODO: these could be a hash with exit codes
-        @soft_fail ||= new_step.soft_fail
+        @soft_fail ||= other.soft_fail
 
-        nil
+        self
       end
 
       def instance_attributes
