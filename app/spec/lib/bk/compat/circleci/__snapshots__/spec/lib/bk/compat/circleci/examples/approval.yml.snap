@@ -10,10 +10,10 @@ steps:
     executor_type: docker
   key: build-and-package
 - commands:
+  - cd ~/repo
   - "# No need for checkout, the agent takes care of that"
   - echo '~~~ Run tests'
   - "./scripts/test.sh"
-  - cd ~/repo
   depends_on:
   - build-and-package
   plugins:

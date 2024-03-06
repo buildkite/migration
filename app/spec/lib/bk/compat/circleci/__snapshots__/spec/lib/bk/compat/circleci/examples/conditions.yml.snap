@@ -33,10 +33,10 @@ steps:
     depends_on:
     - build-and-package
   - commands:
+    - cd ~/repo
     - "# No need for checkout, the agent takes care of that"
     - echo '~~~ Publish binary'
     - "./scripts/publish.sh"
-    - cd ~/repo
     depends_on:
     - gate
     plugins:
