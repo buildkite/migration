@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../environment'
-
 module BK
   module Compat
     # simple waiting step
@@ -47,10 +45,10 @@ module BK
     # basic command step
     class CommandStep
       attr_accessor :agents, :artifact_paths, :branches, :concurrency, :concurrency_group,
-                    :conditional, :depends_on, :key, :label, :matrix, :parameters, :plugins,
-                    :soft_fail, :timeout_in_minutes, :transformer
+                    :conditional, :depends_on, :env, :key, :label, :matrix, :parameters,
+                    :plugins, :soft_fail, :timeout_in_minutes, :transformer
 
-      attr_reader :commands, :env # we define special writers
+      attr_reader :commands # we define special writers
 
       LIST_ATTRIBUTES = %w[artifact_paths commands depends_on plugins].freeze
       HASH_ATTRIBUTES = %w[agents env matrix parameters].freeze
@@ -76,14 +74,6 @@ module BK
 
       def prepend_commands(*values)
         @commands.prepend(*values.flatten)
-      end
-
-      def env=(value)
-        @env = if value.is_a?(BK::Compat::Environment)
-                 value
-               else
-                 BK::Compat::Environment.new(value)
-               end
       end
 
       def to_h
