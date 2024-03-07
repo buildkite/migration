@@ -49,7 +49,7 @@ workflows:
       - test
   my-workflow-2:
     when:
-      equal: [ "main", BUILDKITE_BRANCH ]
+      equal: [ "main", << pipeline.git.branch >> ]
     jobs:
       - build-and-package
       - gate:

@@ -33,6 +33,7 @@ module BK
 
       def to_h
         { block: @key, key: @key, depends_on: @depends_on }.tap do |h| 
+          # rename conditional to if (a reserved word as an attribute or instance variable is complicated)
           h[:if] = @conditional unless @conditional.nil?
         end
       end

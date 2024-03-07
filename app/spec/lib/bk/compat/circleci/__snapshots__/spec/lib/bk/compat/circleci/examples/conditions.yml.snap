@@ -49,4 +49,4 @@ steps:
     env:
       DEPLOY_ENV: staging
     key: publish
-  if: '"BUILDKITE_BRANCH" == "main"'
+  if: '"<< pipeline.git.branch >>" == "main"'
