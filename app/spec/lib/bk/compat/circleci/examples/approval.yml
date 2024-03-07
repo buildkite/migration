@@ -1,0 +1,43 @@
+version: 2.1
+
+jobs:
+  build-and-package:
+    docker:
+      - image: "cimg/base:stable"
+    steps:
+      - checkout
+      - run: ./scripts/build-package.sh
+
+  test:
+    working_directory: ~/repo
+    docker:
+      - image: "cimg/base:stable"
+    steps:
+      - checkout
+      - run:
+          name: Run tests
+          command: ./scripts/test.sh
+
+  deploy:
+    docker:
+      - image: "cimg/base:stable"
+    steps:
+      - checkout
+      - run:
+          name: Deploy!
+          command: ./scripts/deploy.sh
+
+workflows:
+  stage_test_approve_deploy:
+    jobs:
+      - build-and-package
+      - test:
+          requires:
+            - build-and-package
+      - gate:
+          type: approval
+          requires:
+            - test
+      - deploy:
+          requires:
+            - gate

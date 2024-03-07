@@ -19,11 +19,12 @@ module BK
 
     # simple block step
     class BlockStep
-      attr_accessor :depends_on, :key
+      attr_accessor :conditional, :depends_on, :key
 
-      def initialize(key:, depends_on: [])
+      def initialize(conditional: nil, key:, depends_on: [])
         @key = key
         @depends_on = depends_on
+        @conditional = conditional
       end
 
       def <<(_obj)
@@ -31,11 +32,10 @@ module BK
       end
 
       def to_h
-        {
-          block: @key,
-          key: @key,
-          depends_on: @depends_on
-        }
+        { block: @key, key: @key, depends_on: @depends_on }.tap do |h| 
+          # rename conditional to if (a reserved word as an attribute or instance variable is complicated)
+          h[:if] = @conditional unless @conditional.nil?
+        end
       end
 
       def instantiate
