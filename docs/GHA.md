@@ -26,7 +26,7 @@ The Buildkite Migration tool's currently supported (✅), partially supported (�
 ## Jobs (`jobs`) 
 
 > [!NOTE]  
-> > When Buildkite builds are run; each created command step inside the pipeline is ran as a [job](https://buildkite.com/docs/pipelines/defining-steps#job-states) that will be distributed and assigned to the matching agents meeting its specific queue and/or tag [targeting](h.ttps://buildkite.com/docs/pipelines/defining-steps#targeting-specific-agents). Each job is run within its own seperate environment, with potentially different environment variables (for example those defined at [step](https://buildkite.com/docs/pipelines/command-step#command-step-attributes) level) - and is not always gauarnteed to run on the same agent depending on targeting rules specified/agent fleet setup.
+> > When Buildkite builds are run; each created command step inside the pipeline is ran as a [job](https://buildkite.com/docs/pipelines/defining-steps#job-states) that will be distributed and assigned to the matching agents meeting its specific queue and/or tag [targeting](h.ttps://buildkite.com/docs/pipelines/defining-steps#targeting-specific-agents). Each job is run within its own separate environment, with potentially different environment variables (for example those defined at [step](https://buildkite.com/docs/pipelines/command-step#command-step-attributes) level) - and is not always guaranteed to run on the same agent depending on targeting rules specified/agent fleet setup.
 
 | Key | Supported? | Notes |
 | --- | ---------- | ----- |
@@ -35,12 +35,12 @@ The Buildkite Migration tool's currently supported (✅), partially supported (�
 | `jobs.<id>.runs-on` | ✅ | This attribute is mapped to the agent targeting [tag](https://buildkite.com/docs/agent/v3/queues#targeting-a-queue) `runs-on`. Jobs that target custom `tag` names will have a `queue` target of `default`. |
 | `jobs.<id>.steps`| ✅ | Steps that make up a particular action's `job`. |
 | `jobs.<id>.steps.env` | ✅ | Environment variables that are defined at `step` level are translated as a variable definition within the `commands` of a Buildkite [command step](https://buildkite.com/docs/pipelines/command-step). |
-| `jobs.<id>.steps.run` | ✅ | The commands (less than 21,000 characters) that make up a particular job. Each `run` is translated to a seperate command inside of the output `commands` block of its generated Buildkite command step. |
+| `jobs.<id>.steps.run` | ✅ | The commands (less than 21,000 characters) that make up a particular job. Each `run` is translated to a separate command inside of the output `commands` block of its generated Buildkite command step. |
 | `jobs.<id>.steps.strategy` | ✅ | Allows for the conversion of a step's `strategy` (matrix) to create multiple jobs of a combination of values. |
 | `jobs.<id>.steps.strategy.matrix` | ✅ | A `matrix` key inside of a step's `strategy` will be translated to a [Buildkite build matrix](https://buildkite.com/docs/pipelines/build-matrix). |
 | `jobs.<id>.steps.strategy.matrix.include` | ✅ | Key/value pairs to add in the generated [matrix](https://buildkite.com/docs/pipelines/build-matrix)'s combinations. |
 | `jobs.<id>.steps.strategy.matrix.exclude`| ✅ | Key/value pairs to exclude in the generated [matrix](https://buildkite.com/docs/pipelines/build-matrix)'s combinations (`skip`). | 
-| `jobs.<id>.steps.uses` | ❌ | `uses` defines a seperate action to use within the context of a action's job, and is currently not supported. |
+| `jobs.<id>.steps.uses` | ❌ | `uses` defines a separate action to use within the context of a action's job, and is currently not supported. |
 
 ## Name (`name`)
 
