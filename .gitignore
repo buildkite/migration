@@ -3,3 +3,6 @@ rubyc
 
 # dist folder
 dist
+
+# rbenv local version
+.ruby-version
