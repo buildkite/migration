@@ -18,8 +18,12 @@ module BK
           type == 'Run'
         end
 
-        def translator(**step)
-          BK::Compat::CommandStep.new(commands: [ "Run step with config #{step}" ])
+        def translator(name:, identifier:, spec:, **rest)
+          BK::Compat::CommandStep.new(
+            label: name,
+            key: identifier,
+            commands: [ spec['command'] ]
+          )
         end
       end
     end
