@@ -1,0 +1,24 @@
+---
+steps:
+- group: gha-test
+  key: ghatest
+  steps:
+  - commands:
+    - ' # step [] {:type=>"Background", :name=>"postgres-dependency", :identifier=>"postgresdependency",
+      :spec=>{"connectorRef"=>"myDockerHubConnector", "image"=>"postgres:10.8", "shell"=>"Sh",
+      "envVariables"=>{"POSTGRES_USER"=>"postgres", "POSTGRES_PASSWORD"=>"<+secrets.getValue(\"DbPasswordSecret\")>",
+      "POSTGRES_DB"=>"postgres"}}} not implemented yet :('
+    - echo "this runs on openjdk"
+    label: stage1
+    key: stage1
+  - commands:
+    - |-
+      echo "pipeline var:" <+pipeline.variables.pipelinevar1>
+      echo "project level var:" <+variable.proj_var>
+      echo "secret example :" <+secrets.getValue("DbPasswordSecret")>
+    label: stage2
+    key: stage2
+  - commands:
+    - echo "Testing on  <+matrix.testparam>"
+    label: matrix stage
+    key: matrix_stage
