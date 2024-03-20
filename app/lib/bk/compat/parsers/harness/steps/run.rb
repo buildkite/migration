@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../../../pipeline/step'
 
 module BK
@@ -18,7 +20,7 @@ module BK
           type == 'Run'
         end
 
-        def translator(name:, identifier:, spec:, **rest)
+        def translator(name:, identifier:, spec:, **_rest)
           BK::Compat::CommandStep.new(
             label: name,
             key: identifier,

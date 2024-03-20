@@ -3,8 +3,7 @@
 require_relative '../translator'
 require_relative '../pipeline'
 require_relative '../pipeline/step'
-require_relative './harness/steps/run'
-require_relative './harness/steps/background'
+require_relative 'harness/steps/run'
 
 module BK
   module Compat
@@ -26,9 +25,7 @@ module BK
         config = YAML.safe_load(text, aliases: true)
         mandatory_keys = %w[pipeline].freeze
 
-        if config.is_a?(String)
-          false
-        elsif mandatory_keys & config.keys == mandatory_keys
+        if config.is_a?(Hash) && mandatory_keys & config.keys == mandatory_keys
           config['pipeline'].include?('stages')
         else
           false
@@ -48,10 +45,10 @@ module BK
           label: @config['pipeline']['name'],
           key: @config['pipeline']['identifier']
         )
-        
-        grp.steps = @config['pipeline']['stages'].map { |stage|
+
+        grp.steps = @config['pipeline']['stages'].map do |stage|
           parse_stage(**stage['stage'].transform_keys(&:to_sym))
-        }
+        end
 
         Pipeline.new(steps: [simplify_group(grp)])
       end
@@ -61,22 +58,22 @@ module BK
       def simplify_group(group)
         # If there ended up being only 1 stage, skip the group and just
         # pull the steps out.
-        if group.steps.length == 1 then
-          group.steps.map! { |step| step.conditional = group.conditional } 
+        if group.steps.length == 1
+          group.steps.map! { |step| step.conditional = group.conditional }
           group = groups.steps.first
         end
         group
       end
 
-      def parse_stage(name:, identifier:, spec:, **rest)
+      def parse_stage(name:, identifier:, spec:, **_rest)
         BK::Compat::CommandStep.new(
           label: name,
           key: identifier
-        ).tap { |cmd|
-          spec.dig('execution', 'steps').map { |step|
+        ).tap do |cmd|
+          spec.dig('execution', 'steps').map do |step|
             cmd << translate_step(**step['step'].transform_keys(&:to_sym))
-          }
-        }
+          end
+        end
       end
     end
   end
