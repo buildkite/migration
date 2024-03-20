@@ -1,0 +1,110 @@
+pipeline:
+  name: gha-test
+  identifier: ghatest
+  projectIdentifier: gha_test
+  orgIdentifier: default
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: account.myscm
+        repoName: test
+        build: <+input>
+  stages:
+    - stage:
+        name: stage1
+        identifier: stage1
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Background
+                  name: postgres-dependency
+                  identifier: postgresdependency
+                  spec:
+                    connectorRef: myDockerHubConnector
+                    image: postgres:10.8
+                    shell: Sh
+                    envVariables:
+                      POSTGRES_USER: postgres
+                      POSTGRES_PASSWORD: <+secrets.getValue("DbPasswordSecret")>
+                      POSTGRES_DB: postgres
+              - step:
+                  type: Run
+                  name: Run_1
+                  identifier: Run_1
+                  spec:
+                    connectorRef: myDockerHubConnector
+                    image: openjdk:17.0-jdk
+                    shell: Bash
+                    command: echo "this runs on openjdk"
+    - stage:
+        name: stage2
+        identifier: stage2
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: Run_2
+                  identifier: Run_2
+                  spec:
+                    connectorRef: myDockerHubConnector
+                    image: node:13.0.0
+                    shell: Bash
+                    command: |-
+                      echo "pipeline var:" <+pipeline.variables.pipelinevar1>
+                      echo "project level var:" <+variable.proj_var>
+                      echo "secret example :" <+secrets.getValue("DbPasswordSecret")>
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+    - stage:
+        name: matrix stage
+        identifier: matrix_stage
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: Run_3
+                  identifier: Run_3
+                  spec:
+                    shell: Bash
+                    command: echo "Testing on  <+matrix.testparam>"
+        strategy:
+          matrix:
+            testparam:
+              - node
+              - python
+              - ubuntu
+          maxConcurrency: 3
+  variables:
+    - name: pipelinevar1
+      type: String
+      description: ""
+      value: someval
