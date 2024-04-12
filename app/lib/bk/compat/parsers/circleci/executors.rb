@@ -70,6 +70,8 @@ module BK
       end
 
       def executor_docker_aws_auth(config)
+        return [] if config.empty?
+
         BK::Compat::CircleCISteps::CircleCIStep.new.tap do |step|
           if config.include?('aws_access_key_id')
             step.add_commands('# Configure the agent to have the appropriate credentials for ECR auth')
