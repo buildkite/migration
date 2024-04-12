@@ -108,10 +108,10 @@ module BK
           containers[name] = config
         end
 
-        conf = { services: containers }
+        conf = { 'services' => containers }
         cmds = [
           '# to make multiple images work, add the following composefile to your repository',
-          "cat > compose.yaml << EOF\n#{conf.transform_keys(&:to_s).to_yaml}\nEOF"
+          "cat > compose.yaml << EOF\n#{conf.to_yaml}\nEOF"
         ]
         plugin_config = { 'run' => apps[0].fetch('name', 'service0') }
 
