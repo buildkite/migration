@@ -101,24 +101,24 @@ module BK
 
       def executor_docker_compose_plugin(*apps)
         containers = {}
-        apps.each_with_index { | app, i |
+        apps.each_with_index do |app, i|
           config = app.slice('image', 'entrypoint', 'user', 'command', 'environment')
           name = config.fetch('name', "service#{i}")
 
           containers[name] = config
-        }
+        end
 
         conf = { services: containers }
         cmds = [
-          "# to make multiple images work, add the following composefile to your repository",
+          '# to make multiple images work, add the following composefile to your repository',
           "cat > compose.yaml << EOF\n#{conf.transform_keys(&:to_s).to_yaml}\nEOF"
         ]
-        plugin_config = {run: apps[0].fetch('name', 'service0')}
+        plugin_config = { 'run' => apps[0].fetch('name', 'service0') }
 
         BK::Compat::CircleCISteps::CircleCIStep.new(
           key: 'docker compose',
           commands: cmds,
-          agents: { 'executor_type': 'docker_compose' },
+          agents: { 'executor_type' => 'docker_compose' },
           plugins: [
             BK::Compat::Plugin.new(
               name: 'docker-compose',
