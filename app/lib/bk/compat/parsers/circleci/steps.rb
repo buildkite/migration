@@ -102,7 +102,7 @@ module BK
         end
 
         def translate_setup_remote_docker(_config)
-          ['#  No need to setup remote docker, use the host docker']
+          ['# No need to setup remote docker, use the host docker']
         end
 
         def translate_store_artifacts(_config)

@@ -44,16 +44,14 @@ module BK
       end
 
       def executor_docker(config)
-        return 'Need to use Docker Compose for multiple image execution :(' if config.length > 1
-
-        # assume we have a single configuration
-        config = config[0]
+        first, *rest = config # split first configuration
 
         BK::Compat::CircleCISteps::CircleCIStep.new.tap do |step|
           step.agents['executor_type'] = 'docker'
-          step << executor_docker_plugin(config)
-          step << executor_docker_auth_plugin(config.fetch('auth', {}))
-          step << executor_docker_aws_auth(config['aws-auth']) if config.include?('aws-auth')
+          step << executor_docker_auth_plugin(first.fetch('auth', {}))
+          step << executor_docker_aws_auth(first.fetch('aws-auth', {}))
+
+          step << (rest.empty? ? executor_docker_plugin(first) : executor_docker_compose_plugin(first, *rest))
         end
       end
 
@@ -70,6 +68,8 @@ module BK
       end
 
       def executor_docker_aws_auth(config)
+        return [] if config.empty?
+
         BK::Compat::CircleCISteps::CircleCIStep.new.tap do |step|
           if config.include?('aws_access_key_id')
             step.add_commands('# Configure the agent to have the appropriate credentials for ECR auth')
@@ -96,6 +96,35 @@ module BK
         BK::Compat::Plugin.new(
           name: 'docker',
           config: plugin_config
+        )
+      end
+
+      def executor_docker_compose_plugin(*apps)
+        containers = {}
+        apps.each_with_index do |app, i|
+          config = app.slice('image', 'entrypoint', 'user', 'command', 'environment')
+          name = config.fetch('name', "service#{i}")
+
+          containers[name] = config
+        end
+
+        conf = { 'services' => containers }
+        cmds = [
+          '# to make multiple images work, add the following composefile to your repository',
+          "cat > compose.yaml << EOF\n#{conf.to_yaml}\nEOF"
+        ]
+        plugin_config = { 'run' => apps[0].fetch('name', 'service0') }
+
+        BK::Compat::CircleCISteps::CircleCIStep.new(
+          key: 'docker compose',
+          commands: cmds,
+          agents: { 'executor_type' => 'docker_compose' },
+          plugins: [
+            BK::Compat::Plugin.new(
+              name: 'docker-compose',
+              config: plugin_config
+            )
+          ]
         )
       end
 

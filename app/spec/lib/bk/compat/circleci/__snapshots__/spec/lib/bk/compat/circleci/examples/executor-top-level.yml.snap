@@ -9,8 +9,23 @@ steps:
     executor_type: docker
   key: docker-xenial
 - commands:
-  - Need to use Docker Compose for multiple image execution :(
+  - "# to make multiple images work, add the following composefile to your repository"
+  - |-
+    cat > compose.yaml << EOF
+    ---
+    services:
+      service0:
+        image: ubuntu:noble
+      service1:
+        image: circleci/python:3.9-stretch-browsers
+
+    EOF
   - apt-update
+  plugins:
+  - docker-compose#v5.0.0:
+      run: service0
+  agents:
+    executor_type: docker_compose
   key: docker-noble-multi
 - commands:
   - xcodebuild -help
