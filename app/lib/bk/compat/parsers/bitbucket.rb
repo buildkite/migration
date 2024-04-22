@@ -3,6 +3,7 @@
 require_relative '../translator'
 require_relative '../pipeline'
 require_relative '../pipeline/step'
+require_relative 'bitbucket/steps'
 
 module BK
   module Compat
@@ -31,14 +32,17 @@ module BK
       def initialize(text, options = {})
         @config = YAML.safe_load(text, aliases: true)
         @options = options
+
+        BK::Compat::BitBucketSteps::Step.new(register: method(:register_translator))
       end
 
       def parse
-        pps = %w[branches custom default pull-requests tags].freeze
+        # custom is also valid, but not supported just yet
+        pps = %w[branches default pull-requests tags].freeze
         conf = @config['pipelines']
         Pipeline.new(
           steps: pps.map { |p| 
-            parse_pipeline(**conf[p]) if conf.include?(p)
+            parse_pipeline(conf[p]) if conf.include?(p)
           }.compact
         )
       end
@@ -49,20 +53,25 @@ module BK
         # If there ended up being only 1 stage, skip the group and just
         # pull the steps out.
         if group.steps.length == 1
-          group.steps.map! { |step| step.conditional = group.conditional }
-          group = groups.steps.first
+          group.steps[0].conditional = group.conditional
+          group = group.steps.first
         end
         group
       end
 
-      def parse_pipeline(name:, identifier:, spec:, **_rest)
-        BK::Compat::CommandStep.new(
-          label: name,
-          key: identifier
-        ).tap do |cmd|
-          spec.dig('execution', 'steps').map do |step|
-            cmd << translate_step(**step['step'].transform_keys(&:to_sym))
-          end
+      def parse_pipeline(conf)
+        if conf.is_a?(Array)
+          simplify_group(BK::Compat::GroupStep.new(
+            key: 'group1',
+            steps: conf.map do |s|
+              translate_step(s)
+            end
+          ))
+        else
+          BK::Compat::CommandStep.new(
+            label: 'import step',
+            commands: [ "Import steps not supported yet #{conf}" ]
+          )
         end
       end
     end
