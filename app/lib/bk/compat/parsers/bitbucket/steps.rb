@@ -21,10 +21,11 @@ module BK
         end
 
         def translator(conf, *, **)
+          step = conf['step']
+          # script is the only thing that is mandatory
           BK::Compat::CommandStep.new(
-            label: 'step',
-            key: 'step',
-            commands: [ "Step with #{conf['step']}" ]
+            label: step.fetch('name', 'Script step'),
+            commands: step['script']
           )
         end
       end
