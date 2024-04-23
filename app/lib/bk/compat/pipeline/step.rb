@@ -33,8 +33,9 @@ module BK
       end
 
       def to_h
-        { block: @key, key: @key, depends_on: @depends_on }.tap do |h|
+        { block: @key, key: @key }.tap do |h|
           # rename conditional to if (a reserved word as an attribute or instance variable is complicated)
+          h[:depends_on] = @depends_on unless @depends_on.empty?
           h[:if] = @conditional unless @conditional.nil?
           h[:prompt] = @prompt unless @prompt.nil?
         end
