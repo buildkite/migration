@@ -1,0 +1,16 @@
+---
+steps:
+- group: "~"
+  key: group1
+  steps:
+  - commands:
+    - echo 'running'
+    label: simple
+  - key: execute-complex
+    prompt: Execute step complex?
+    input: execute-complex
+  - commands:
+    - echo 'running'
+    depends_on:
+    - execute-complex
+    label: complex
