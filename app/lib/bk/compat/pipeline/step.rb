@@ -188,7 +188,7 @@ module BK
     class GroupStep
       attr_accessor :label, :key, :steps, :conditional
 
-      def initialize(label: nil, key: nil, steps: [], conditional: nil)
+      def initialize(label: '~', key: nil, steps: [], conditional: nil)
         @label = label
         @key = key
         @steps = steps
