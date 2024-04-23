@@ -21,8 +21,20 @@ module BK
         end
 
         def translator(conf, *, **)
-          step = conf['step']
-          # script is the only thing that is mandatory
+          base = base_step(conf['step'])
+
+          if conf['step'].fetch('trigger', 'automatic') == 'manual'
+            k = base.key || 'cmd'
+
+            input = BK::Compat::InputStep.new(key: "execute-#{k}", prompt: "Execute step #{k}?")
+            base.depends_on = [input.key]
+            [input, base]
+          else
+            base
+          end
+        end
+
+        def base_step(step)
           BK::Compat::CommandStep.new(
             label: step.fetch('name', 'Script step'),
             commands: translate_scripts(Array(step['script'])),
