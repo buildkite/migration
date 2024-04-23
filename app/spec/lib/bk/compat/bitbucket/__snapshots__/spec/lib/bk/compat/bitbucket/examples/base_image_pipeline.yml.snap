@@ -1,0 +1,17 @@
+---
+steps:
+- group:
+  key: group1
+  steps:
+  - commands:
+    - bash --version
+    plugins:
+    - docker#v5.10.0:
+        image: bash:latest
+    label: Step using the Bash image
+  - commands:
+    - echo "Hello, World from the default Pipelines image"
+    plugins:
+    - docker#v5.10.0:
+        image: bash:latest
+    label: Step using the default Bitbucket Pipelines image

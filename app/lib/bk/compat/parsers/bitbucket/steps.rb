@@ -27,7 +27,9 @@ module BK
             label: step.fetch('name', 'Script step'),
             commands: step['script'],
           ).tap do |cmdstep|
-            cmdstep << translate_image(step['image']) if step.include?('image')
+            if step.include?('image')
+              cmdstep << translate_image(step['image']) 
+            end
           end
         end
 
