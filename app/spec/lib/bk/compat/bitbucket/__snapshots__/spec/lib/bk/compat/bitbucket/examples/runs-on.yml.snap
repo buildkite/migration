@@ -1,0 +1,34 @@
+---
+steps:
+- group: "~"
+  key: group1
+  steps:
+  - commands:
+    - echo 'step 1'
+    agents:
+      linux: "*"
+    label: Simple label
+  - commands:
+    - echo 'step 2'
+    agents:
+      size: 2x
+    label: Simple size
+  - commands:
+    - echo 'step 3'
+    agents:
+      linux: "*"
+      aws: "*"
+    label: Complex label
+  - commands:
+    - echo 'step 4'
+    agents:
+      size: 4x
+      linux: "*"
+    label: Combination
+  - commands:
+    - echo 'step 1'
+    agents:
+      size: 8x
+      linux: "*"
+      aws: "*"
+    label: Complex combination
