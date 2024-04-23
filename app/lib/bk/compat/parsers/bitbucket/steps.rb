@@ -29,7 +29,7 @@ module BK
             agents: translate_agents(step.slice('size', 'runs-on'))
           ).tap do |cmd|
             cmd.timeout_in_minutes = step.fetch('max-time', nil)
-            cmd.add_commands('# The after-script property should be configured as a pre-exit repository hook') if !step['after-script'].nil?
+            translate_after_script(cmd) if !step['after-script'].nil?
           end
         end
 
@@ -53,6 +53,10 @@ module BK
               "# Invalid script element #{s}"
             end
           end
+        end
+
+        def translate_after_script(cmd)
+          cmd.add_commands('# The after-script property should be configured as a pre-exit repository hook')
         end
       end
     end
