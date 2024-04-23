@@ -26,7 +26,11 @@ module BK
           BK::Compat::CommandStep.new(
             label: step.fetch('name', 'Script step'),
             commands: step['script']
-          )
+          ).tap do |cmd|
+            cmd.agents[:size] = step['size'] if step.include?('size')
+            # Array call is to force a single-value string still works
+            Array(step.fetch('runs-on', nil)).each { |tag| cmd.agents[tag] = '*' }
+          end
         end
       end
     end
