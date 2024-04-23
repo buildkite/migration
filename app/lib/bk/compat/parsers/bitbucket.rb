@@ -4,6 +4,7 @@ require_relative '../translator'
 require_relative '../pipeline'
 require_relative '../pipeline/step'
 require_relative 'bitbucket/steps'
+require_relative 'bitbucket/import'
 
 module BK
   module Compat
@@ -34,6 +35,7 @@ module BK
         @options = options
 
         BK::Compat::BitBucketSteps::Step.new(register: method(:register_translator))
+        BK::Compat::BitBucketSteps::Import.new(register: method(:register_translator))
       end
 
       def parse
@@ -41,9 +43,7 @@ module BK
         pps = %w[branches default pull-requests tags].freeze
         conf = @config['pipelines']
         Pipeline.new(
-          steps: pps.map { |p| 
-            parse_pipeline(conf[p]) if conf.include?(p)
-          }.compact
+          steps: pps.map { |p| parse_pipeline(conf[p]) if conf.include?(p) }.compact
         )
       end
 
@@ -60,19 +60,13 @@ module BK
       end
 
       def parse_pipeline(conf)
-        if conf.is_a?(Array)
-          simplify_group(BK::Compat::GroupStep.new(
+        steps = Array(conf).map { |s| translate_step(s) }
+        simplify_group(
+          BK::Compat::GroupStep.new(
             key: 'group1',
-            steps: conf.map do |s|
-              translate_step(s)
-            end
-          ))
-        else
-          BK::Compat::CommandStep.new(
-            label: 'import step',
-            commands: [ "Import steps not supported yet #{conf}" ]
+            steps: steps.flatten
           )
-        end
+        )
       end
     end
   end
