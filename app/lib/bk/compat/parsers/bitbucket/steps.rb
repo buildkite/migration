@@ -26,10 +26,8 @@ module BK
           BK::Compat::CommandStep.new(
             label: step.fetch('name', 'Script step'),
             commands: step['script'],
-          ).tap do |cmdstep|
-            if step.include?('image')
-              cmdstep << translate_image(step['image']) 
-            end
+          ).tap do |cmd|
+            cmd << translate_image(step['image']) if step.include?('image')
           end
         end
 
