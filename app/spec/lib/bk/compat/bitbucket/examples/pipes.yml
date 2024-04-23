@@ -1,0 +1,17 @@
+pipelines:
+  default:
+    - step:
+        name: simple pipe
+        script:
+          - echo 'testing pipe'
+          - pipe: test-pipe:v1.1
+    - step:
+        name: pipe with vars
+        script:
+          - echo 'testing vars pipe'
+          - pipe: test-pipe:v1.1
+            variables:
+              TEST: value
+              TEST_ARRAY:
+                - value1
+                - value2
