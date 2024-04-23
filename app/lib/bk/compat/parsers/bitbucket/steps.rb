@@ -25,7 +25,7 @@ module BK
           # script is the only thing that is mandatory
           BK::Compat::CommandStep.new(
             label: step.fetch('name', 'Script step'),
-            commands: step['script'],
+            commands: translate_scripts(Array(step['script'])),
             agents: translate_agents(step.slice('size', 'runs-on'))
           ).tap do |cmd|
             cmd.timeout_in_minutes = step.fetch('max-time', nil)
@@ -37,6 +37,20 @@ module BK
             h[:size] = conf['size'] if conf.include?('size')
             # Array call is to force a single-value string still works
             Array(conf.fetch('runs-on', nil)).each { |tag| h[tag] = '*' }
+          end
+        end
+
+        def translate_scripts(scripts)
+          scripts.map do |s|
+            case s
+            when String
+              s
+            when Hash
+              # assume it is a pipe
+              "# Pipe #{s['pipe']} is not currently supported, maybe a plugin?"
+            else
+              "# Invalid script element #{s}"
+            end
           end
         end
       end
