@@ -1,6 +1,6 @@
 ---
 steps:
-- group:
+- group: "~"
   key: group1
   steps:
   - commands:
