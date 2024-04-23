@@ -25,7 +25,18 @@ module BK
           # script is the only thing that is mandatory
           BK::Compat::CommandStep.new(
             label: step.fetch('name', 'Script step'),
-            commands: step['script']
+            commands: step['script'],
+          ).tap do |cmdstep|
+            cmdstep << translate_image(step['image']) if step.include?('image')
+          end
+        end
+
+        def translate_image(image)
+          BK::Compat::Plugin.new(
+            name: 'docker',
+            config: {
+              'image' => "#{image}"
+            }
           )
         end
       end
