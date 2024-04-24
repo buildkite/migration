@@ -1,0 +1,13 @@
+---
+steps:
+- group: "~"
+  key: group1
+  steps:
+  - commands:
+    - echo 'testing pipe'
+    - "# Pipe test-pipe:v1.1 is not currently supported, maybe a plugin?"
+    label: simple pipe
+  - commands:
+    - echo 'testing vars pipe'
+    - "# Pipe test-pipe:v1.1 is not currently supported, maybe a plugin?"
+    label: pipe with vars
