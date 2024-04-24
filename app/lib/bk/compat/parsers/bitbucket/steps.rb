@@ -21,8 +21,21 @@ module BK
         end
 
         def translator(conf, *, **)
-          step = conf['step']
-          # script is the only thing that is mandatory
+          base = base_step(conf['step'])
+
+          if conf['step'].fetch('trigger', 'automatic') == 'manual'
+            # TODO: ensure this is a valid, deterministic and unique key
+            k = base.key || base.label || 'cmd'
+
+            input = BK::Compat::InputStep.new(key: "execute-#{k}", prompt: "Execute step #{k}?")
+            base.depends_on = [input.key]
+            [input, base]
+          else
+            base
+          end
+        end
+
+        def base_step(step)
           BK::Compat::CommandStep.new(
             label: step.fetch('name', 'Script step'),
             commands: translate_scripts(Array(step['script'])),
@@ -30,9 +43,20 @@ module BK
           ).tap do |cmd|
             cmd.timeout_in_minutes = step.fetch('max-time', nil)
             translate_after_script(cmd) if !step['after-script'].nil?
+            # Specify image if it was defined on the step
+            cmd << translate_image(step['image']) if step.include?('image')
           end
         end
 
+        def translate_image(image)
+          BK::Compat::Plugin.new(
+            name: 'docker',
+            config: {
+              'image' => "#{image}"
+            }
+          )
+        end
+        
         def translate_agents(conf)
           {}.tap do |h|
             h[:size] = conf['size'] if conf.include?('size')
