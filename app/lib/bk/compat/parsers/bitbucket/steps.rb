@@ -44,6 +44,8 @@ module BK
             cmd.timeout_in_minutes = step.fetch('max-time', nil)
             # Specify image if it was defined on the step
             cmd << translate_image(step['image']) if step.include?('image')
+            # Translate after-script
+            cmd.add_commands('# The after-script property should be configured as a pre-exit repository hook') if !step['after-script'].nil?
           end
         end
 
