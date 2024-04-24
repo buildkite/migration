@@ -101,7 +101,7 @@ module BK
             config: {
               'image' => "#{image}"
             }
-          )
+          ) unless image.nil?
         end
 
         def translate_agents(conf)
