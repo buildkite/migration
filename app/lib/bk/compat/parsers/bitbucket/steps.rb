@@ -44,6 +44,7 @@ module BK
             cmd.timeout_in_minutes = step.fetch('max-time', nil)
             # Specify image if it was defined on the step
             cmd << translate_image(step['image']) if step.include?('image')
+            cmd << translate_oidc if step['oidc']
           end
         end
 
@@ -52,6 +53,15 @@ module BK
             name: 'docker',
             config: {
               'image' => "#{image}"
+            }
+          )
+        end
+
+        def translate_oidc()
+          BK::Compat::Plugin.new(
+            name: 'aws-assume-role-with-web-identity',
+            config: {
+              'role-arn' => "arn:aws:iam::AWS-ACCOUNT-ID:role/SOME-ROLE"
             }
           )
         end

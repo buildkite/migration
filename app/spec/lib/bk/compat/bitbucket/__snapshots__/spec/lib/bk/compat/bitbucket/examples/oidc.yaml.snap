@@ -1,0 +1,11 @@
+---
+steps:
+- commands:
+  - echo "I can access data through OpenID Connect!"
+  - aws sts assume-role-with-web-identity --role-arn arn:aws:iam::XXXXXX:role/projectx-build
+    --role-session-name build-session  --web-identity-token "$BITBUCKET_STEP_OIDC_TOKEN"
+    --duration-seconds 1000
+  plugins:
+  - aws-assume-role-with-web-identity:
+      role-arn: arn:aws:iam::AWS-ACCOUNT-ID:role/SOME-ROLE
+  label: Script step
