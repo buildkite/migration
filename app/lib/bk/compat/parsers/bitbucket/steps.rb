@@ -45,6 +45,8 @@ module BK
             # Specify image if it was defined on the step
             cmd << translate_image(step['image']) if step.include?('image')
             cmd.add_commands('# `deployments` has no direct translation.') if step.include?('deployment')
+            cmd.add_commands('# `fail-fast` has no direct translation - consider using `soft_fail`/`cancel_on_build_failing`.') if step.include?('fail-fast')
+            cmd.add_commands('# The after-script property should be configured as a pre-exit repository hook') if !step['after-script'].nil?
           end
         end
 
