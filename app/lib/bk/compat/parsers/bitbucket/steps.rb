@@ -21,8 +21,8 @@ module BK
           conf.include?('step')
         end
 
-        def translator(conf, *, **)
-          base = base_step(conf['step'])
+        def translator(conf, *, defaults: {}, **)
+          base = base_step(defaults.merge(conf['step']))
 
           if conf['step'].fetch('trigger', 'automatic') == 'manual'
             # TODO: ensure this is a valid, deterministic and unique key
@@ -96,12 +96,14 @@ module BK
         end
 
         def translate_image(image)
+          return [] if image.nil?
+
           BK::Compat::Plugin.new(
             name: 'docker',
             config: {
-              'image' => "#{image}"
+              'image' => image.to_s
             }
-          ) unless image.nil?
+          )
         end
 
         def translate_agents(conf)

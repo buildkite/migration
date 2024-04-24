@@ -41,10 +41,10 @@ module BK
       def parse
         # custom is also valid, but not supported just yet
         pps = %w[branches default pull-requests tags].freeze
-        image_base = @config['image']
+        defaults = @config.slice('image')
         conf = @config['pipelines']
         Pipeline.new(
-          steps: pps.map { |p| parse_pipeline(conf[p], image_base) if conf.include?(p) }.compact
+          steps: pps.map { |p| parse_pipeline(conf[p], defaults) if conf.include?(p) }.compact
         )
       end
 
@@ -60,11 +60,8 @@ module BK
         group
       end
 
-      def parse_pipeline(conf, image_base)
-        steps = Array(conf).map { |s| 
-          s['step']['image'] = image_base if s['step']['image'].nil? && !image_base.nil?  
-          translate_step(s) 
-        }
+      def parse_pipeline(conf, defaults)
+        steps = Array(conf).map { |s| translate_step(s, defaults: defaults) }
         simplify_group(
           BK::Compat::GroupStep.new(
             key: 'group1',
