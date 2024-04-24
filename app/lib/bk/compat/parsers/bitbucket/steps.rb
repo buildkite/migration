@@ -44,6 +44,7 @@ module BK
             cmd.timeout_in_minutes = step.fetch('max-time', nil)
             # Specify image if it was defined on the step
             cmd << translate_image(step['image']) if step.include?('image')
+            cmd.add_commands('# `fail-fast` has no direct translation - consider using `soft_fail`/`cancel_on_build_failing`.') if step.include?('fail-fast')
           end
         end
 

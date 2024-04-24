@@ -1,0 +1,10 @@
+---
+steps:
+- commands:
+  - npm install
+  - npm test
+  - "# `fail-fast` has no direct translation - consider using `soft_fail`/`cancel_on_build_failing`."
+  plugins:
+  - docker#v5.10.0:
+      image: node:21-alpine
+  label: Build and test
