@@ -42,9 +42,20 @@ module BK
             agents: translate_agents(step.slice('size', 'runs-on'))
           ).tap do |cmd|
             cmd.timeout_in_minutes = step.fetch('max-time', nil)
+            # Specify image if it was defined on the step
+            cmd << translate_image(step['image']) if step.include?('image')
           end
         end
 
+        def translate_image(image)
+          BK::Compat::Plugin.new(
+            name: 'docker',
+            config: {
+              'image' => "#{image}"
+            }
+          )
+        end
+        
         def translate_agents(conf)
           {}.tap do |h|
             h[:size] = conf['size'] if conf.include?('size')
