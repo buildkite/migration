@@ -44,6 +44,7 @@ module BK
             cmd.timeout_in_minutes = step.fetch('max-time', nil)
             # Specify image if it was defined on the step
             cmd << translate_image(step['image']) if step.include?('image')
+            cmd.add_commands('# `deployments` has no direct translation.') if step.include?('deployment')
           end
         end
 
