@@ -44,10 +44,21 @@ module BK
             cmd.timeout_in_minutes = step.fetch('max-time', nil)
             # Specify image if it was defined on the step
             cmd << translate_image(step['image']) if step.include?('image')
-            cmd.add_commands('# `deployments` has no direct translation.') if step.include?('deployment')
-            cmd.add_commands('# `fail-fast` has no direct translation - consider using `soft_fail`/`cancel_on_build_failing`.') if step.include?('fail-fast')
-            cmd.add_commands('# The after-script property should be configured as a pre-exit repository hook') if !step['after-script'].nil?
+            cmd << untranslatable(step)
           end
+        end
+
+        def untranslatable(step)
+          msgs = {
+            'deployment' => '# `deployments` has no direct translation.',
+            'fail-fast' =>
+              '# `fail-fast` has no direct translation - consider using `soft_fail`/`cancel_on_build_failing`.',
+            'after-script' => '# The after-script property should be configured as a pre-exit repository hook'
+          }
+
+          msgs.map do |k, message|
+            message if step.include?(k)
+          end.compact
         end
 
         def translate_image(image)
@@ -58,7 +69,7 @@ module BK
             }
           )
         end
-        
+
         def translate_agents(conf)
           {}.tap do |h|
             h[:size] = conf['size'] if conf.include?('size')
