@@ -84,7 +84,7 @@ module BK
         end
 
         def sparse_checkout_plugin(conf)
-          return [] if conf.nil?
+          return [] if conf.nil? || !conf.fetch('enabled', true)
 
           BK::Compat::Plugin.new(
             name: 'sparse-checkout',
@@ -92,7 +92,7 @@ module BK
               'paths' => conf['patterns'],
               'no-cone' => !conf.fetch('cone-mode', true)
             }
-          ) if conf.fetch('enabled', true)
+          )
         end
 
         def translate_image(image)
