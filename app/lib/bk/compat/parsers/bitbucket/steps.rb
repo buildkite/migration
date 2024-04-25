@@ -2,6 +2,7 @@
 
 require_relative '../../pipeline/step'
 require_relative '../../pipeline/plugin'
+require_relative 'image'
 
 module BK
   module Compat
@@ -91,17 +92,6 @@ module BK
             config: {
               'paths' => conf['patterns'],
               'no-cone' => !conf.fetch('cone-mode', true)
-            }
-          )
-        end
-
-        def translate_image(image)
-          return [] if image.nil?
-
-          BK::Compat::Plugin.new(
-            name: 'docker',
-            config: {
-              'image' => image.to_s
             }
           )
         end
