@@ -64,7 +64,8 @@ module BK
             'deployment' => '# `deployments` has no direct translation.',
             'fail-fast' =>
               '# `fail-fast` has no direct translation - consider using `soft_fail`/`cancel_on_build_failing`.',
-            'after-script' => '# The after-script property should be configured as a pre-exit repository hook'
+            'after-script' => '# The after-script property should be configured as a pre-exit repository hook',
+            'docker' => '# The availability of docker in steps depend on the agent configuration'
           }
 
           msgs.map do |k, message|
