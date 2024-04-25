@@ -4,8 +4,8 @@ pipelines:
     - step:
         name: Build and test
         image: node:10.15.0
-        caches:
-          - node
+        #caches:
+        #  - node
         script:
           - npm install
           - npm test
@@ -16,10 +16,10 @@ pipelines:
     - step:
         name: Integration test
         image: node:10.15.0
-        caches:
-          - node
-        services:
-          - postgres
+        #caches:
+        #  - node
+        #services:
+        #  - postgres
         script:
         # using one of the artifacts from the previous step
           - cat reports/tests.txt
@@ -38,7 +38,7 @@ pipelines:
         script:
           - echo "Deployment successful!" > success.txt
 
-definitions:
-  services:
-    postgres:
-      image: postgres:9.6.4
+#definitions:
+#  services:
+#    postgres:
+#      image: postgres:9.6.4
