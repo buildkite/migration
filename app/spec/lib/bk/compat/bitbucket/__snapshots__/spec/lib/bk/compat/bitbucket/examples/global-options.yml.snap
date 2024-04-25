@@ -1,0 +1,26 @@
+---
+steps:
+- group: "~"
+  key: group1
+  steps:
+  - commands:
+    - echo 'no configuration'
+    - "# The availability of docker in steps depend on the agent configuration"
+    agents:
+      size: 8x
+    label: no conf
+    timeout_in_minutes: 50
+  - commands:
+    - echo 'override max-time'
+    - "# The availability of docker in steps depend on the agent configuration"
+    agents:
+      size: 8x
+    label: with time
+    timeout_in_minutes: 100
+  - commands:
+    - echo 'override size'
+    - "# The availability of docker in steps depend on the agent configuration"
+    agents:
+      size: 1x
+    label: with size
+    timeout_in_minutes: 50
