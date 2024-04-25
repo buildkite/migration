@@ -15,7 +15,7 @@ module BK
           [
             image_base(normalized.slice('name', 'run-as-user')),
             image_basic_auth(normalized.slice('password', 'username')),
-            image_aws_auth(normalized.fetch('aws', {}))
+            image_aws_auth(normalized.fetch('aws', {}), name: normalized['name'])
           ].compact.each { |p| cmd << p }
 
           cmd
@@ -27,7 +27,7 @@ module BK
           BK::Compat::Plugin.new(
             name: 'docker',
             config: {
-              'image' => conf.delete('name'),
+              'image' => conf['name'],
               'user' => conf.delete('run-as-user')
             }.compact
           )
@@ -40,24 +40,38 @@ module BK
             name: 'docker-login',
             config: {
               'username' => conf['username'],
-              'password-env' => conf['password'].ltrim('$')
+              'password-env' => conf['password'].sub(/^\$/, '')
             }
           )
         end
 
-        def image_aws_auth(conf)
+        def image_aws_auth(conf, name: nil)
           return nil if conf.empty?
+
+          # assume the image name is a reference to an ECR repo
+          acct, _, _, region, *_rest = name.split('.')
 
           plugin = {
             'login' => true,
-            'account-ids' => '$AWS_ACCOUNT',
-            'region' => '$AWS_DEFAULT_REGION'
+            'account-ids' => acct,
+            'region' => region
           }
-          plugin['assume-role'] = { 'role-arn' => config['oidc-role'] } if config.include?('oidc-role')
+          plugin['assume-role'] = { 'role-arn' => conf['oidc-role'] } if conf.include?('oidc-role')
 
-          BK::Compat::Plugin.new(
-            name: 'ecr',
-            config: plugin
+          if conf.include?('access-key') || conf.include?('secret-key')
+            cmd = [
+              '# use AWS_ACCESS_KEY and AWS_SECRET_ACCESS_KEY variables for authentication'
+            ]
+          end
+
+          BK::Compat::CommandStep.new(
+            plugins: [
+              BK::Compat::Plugin.new(
+                name: 'ecr',
+                config: plugin
+              )
+            ],
+            commands: cmd
           )
         end
       end
