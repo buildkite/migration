@@ -44,13 +44,20 @@ module BK
             agents: translate_agents(step.slice('size', 'runs-on')),
             timeout_in_minutes: step.delete('max-time')
           )
-          cmd >> translate_conditional(step.fetch('condition', {}))
+          pre_keys(step).each { |k| cmd >> k }
+          post_keys(step).each { |k| cmd << k }
 
-          other_keys(step).each { |k| cmd << k }
           cmd
         end
 
-        def other_keys(step)
+        def pre_keys(step)
+          [
+            translate_conditional(step.fetch('condition', {})),
+            translate_oidc(step.fetch('oidc', false))
+          ]
+        end
+
+        def post_keys(step)
           [
             translate_image(step.delete('image')),
             untranslatable(step),
@@ -84,6 +91,15 @@ module BK
               '# IMPORTANT: artifacts are not automatically downloaded in future steps'
             ]
           )
+        end
+
+        def translate_oidc(enabled)
+          return [] if enabled.nil? || !enabled
+
+          [
+            'BITBUCKET_STEP_OIDC_TOKEN="$(buildkite-agent oidc request-token)"',
+            'export BITBUCKET_STEP_OIDC_TOKEN'
+          ]
         end
 
         def translate_clone(opts)
