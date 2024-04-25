@@ -2,6 +2,7 @@
 
 require_relative '../../pipeline/step'
 require_relative '../../pipeline/plugin'
+require_relative 'caches'
 require_relative 'image'
 
 module BK
@@ -23,6 +24,8 @@ module BK
         end
 
         def translator(conf, *, defaults: {}, **)
+          load_caches!
+
           base = base_step(defaults.merge(conf['step']))
 
           if conf['step'].fetch('trigger', 'automatic') == 'manual'
@@ -62,7 +65,8 @@ module BK
             translate_image(step.delete('image')),
             untranslatable(step),
             translate_artifacts(step.delete('artifacts')),
-            translate_clone(step.fetch('clone', {}))
+            translate_clone(step.fetch('clone', {})),
+            translate_caches(step.fetch('caches', []))
           ]
         end
 
