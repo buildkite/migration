@@ -42,7 +42,6 @@ module BK
             label: step.fetch('name', 'Script step'),
             commands: translate_scripts(Array(step['script'])),
             agents: translate_agents(step.slice('size', 'runs-on')),
-            artifact_paths: translate_artifacts(step.delete('artifacts')),
             timeout_in_minutes: step.delete('max-time')
           )
 
@@ -54,6 +53,7 @@ module BK
           [
             translate_image(step.delete('image')),
             untranslatable(step),
+            translate_artifacts(step.delete('artifacts')),
             translate_clone(step.fetch('clone', {}))
           ]
         end
@@ -76,7 +76,7 @@ module BK
 
           normalized = conf.is_a?(Array) ? conf : conf['paths']
 
-          BK::Compat::CommandStep(
+          BK::Compat::CommandStep.new(
             artifact_paths: normalized,
             commands: [
               '# IMPORTANT: artifacts are not automatically downloaded in future steps'
