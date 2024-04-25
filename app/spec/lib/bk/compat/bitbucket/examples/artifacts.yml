@@ -1,0 +1,44 @@
+# from https://support.atlassian.com/bitbucket-cloud/docs/use-artifacts-in-steps/#Use-artifacts
+pipelines:
+  default:
+    - step:
+        name: Build and test
+        image: node:10.15.0
+        caches:
+          - node
+        script:
+          - npm install
+          - npm test
+          - npm run build
+        artifacts: # defining the artifacts to be passed to each future step.
+          - dist/**
+          - reports/*.txt
+    - step:
+        name: Integration test
+        image: node:10.15.0
+        caches:
+          - node
+        services:
+          - postgres
+        script:
+        # using one of the artifacts from the previous step
+          - cat reports/tests.txt
+          - npm run integration-test
+    - step:
+        name: Deploy to beanstalk
+        image: python:3.5.1
+        script:
+          - python deploy-to-beanstalk.py
+    - step:
+        name: Display success message
+        artifacts:
+          download: false # do not download artifacts in this step
+          paths: # defining artifacts to be passed to each future step
+            - success.txt
+        script:
+          - echo "Deployment successful!" > success.txt
+
+definitions:
+  services:
+    postgres:
+      image: postgres:9.6.4
