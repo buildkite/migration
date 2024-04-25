@@ -21,5 +21,5 @@ steps:
     - go test tests/* -v 2>&1 | go-junit-report > test-reports/report.xml
     plugins:
     - docker#v5.10.0:
-        image: golang:1.21
+        image: golang:1.22
     label: Test
