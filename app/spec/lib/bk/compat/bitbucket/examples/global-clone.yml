@@ -1,0 +1,25 @@
+clone:
+  sparse-checkout:
+    patterns:
+      - path1/*
+      - path2
+
+pipelines:
+  default:
+    - step:
+        name: simple
+        script:
+          - echo 'simple'
+    - step:
+        name: no clone
+        clone:
+          enabled: false
+        script:
+          - echo 'no cloning'
+    - step:
+        name: no sparse
+        clone:
+          sparse-checkout:
+            enabled: false
+        script:
+          - echo 'no sparse'
