@@ -18,7 +18,7 @@ module BK
             'maven' => cache_maven,
             'node' => cache_node,
             'pip' => cache_pip,
-            'sbp' => cache_sbt
+            'sbt' => cache_sbt
           }
         end
 
@@ -53,7 +53,7 @@ module BK
         end
 
         def cache_ivy2
-          file_plugin('build.sbt', '~/.ivy2/cache')
+          file_plugin('ivy.xml', '~/.ivy2/cache')
         end
 
         def cache_maven
