@@ -1,0 +1,108 @@
+---
+steps:
+- group: "~"
+  key: group1
+  steps:
+  - commands:
+    - echo 'nothing to see here'
+    label: no services
+  - commands:
+    - "# to user services, add the following composefile to your repository"
+    - "# and add the image used in the step as `app`"
+    - |-
+      cat > compose.yaml << EOF
+      ---
+      services:
+        app:
+          depends_on:
+          - simple
+          - mysql
+          - redis
+        simple:
+          image: bash:latest
+        mysql:
+          image: mysql:5.7
+          environment:
+          - MYSQL_DATABASE=my-db
+          - MYSQL_ROOT_PASSWORD=$password
+        redis:
+          image: redis:3.2
+          resources:
+            limits:
+              memory: 128M
+
+      EOF
+    - echo 'should be able to connect to MySQL'
+    plugins:
+    - docker-compose#v5.0.0: &1
+        run: app
+    agents:
+      executor_type: docker_compose
+    label: just the db
+  - commands:
+    - "# to user services, add the following composefile to your repository"
+    - "# and add the image used in the step as `app`"
+    - |-
+      cat > compose.yaml << EOF
+      ---
+      services:
+        app:
+          depends_on:
+          - simple
+          - mysql
+          - redis
+        simple:
+          image: bash:latest
+        mysql:
+          image: mysql:5.7
+          environment:
+          - MYSQL_DATABASE=my-db
+          - MYSQL_ROOT_PASSWORD=$password
+        redis:
+          image: redis:3.2
+          resources:
+            limits:
+              memory: 128M
+
+      EOF
+    - echo 'should be able to connect to MySQL'
+    - echo 'should be able to connect to redis'
+    plugins:
+    - docker-compose#v5.0.0: *1
+    agents:
+      executor_type: docker_compose
+    label: just redis
+  - commands:
+    - "# to user services, add the following composefile to your repository"
+    - "# and add the image used in the step as `app`"
+    - |-
+      cat > compose.yaml << EOF
+      ---
+      services:
+        app:
+          depends_on:
+          - simple
+          - mysql
+          - redis
+        simple:
+          image: bash:latest
+        mysql:
+          image: mysql:5.7
+          environment:
+          - MYSQL_DATABASE=my-db
+          - MYSQL_ROOT_PASSWORD=$password
+        redis:
+          image: redis:3.2
+          resources:
+            limits:
+              memory: 128M
+
+      EOF
+    - echo 'should be able to connect to MySQL'
+    - echo 'should be able to connect to redis'
+    - echo 'should be able to connect to MySQL'
+    plugins:
+    - docker-compose#v5.0.0: *1
+    agents:
+      executor_type: docker_compose
+    label: all of them

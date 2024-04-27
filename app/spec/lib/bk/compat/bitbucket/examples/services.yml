@@ -1,0 +1,39 @@
+definitions:
+  services:
+    simple:
+      image: bash:latest
+    mysql:
+      image: mysql:5.7
+      variables:
+        MYSQL_DATABASE: my-db  
+        MYSQL_ROOT_PASSWORD: $password
+    redis:
+      image: redis:3.2
+      memory: 128
+
+pipelines:
+  default:
+    - step:
+        name: no services
+        script:
+          - echo 'nothing to see here'
+    - step:
+        name: just the db
+        services:
+          - mysql
+        script:
+          - echo 'should be able to connect to MySQL'
+    - step:
+        name: just redis
+        services:
+          - redis
+        script:
+          - echo 'should be able to connect to redis'
+    - step:
+        name: all of them
+        services:
+          - simple
+          - redis
+          - mysql
+        script:
+          - echo 'should be able to connect to MySQL'
