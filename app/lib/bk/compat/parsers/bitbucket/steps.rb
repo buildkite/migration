@@ -2,8 +2,10 @@
 
 require_relative '../../pipeline/step'
 require_relative '../../pipeline/plugin'
+
 require_relative 'caches'
 require_relative 'image'
+require_relative 'services'
 
 module BK
   module Compat
@@ -12,6 +14,8 @@ module BK
       class Step
         def initialize(register:, definitions: {})
           load_caches!(definitions.fetch('caches', nil))
+          load_services!(definitions.fetch('services', nil))
+
           register.call(
             method(:matcher),
             method(:translator)
@@ -55,7 +59,8 @@ module BK
         def pre_keys(step)
           [
             translate_conditional(step.fetch('condition', {})),
-            translate_oidc(step.fetch('oidc', false))
+            translate_oidc(step.fetch('oidc', false)),
+            translate_services(step.fetch('services', []))
           ]
         end
 
