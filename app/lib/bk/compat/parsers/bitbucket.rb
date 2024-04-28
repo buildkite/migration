@@ -5,6 +5,7 @@ require_relative '../pipeline'
 require_relative '../pipeline/step'
 
 require_relative 'bitbucket/import'
+require_relative 'bitbucket/stages'
 require_relative 'bitbucket/steps'
 require_relative 'bitbucket/variables'
 
