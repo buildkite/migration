@@ -1,0 +1,36 @@
+---
+steps:
+- group: "~"
+  key: group1
+  steps:
+  - artifact_paths:
+    - dist/**
+    - reports/*.txt
+    commands:
+    - npm install
+    - npm test
+    - npm run build
+    - "# IMPORTANT: artifacts are not automatically downloaded in future steps"
+    plugins:
+    - docker#v5.10.0:
+        image: node:10.15.0
+    label: Build and test
+  - commands:
+    - cat reports/tests.txt
+    - npm run integration-test
+    plugins:
+    - docker#v5.10.0:
+        image: node:10.15.0
+    label: Integration test
+  - commands:
+    - python deploy-to-beanstalk.py
+    plugins:
+    - docker#v5.10.0:
+        image: python:3.5.1
+    label: Deploy to beanstalk
+  - artifact_paths:
+    - success.txt
+    commands:
+    - echo "Deployment successful!" > success.txt
+    - "# IMPORTANT: artifacts are not automatically downloaded in future steps"
+    label: Display success message

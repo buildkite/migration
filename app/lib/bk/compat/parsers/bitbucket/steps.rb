@@ -53,6 +53,7 @@ module BK
           [
             translate_image(step.delete('image')),
             untranslatable(step),
+            translate_artifacts(step.delete('artifacts')),
             translate_clone(step.fetch('clone', {}))
           ]
         end
@@ -68,6 +69,19 @@ module BK
           msgs.map do |k, message|
             message if step.include?(k)
           end.compact
+        end
+
+        def translate_artifacts(conf)
+          return [] if conf.nil?
+
+          normalized = conf.is_a?(Array) ? conf : conf['paths']
+
+          BK::Compat::CommandStep.new(
+            artifact_paths: normalized,
+            commands: [
+              '# IMPORTANT: artifacts are not automatically downloaded in future steps'
+            ]
+          )
         end
 
         def translate_clone(opts)
