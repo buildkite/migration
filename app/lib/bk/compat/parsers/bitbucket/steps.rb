@@ -30,7 +30,7 @@ module BK
         end
 
         def translator(conf, *, defaults: {}, **)
-          base = base_step(defaults.merge(conf['step']))
+          base = [base_step(defaults.merge(conf['step'])), BK::Compat::WaitStep.new]
 
           BK::Compat::BitBucket.translate_trigger(conf['step'].fetch('trigger', 'automatic'), base)
         end

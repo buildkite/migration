@@ -1,11 +1,11 @@
 ---
 steps:
-- group: "~"
-  key: group1
+- group: default
   steps:
   - commands:
     - echo 'nothing to see here'
     label: no services
+  - wait
   - commands:
     - "# to user services, add the following composefile to your repository"
     - "# and add the image used in the step as `app`"
@@ -39,6 +39,7 @@ steps:
     agents:
       executor_type: docker_compose
     label: just the db
+  - wait
   - commands:
     - "# to user services, add the following composefile to your repository"
     - "# and add the image used in the step as `app`"
@@ -72,6 +73,7 @@ steps:
     agents:
       executor_type: docker_compose
     label: just redis
+  - wait
   - commands:
     - "# to user services, add the following composefile to your repository"
     - "# and add the image used in the step as `app`"

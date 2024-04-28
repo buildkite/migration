@@ -1,13 +1,13 @@
 ---
 steps:
-- group: "~"
-  key: group1
+- group: default
   steps:
   - group: simple stage
     steps:
     - commands:
       - sh ./build-app.sh
       label: Build app
+    - wait
     - commands:
       - sh ./run-tests.sh
       label: Run unit tests
@@ -23,6 +23,7 @@ steps:
     - commands:
       - sh ./build-app.sh
       label: Build app
+    - wait
     - commands:
       - sh ./run-tests.sh
       label: Run unit tests
@@ -36,6 +37,7 @@ steps:
       depends_on:
       - execute-5f4b7c80dda894d4254d2c5547b1c7dc5dc16891
       label: Build app
+    - wait
     - commands:
       - sh ./run-tests.sh
       depends_on:

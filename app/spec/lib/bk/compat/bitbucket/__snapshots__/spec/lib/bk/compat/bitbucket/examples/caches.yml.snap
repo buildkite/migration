@@ -1,7 +1,6 @@
 ---
 steps:
-- group: "~"
-  key: group1
+- group: default
   steps:
   - commands:
     - docker version
@@ -10,6 +9,7 @@ steps:
     - "# Use BUILDKIT_INLINE_CACHE when building/pushing images and then --cache-from
       IMAGE"
     label: cache docker
+  - wait
   - commands:
     - composer install
     - "# caching works differently (invalidations have to be explicit)"
@@ -20,6 +20,7 @@ steps:
         save: file
         manifest: composer.json
     label: cache composer
+  - wait
   - commands:
     - dotnet restore
     - "# caching works differently (invalidations have to be explicit)"
@@ -30,6 +31,7 @@ steps:
         save: file
         manifest: packages.config
     label: cache dotnetcore
+  - wait
   - commands:
     - gradle build
     - "# caching works differently (invalidations have to be explicit)"
@@ -40,6 +42,7 @@ steps:
         save: file
         manifest: settings.gradle
     label: cache gradle
+  - wait
   - commands:
     - ant build
     - "# caching works differently (invalidations have to be explicit)"
@@ -50,6 +53,7 @@ steps:
         save: file
         manifest: ivy.xml
     label: cache ivy2
+  - wait
   - commands:
     - mvn -B verify --file pom.xml
     - "# caching works differently (invalidations have to be explicit)"
@@ -60,6 +64,7 @@ steps:
         save: file
         manifest: pom.xml
     label: cache maven
+  - wait
   - commands:
     - npm ci
     - "# caching works differently (invalidations have to be explicit)"
@@ -70,6 +75,7 @@ steps:
         save: file
         manifest: packages.json
     label: cache node
+  - wait
   - commands:
     - pip install -r requirements.txt
     - "# caching works differently (invalidations have to be explicit)"
@@ -80,6 +86,7 @@ steps:
         save: file
         manifest: requirements.txt
     label: cache pip
+  - wait
   - commands:
     - sbt clean compile
     - "# caching works differently (invalidations have to be explicit)"
