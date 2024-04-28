@@ -6,6 +6,11 @@ module BK
   module Compat
     # extending class with some shared code
     class BitBucket
+      def self.step_id(step)
+        # key is unique, but not mandatory so hash the step
+        step.key || Digest::SHA1.hexdigest(step.to_h.to_s)
+      end
+
       def self.translate_conditional(conf)
         return [] if Hash(conf).empty?
 
@@ -22,21 +27,23 @@ module BK
         )
       end
 
-      def self.translate_trigger(trigger, step)
+      def self.translate_trigger(trigger, next_steps)
+        steps = Array(next_steps)
+
         case trigger
         when 'manual'
           # ensure key is unique but deterministic
-          k = step.key || Digest::SHA1.hexdigest(step.to_h.to_s)
+          k = step_id(steps[0])
 
           input = BK::Compat::InputStep.new(
             key: "execute-#{k}",
             prompt: "Execute step #{k}?"
           )
-          step.depends_on = [input.key]
+          steps.each { |s| s.depends_on << input.key }
 
-          [input, step]
+          [input].concat(steps)
         else
-          step
+          steps
         end
       end
     end

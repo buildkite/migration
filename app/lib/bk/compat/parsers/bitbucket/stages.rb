@@ -28,10 +28,10 @@ module BK
           steps = Array(stage['steps']).map { |s| @recursor&.call(s, defaults: defaults) }
           # TODO: this condition step should block all others
           condition = BK::Compat::BitBucket.translate_conditional(stage['condition'])
-          steps[0] = BK::Compat::BitBucket.translate_trigger(stage['trigger'],  steps[0])
+          steps = BK::Compat::BitBucket.translate_trigger(stage['trigger'], steps)
           BK::Compat::GroupStep.new(
             # TODO: make stage names unique
-            key: stage.fetch('name', 'stage1'),
+            label: stage.fetch('name', 'stage1'),
             steps: [condition, steps].flatten
           )
         end
