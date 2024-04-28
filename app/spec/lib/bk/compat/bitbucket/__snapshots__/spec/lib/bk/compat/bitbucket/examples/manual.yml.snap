@@ -6,11 +6,11 @@ steps:
   - commands:
     - echo 'running'
     label: simple
-  - key: execute-complex
-    prompt: Execute step complex?
-    input: execute-complex
+  - key: execute-cad93b8b7bf63eb33ffe9002d9b6932eb155ec3c
+    prompt: Execute step cad93b8b7bf63eb33ffe9002d9b6932eb155ec3c?
+    input: execute-cad93b8b7bf63eb33ffe9002d9b6932eb155ec3c
   - commands:
     - echo 'running'
     depends_on:
-    - execute-complex
+    - execute-cad93b8b7bf63eb33ffe9002d9b6932eb155ec3c
     label: complex
