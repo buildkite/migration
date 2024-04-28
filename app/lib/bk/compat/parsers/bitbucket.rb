@@ -60,7 +60,7 @@ module BK
         conf = @config['pipelines']
 
         # TODO: change group1 to default
-        main_steps = [parse_pipeline('group1', conf['default'], defaults)]
+        main_steps = [parse_pipeline('default', conf['default'], defaults)]
         others = pps.map do |p|
           named_pipelines(conf.fetch(p, {}), defaults)
           # post: method("post_process_#{p}".to_sym)
@@ -82,6 +82,9 @@ module BK
       end
 
       def simplify_group(group)
+        #if ther last step is a wait, remove it
+        group.steps.pop if group.steps.last.is_a?(WaitStep)
+
         # If there ended up being only 1 stage, skip the group and just
         # pull the steps out.
         if group.steps.length == 1
@@ -98,7 +101,7 @@ module BK
         steps = Array(conf).map { |s| translate_step(s, defaults: defaults) }
         simplify_group(
           BK::Compat::GroupStep.new(
-            key: name,
+            label: name,
             steps: steps.flatten
           )
         )
