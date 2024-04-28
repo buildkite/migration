@@ -45,32 +45,50 @@ module BK
       end
 
       def parse
-        # custom is also valid, but not supported just yet
-        pps = %w[branches default pull-requests tags].freeze
+        pps = %w[branches custom pull-requests tags].freeze
         defaults = @config.slice('image', 'clone').merge(@config.fetch('options', {}))
         conf = @config['pipelines']
+
+        # TODO: change group1 to default
+        main_steps = [parse_pipeline('group1', conf['default'], defaults)]
+        others = pps.map do |p|
+          named_pipelines(conf.fetch(p, {}), defaults)
+          # post: method("post_process_#{p}".to_sym)
+        end
+        definitions = named_pipelines(@config.dig('definitions', 'pipelines'), defaults)
         Pipeline.new(
-          steps: pps.map { |p| parse_pipeline(conf[p], defaults) if conf.include?(p) }.compact
+          steps: [main_steps, definitions, others].flatten.compact
         )
       end
 
       private
+
+      def named_pipelines(conf, defaults)
+        return [] if Hash(conf).empty?
+
+        conf.map do |name, steps|
+          parse_pipeline(name, steps, defaults)
+        end
+      end
 
       def simplify_group(group)
         # If there ended up being only 1 stage, skip the group and just
         # pull the steps out.
         if group.steps.length == 1
           group.steps[0].conditional = group.conditional
-          group = group.steps.first
+          return group.steps[0]
+        elsif group.steps.empty?
+          return []
         end
+
         group
       end
 
-      def parse_pipeline(conf, defaults)
+      def parse_pipeline(name, conf, defaults)
         steps = Array(conf).map { |s| translate_step(s, defaults: defaults) }
         simplify_group(
           BK::Compat::GroupStep.new(
-            key: 'group1',
+            key: name,
             steps: steps.flatten
           )
         )
