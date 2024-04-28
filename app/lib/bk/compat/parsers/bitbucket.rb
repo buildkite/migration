@@ -38,6 +38,10 @@ module BK
         @options = options
 
         BK::Compat::BitBucketSteps::Import.new(register: method(:register_translator))
+        BK::Compat::BitBucketSteps::Stages.new(
+          register: method(:register_translator),
+          recursor: method(:translate_step)
+        )
         BK::Compat::BitBucketSteps::Step.new(
           register: method(:register_translator),
           definitions: @config.fetch('definitions', {})
