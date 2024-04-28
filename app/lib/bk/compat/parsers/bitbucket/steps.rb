@@ -32,16 +32,7 @@ module BK
         def translator(conf, *, defaults: {}, **)
           base = base_step(defaults.merge(conf['step']))
 
-          if conf['step'].fetch('trigger', 'automatic') == 'manual'
-            # TODO: ensure this is a valid, deterministic and unique key
-            k = base.key || base.label || 'cmd'
-
-            input = BK::Compat::InputStep.new(key: "execute-#{k}", prompt: "Execute step #{k}?")
-            base.depends_on = [input.key]
-            [input, base]
-          else
-            base
-          end
+          BK::Compat::BitBucket.translate_trigger(conf['step'].fetch('trigger', 'automatic'), base)
         end
 
         def base_step(step)

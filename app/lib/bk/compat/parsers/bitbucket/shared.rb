@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'digest'
+
 module BK
   module Compat
     # extending class with some shared code
@@ -18,6 +20,24 @@ module BK
             'fi'
           ]
         )
+      end
+
+      def self.translate_trigger(trigger, step)
+        case trigger
+        when 'manual'
+          # ensure key is unique but deterministic
+          k = step.key || Digest::SHA1.hexdigest(step.to_h.to_s)
+
+          input = BK::Compat::InputStep.new(
+            key: "execute-#{k}",
+            prompt: "Execute step #{k}?"
+          )
+          step.depends_on = [input.key]
+
+          [input, step]
+        else
+          step
+        end
       end
     end
   end
