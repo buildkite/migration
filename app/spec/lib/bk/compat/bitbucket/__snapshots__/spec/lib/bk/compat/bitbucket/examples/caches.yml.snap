@@ -1,6 +1,7 @@
 ---
 steps:
-- group: default
+- group: "~"
+  key: group1
   steps:
   - commands:
     - docker version
@@ -9,92 +10,88 @@ steps:
     - "# Use BUILDKIT_INLINE_CACHE when building/pushing images and then --cache-from
       IMAGE"
     label: cache docker
-  - wait
   - commands:
     - composer install
     - "# caching works differently (invalidations have to be explicit)"
     plugins:
     - cache:
+        manifest: composer.json
         path: "~/.composer/cache"
         restore: file
         save: file
-        manifest: composer.json
     label: cache composer
-  - wait
   - commands:
     - dotnet restore
     - "# caching works differently (invalidations have to be explicit)"
     plugins:
     - cache:
+        manifest: packages.config
         path: "~/.nuget/packages"
         restore: file
         save: file
-        manifest: packages.config
     label: cache dotnetcore
-  - wait
   - commands:
     - gradle build
     - "# caching works differently (invalidations have to be explicit)"
     plugins:
     - cache:
+        manifest: settings.gradle
         path: "~/.gradle/caches"
         restore: file
         save: file
-        manifest: settings.gradle
     label: cache gradle
-  - wait
   - commands:
     - ant build
     - "# caching works differently (invalidations have to be explicit)"
     plugins:
-    - cache: &1
+    - cache:
+        manifest: ivy.xml
         path: "~/.ivy2/cache"
         restore: file
         save: file
-        manifest: ivy.xml
     label: cache ivy2
-  - wait
   - commands:
     - mvn -B verify --file pom.xml
     - "# caching works differently (invalidations have to be explicit)"
     plugins:
     - cache:
+        manifest: pom.xml
         path: "~/.m2/repository"
         restore: file
         save: file
-        manifest: pom.xml
     label: cache maven
-  - wait
   - commands:
     - npm ci
     - "# caching works differently (invalidations have to be explicit)"
     plugins:
     - cache:
+        manifest: packages.json
         path: node_modules
         restore: file
         save: file
-        manifest: packages.json
     label: cache node
-  - wait
   - commands:
     - pip install -r requirements.txt
     - "# caching works differently (invalidations have to be explicit)"
     plugins:
     - cache:
+        manifest: requirements.txt
         path: "~/.cache/pip"
         restore: file
         save: file
-        manifest: requirements.txt
     label: cache pip
-  - wait
   - commands:
     - sbt clean compile
     - "# caching works differently (invalidations have to be explicit)"
     plugins:
     - cache:
+        manifest: build.sbt
         path: "~/.sbt"
         restore: file
         save: file
-        manifest: build.sbt
-    - cache: *1
+    - cache:
+        manifest: ivy.xml
+        path: "~/.ivy2/cache"
+        restore: file
+        save: file
     label: cache sbt
