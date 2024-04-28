@@ -5,6 +5,7 @@ require_relative '../pipeline'
 require_relative '../pipeline/step'
 
 require_relative 'bitbucket/import'
+require_relative 'bitbucket/parallel'
 require_relative 'bitbucket/stages'
 require_relative 'bitbucket/steps'
 require_relative 'bitbucket/variables'
@@ -38,6 +39,10 @@ module BK
         @options = options
 
         BK::Compat::BitBucketSteps::Import.new(register: method(:register_translator))
+        BK::Compat::BitBucketSteps::Parallel.new(
+          register: method(:register_translator),
+          recursor: method(:translate_step)
+        )
         BK::Compat::BitBucketSteps::Stages.new(
           register: method(:register_translator),
           recursor: method(:translate_step)
