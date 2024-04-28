@@ -27,7 +27,8 @@ module BK
           steps = Array(stage['steps']).map { |s| @recursor&.call(s, defaults: defaults) }
           # TODO: this condition step should block all others
           condition = BK::Compat::BitBucket.translate_conditional(stage['condition'])
-          steps = BK::Compat::BitBucket.translate_trigger(stage['trigger'], steps)
+          steps = BK::Compat::BitBucket.translate_trigger(stage['trigger'], steps.flatten)
+          steps.pop if steps.last.is_a?(BK::Compat::WaitStep)
           BK::Compat::GroupStep.new(
             # TODO: make stage names unique
             label: stage.fetch('name', 'stage1'),

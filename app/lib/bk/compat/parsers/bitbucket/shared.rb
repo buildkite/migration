@@ -8,7 +8,7 @@ module BK
     class BitBucket
       def self.step_id(step)
         # key is unique, but not mandatory so hash the step
-        step.key || Digest::SHA1.hexdigest(step.to_h.to_s)
+        [step].flatten[0].key || Digest::SHA1.hexdigest(step.to_h.to_s)
       end
 
       def self.translate_conditional(conf)
@@ -39,7 +39,7 @@ module BK
             key: "execute-#{k}",
             prompt: "Execute step #{k}?"
           )
-          steps.each { |s| s.depends_on << input.key }
+          steps.each { |s| s.depends_on << input.key unless s.is_a?(WaitStep) }
 
           [input].concat(steps)
         else
