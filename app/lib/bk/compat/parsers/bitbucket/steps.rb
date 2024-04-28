@@ -2,14 +2,21 @@
 
 require_relative '../../pipeline/step'
 require_relative '../../pipeline/plugin'
+
+require_relative 'caches'
 require_relative 'image'
+require_relative 'services'
+require_relative 'shared'
 
 module BK
   module Compat
     module BitBucketSteps
       # Implementation of native step translation
       class Step
-        def initialize(register:)
+        def initialize(register:, definitions: {})
+          load_caches!(definitions.fetch('caches', nil))
+          load_services!(definitions.fetch('services', nil))
+
           register.call(
             method(:matcher),
             method(:translator)
@@ -23,18 +30,9 @@ module BK
         end
 
         def translator(conf, *, defaults: {}, **)
-          base = base_step(defaults.merge(conf['step']))
+          base = [base_step(defaults.merge(conf['step'])), BK::Compat::WaitStep.new]
 
-          if conf['step'].fetch('trigger', 'automatic') == 'manual'
-            # TODO: ensure this is a valid, deterministic and unique key
-            k = base.key || base.label || 'cmd'
-
-            input = BK::Compat::InputStep.new(key: "execute-#{k}", prompt: "Execute step #{k}?")
-            base.depends_on = [input.key]
-            [input, base]
-          else
-            base
-          end
+          BK::Compat::BitBucket.translate_trigger(conf['step'].fetch('trigger', 'automatic'), base)
         end
 
         def base_step(step)
@@ -44,18 +42,27 @@ module BK
             agents: translate_agents(step.slice('size', 'runs-on')),
             timeout_in_minutes: step.delete('max-time')
           )
-          cmd >> translate_conditional(step.fetch('condition', {}))
+          pre_keys(step).each { |k| cmd >> k }
+          post_keys(step).each { |k| cmd << k }
 
-          other_keys(step).each { |k| cmd << k }
           cmd
         end
 
-        def other_keys(step)
+        def pre_keys(step)
+          [
+            BK::Compat::BitBucket.translate_conditional(step.fetch('condition', {})),
+            translate_oidc(step.fetch('oidc', false)),
+            translate_services(step.fetch('services', []))
+          ]
+        end
+
+        def post_keys(step)
           [
             translate_image(step.delete('image')),
             untranslatable(step),
             translate_artifacts(step.delete('artifacts')),
-            translate_clone(step.fetch('clone', {}))
+            translate_clone(step.fetch('clone', {})),
+            translate_caches(step.fetch('caches', []))
           ]
         end
 
@@ -86,6 +93,15 @@ module BK
           )
         end
 
+        def translate_oidc(enabled)
+          return [] if enabled.nil? || !enabled
+
+          [
+            'BITBUCKET_STEP_OIDC_TOKEN="$(buildkite-agent oidc request-token)"',
+            'export BITBUCKET_STEP_OIDC_TOKEN'
+          ]
+        end
+
         def translate_clone(opts)
           sparse_checkout = opts.delete('sparse-checkout')
           enabled = opts.delete('enabled')
@@ -98,22 +114,6 @@ module BK
             cmd.env['BUILKITE_REPO'] = '' unless enabled.nil? || enabled
             cmd << sparse_checkout_plugin(sparse_checkout)
           end
-        end
-
-        def translate_conditional(conf)
-          return [] if conf.empty?
-
-          globs = conf['changesets']['includePaths'].map { |p| "'#{p}'" }
-          diff_cmd = 'git diff --exit-code --name-only HEAD "${BUILDKITE_PULL_REQUEST_BASE_BRANCH:HEAD^}"'
-
-          BK::Compat::CommandStep.new(
-            commands: [
-              "if #{diff_cmd} -- #{globs.join(' ')}; then",
-              "  echo '+++ :warning: no changes found in #{globs.join(' ')}, exiting step as OK",
-              '  exit 0',
-              'fi'
-            ]
-          )
         end
 
         def sparse_checkout_plugin(conf)

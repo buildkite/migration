@@ -1,0 +1,70 @@
+---
+steps:
+- group: default
+  steps:
+  - commands:
+    - echo 'no file cache'
+    - "# caching works differently (invalidations have to be explicit)"
+    plugins:
+    - cache: &2
+        path: cached/folder
+        restore: pipeline
+        save: pipeline
+    label: no file cache
+  - wait
+  - commands:
+    - echo 'single file cache'
+    - "# caching works differently (invalidations have to be explicit)"
+    plugins:
+    - cache: &1
+        path: other/folder
+        restore: file
+        save: file
+        manifest: manifest.file
+    label: single file cache
+  - wait
+  - commands:
+    - echo 'multiple files cache'
+    - "# caching works differently (invalidations have to be explicit)"
+    plugins:
+    - cache:
+        path: third/folder
+        restore: file
+        save: file
+        manifest: other.manifest
+    - cache:
+        path: third/folder
+        restore: file
+        save: file
+        manifest: glob/*
+    label: multiple files cache
+  - wait
+  - commands:
+    - echo 'multiple caches'
+    - "# caching works differently (invalidations have to be explicit)"
+    plugins:
+    - cache: *1
+    - cache: *2
+    label: multiple caches
+  - wait
+  - commands:
+    - echo 'global and docker caches'
+    - "# caching works differently (invalidations have to be explicit)"
+    - "# docker layer caching is best implemented by docker"
+    - "# Use BUILDKIT_INLINE_CACHE when building/pushing images and then --cache-from
+      IMAGE"
+    plugins:
+    - cache: *2
+    label: global and docker caches
+  - wait
+  - commands:
+    - echo 'global and node caches'
+    - "# caching works differently (invalidations have to be explicit)"
+    plugins:
+    - cache:
+        path: node_modules
+        restore: file
+        save: file
+        manifest: packages.json
+    - cache: *2
+    label: global and builtin caches

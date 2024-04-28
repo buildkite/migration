@@ -1,0 +1,8 @@
+# source: https://support.atlassian.com/bitbucket-cloud/docs/pipeline-start-conditions/#Custom--manual--pipelines
+
+pipelines:
+  custom: # Pipelines that are triggered manually
+    sonar: # The name that is displayed in the list in the Bitbucket Cloud GUI
+      - step:
+          script:
+            - echo "Manual triggers for Sonar are awesome!"
