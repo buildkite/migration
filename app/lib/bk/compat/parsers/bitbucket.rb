@@ -3,8 +3,10 @@
 require_relative '../translator'
 require_relative '../pipeline'
 require_relative '../pipeline/step'
-require_relative 'bitbucket/steps'
+
 require_relative 'bitbucket/import'
+require_relative 'bitbucket/steps'
+require_relative 'bitbucket/variables'
 
 module BK
   module Compat
@@ -34,11 +36,12 @@ module BK
         @config = YAML.safe_load(text, aliases: true)
         @options = options
 
+        BK::Compat::BitBucketSteps::Import.new(register: method(:register_translator))
         BK::Compat::BitBucketSteps::Step.new(
           register: method(:register_translator),
           definitions: @config.fetch('definitions', {})
         )
-        BK::Compat::BitBucketSteps::Import.new(register: method(:register_translator))
+        BK::Compat::BitBucketSteps::Variables.new(register: method(:register_translator))
       end
 
       def parse
