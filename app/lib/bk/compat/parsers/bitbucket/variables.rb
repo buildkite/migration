@@ -29,11 +29,11 @@ module BK
                 'key' => var['name'],
                 'default' => var.delete('default')
               }.tap do |h|
-                h['options'] = var.fetch('allowed-values', []).map { |x| { 'label' => x, 'value' => x } }
-                type = h['options'].empty? ? 'text' : 'select'
+                h['options'] = var['allowed-values']&.map { |x| { 'label' => x, 'value' => x } }
+                type = var.fetch('allowed-values', []).empty? ? 'text' : 'select'
 
-                h[type] = var.fetch('description', '')
-              end
+                h[type] = var.fetch('description', h['key'])
+              end.compact
             end
           )
         end
