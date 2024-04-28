@@ -41,7 +41,7 @@ module BK
       def parse
         # custom is also valid, but not supported just yet
         pps = %w[branches default pull-requests tags].freeze
-        defaults = @config.slice('image', 'clone')
+        defaults = @config.slice('image', 'clone').merge(@config.fetch('options', {}))
         conf = @config['pipelines']
         Pipeline.new(
           steps: pps.map { |p| parse_pipeline(conf[p], defaults) if conf.include?(p) }.compact
