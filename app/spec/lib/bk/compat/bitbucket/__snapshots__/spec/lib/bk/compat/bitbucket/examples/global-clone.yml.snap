@@ -1,7 +1,6 @@
 ---
 steps:
-- group: "~"
-  key: group1
+- group: default
   steps:
   - commands:
     - echo 'simple'
@@ -14,6 +13,7 @@ steps:
         - path2
         no-cone: false
     label: simple
+  - wait
   - commands:
     - echo 'no cloning'
     - "# repository interactions (clone options) should be configured in the agent
@@ -21,6 +21,7 @@ steps:
     env:
       BUILKITE_REPO: ''
     label: no clone
+  - wait
   - commands:
     - echo 'no sparse'
     - "# repository interactions (clone options) should be configured in the agent
