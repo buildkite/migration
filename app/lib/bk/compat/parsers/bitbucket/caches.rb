@@ -6,9 +6,9 @@ require_relative '../../pipeline/plugin'
 module BK
   module Compat
     module BitBucketSteps
-      # Implementation of image-related key translations
+      # Extend Step translation with caching support
       class Step
-        def load_caches!
+        def load_caches!(global_caches)
           @caches = {
             'docker' => cache_docker,
             'composer' => cache_composer,
@@ -20,6 +20,29 @@ module BK
             'pip' => cache_pip,
             'sbt' => cache_sbt
           }
+          Array(global_caches).each { |c| add_cache!(c) }
+        end
+
+        def add_cache!(cache)
+          # assume it is a hash and has a single element
+          return unless cache.is_a?(Hash) || cache.length != 1
+
+          cache.each do |name, conf|
+            # ensure files is an array
+            files = Array(conf.dig('key', 'files'))
+
+            @caches[name] = file_mapping(files, conf['path'])
+          end
+        end
+
+        def file_mapping(files, path)
+          if files.empty?
+            file_plugin(nil, path)
+          else
+            BK::Compat::CommandStep.new(
+              plugins: files.map { |f| file_plugin(f, path) }
+            )
+          end
         end
 
         def translate_caches(caches)
@@ -28,7 +51,7 @@ module BK
           BK::Compat::CommandStep.new.tap do |cmd|
             cmd.add_commands('# caching works differently (invalidations have to be explicit)')
             caches.map do |c|
-              cmd << @caches&.fetch(c, ["# cache #{c} currently not supported"])
+              cmd << @caches.fetch(c, ["# cache #{c} currently not supported"])
             end
           end
         end
@@ -73,14 +96,18 @@ module BK
         end
 
         def file_plugin(file, path)
+          level = file.nil? ? 'pipeline' : 'file'
+          conf = {
+            path: path,
+            restore: level,
+            save: level
+          }
+
+          conf[:manifest] = file unless file.nil?
+
           BK::Compat::Plugin.new(
             name: 'cache',
-            config: {
-              manifest: file,
-              path: path,
-              restore: 'file',
-              save: 'file'
-            }
+            config: conf
           )
         end
       end

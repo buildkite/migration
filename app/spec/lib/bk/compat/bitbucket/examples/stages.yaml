@@ -1,0 +1,43 @@
+pipelines:
+   default:
+    - stage:
+        name: simple stage
+        steps:
+          - step:
+              name: Build app
+              script:
+                - sh ./build-app.sh
+          - step:
+              name: Run unit tests
+              script:
+                - sh ./run-tests.sh
+    - stage:
+        name: conditional stage
+        condition:
+          changesets:
+            includePaths:
+              # only xml files directly under path1 directory
+              - "path1/*.xml"
+              # any changes in deeply nested directories under path2
+              - "path2/**"
+        steps:
+          - step:
+              name: Build app
+              script:
+                - sh ./build-app.sh
+          - step:
+              name: Run unit tests
+              script:
+                - sh ./run-tests.sh
+    - stage:
+        name: manual stage
+        trigger: manual
+        steps:
+          - step:
+              name: Build app
+              script:
+                - sh ./build-app.sh
+          - step:
+              name: Run unit tests
+              script:
+                - sh ./run-tests.sh
