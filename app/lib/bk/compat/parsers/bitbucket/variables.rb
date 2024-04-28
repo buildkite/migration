@@ -22,6 +22,9 @@ module BK
         end
 
         def translator(conf, *, **)
+          # TODO: only parse variables on custom pipelines
+          # TODO: variables apparently are only one per pipeline
+          # TODO: replace variables defined with metadata gets
           BK::Compat::InputStep.new(
             key: 'custom-vars',
             fields: conf['variables'].map do |var|
