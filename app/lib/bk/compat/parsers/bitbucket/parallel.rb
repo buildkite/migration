@@ -30,7 +30,7 @@ module BK
 
           steps = Array(parallel['steps']).map { |s| @recursor&.call(s, defaults: defaults) }
           # by default steps will have Wait inbetween
-          steps = steps.flatten.select { |s| !s.is_a?(WaitStep)}
+          steps = steps.flatten.reject { |s| s.is_a?(WaitStep) }
           BK::Compat::GroupStep.new(
             # TODO: make stage names unique
             label: "parallel-#{BK::Compat::BitBucket.step_id(steps[0])}",

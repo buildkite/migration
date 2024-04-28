@@ -59,7 +59,6 @@ module BK
         defaults = @config.slice('image', 'clone').merge(@config.fetch('options', {}))
         conf = @config['pipelines']
 
-        # TODO: change group1 to default
         main_steps = [parse_pipeline('default', conf['default'], defaults)]
         others = pps.map do |p|
           named_pipelines(conf.fetch(p, {}), defaults)
@@ -82,7 +81,7 @@ module BK
       end
 
       def simplify_group(group)
-        #if ther last step is a wait, remove it
+        # if ther last step is a wait, remove it
         group.steps.pop if group.steps.last.is_a?(WaitStep)
 
         # If there ended up being only 1 stage, skip the group and just

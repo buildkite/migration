@@ -23,17 +23,22 @@ module BK
 
         def translator(conf, *, defaults: {}, **)
           stage = conf['stage']
-          # TODO: these steps can not have conditions
-          steps = Array(stage['steps']).map { |s| @recursor&.call(s, defaults: defaults) }
+          steps = translate_steps(stage, defaults)
           # TODO: this condition step should block all others
           condition = BK::Compat::BitBucket.translate_conditional(stage['condition'])
-          steps = BK::Compat::BitBucket.translate_trigger(stage['trigger'], steps.flatten)
-          steps.pop if steps.last.is_a?(BK::Compat::WaitStep)
           BK::Compat::GroupStep.new(
             # TODO: make stage names unique
             label: stage.fetch('name', 'stage1'),
             steps: [condition, steps].flatten
           )
+        end
+
+        def translate_steps(stage, defaults)
+          # TODO: these steps can not have conditions
+          steps = Array(stage['steps']).map { |s| @recursor&.call(s, defaults: defaults) }
+          steps = BK::Compat::BitBucket.translate_trigger(stage['trigger'], steps.flatten)
+          steps.pop if steps.last.is_a?(BK::Compat::WaitStep)
+          steps
         end
       end
     end
