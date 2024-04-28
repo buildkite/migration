@@ -1,0 +1,19 @@
+---
+steps:
+- group: "~"
+  key: group1
+  steps:
+  - group: parallel-7745d6f42f7f67b5b911003efa6bdd7a809f392c
+    steps:
+    - commands:
+      - "./build.sh"
+      label: Build
+  - group: parallel-d0d6955d5365cdcbbd5215f583dbea2be5cbff7e
+    steps:
+    - commands:
+      - "./integration-tests.sh --batch 1"
+      label: Integration 1
+    - commands:
+      - "./upload-metadata.sh"
+      - "# `fail-fast` has no direct translation - consider using `soft_fail`/`cancel_on_build_failing`."
+      label: Upload metadata
