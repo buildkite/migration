@@ -44,6 +44,7 @@ module BK
             agents: translate_agents(step.slice('size', 'runs-on')),
             timeout_in_minutes: step.delete('max-time')
           )
+          cmd >> translate_conditional(step.fetch('condition', {}))
 
           other_keys(step).each { |k| cmd << k }
           cmd
@@ -96,6 +97,22 @@ module BK
             cmd.env['BUILKITE_REPO'] = '' unless enabled.nil? || enabled
             cmd << sparse_checkout_plugin(sparse_checkout)
           end
+        end
+
+        def translate_conditional(conf)
+          return [] if conf.empty?
+
+          globs = conf['changesets']['includePaths'].map { |p| "'#{p}'" }
+          diff_cmd = 'git diff --exit-code --name-only HEAD "${BUILDKITE_PULL_REQUEST_BASE_BRANCH:HEAD^}"'
+
+          BK::Compat::CommandStep.new(
+            commands: [
+              "if #{diff_cmd} -- #{globs.join(' ')}; then",
+              "  echo '+++ :warning: no changes found in #{globs.join(' ')}, exiting step as OK",
+              '  exit 0',
+              'fi'
+            ]
+          )
         end
 
         def sparse_checkout_plugin(conf)
