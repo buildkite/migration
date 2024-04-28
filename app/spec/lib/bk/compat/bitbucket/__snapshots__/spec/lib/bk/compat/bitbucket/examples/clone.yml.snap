@@ -1,7 +1,6 @@
 ---
 steps:
-- group: "~"
-  key: group1
+- group: default
   steps:
   - commands:
     - echo 'no cloning'
@@ -10,41 +9,49 @@ steps:
     env:
       BUILKITE_REPO: ''
     label: no clone
+  - wait
   - commands:
     - echo 'depth'
     - "# repository interactions (clone options) should be configured in the agent
       itself"
     label: shallow depth
+  - wait
   - commands:
     - echo 'full depth'
     - "# repository interactions (clone options) should be configured in the agent
       itself"
     label: full depth
+  - wait
   - commands:
     - echo 'filter'
     - "# repository interactions (clone options) should be configured in the agent
       itself"
     label: filter
+  - wait
   - commands:
     - echo 'no cloning'
     - "# repository interactions (clone options) should be configured in the agent
       itself"
     label: lfs
+  - wait
   - commands:
     - echo 'ssl'
     - "# repository interactions (clone options) should be configured in the agent
       itself"
     label: ssl
+  - wait
   - commands:
     - echo 'strategy'
     - "# repository interactions (clone options) should be configured in the agent
       itself"
     label: strategy
+  - wait
   - commands:
     - echo 'tags'
     - "# repository interactions (clone options) should be configured in the agent
       itself"
     label: tags
+  - wait
   - commands:
     - echo 'sparse'
     - "# repository interactions (clone options) should be configured in the agent
@@ -56,6 +63,7 @@ steps:
         - path2
         no-cone: false
     label: sparse
+  - wait
   - commands:
     - echo 'sparse no-cone'
     - "# repository interactions (clone options) should be configured in the agent
@@ -67,6 +75,7 @@ steps:
         - path4
         no-cone: true
     label: sparse no-cone
+  - wait
   - commands:
     - echo 'sparse disabled'
     - "# repository interactions (clone options) should be configured in the agent

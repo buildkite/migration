@@ -1,0 +1,22 @@
+pipelines:
+  default:
+    - parallel:  # simple direct translation
+      - step:
+          name: Build
+          script:
+            - ./build.sh
+    - parallel:
+        # these option alows to force stop all running steps if any step fails
+        fail-fast: true
+        steps:
+          - step:
+              name: Integration 1
+              script:
+                - ./integration-tests.sh --batch 1
+          - step:
+              # option can be disabled for a step
+              # and its failure won't stop other steps in a group
+              fail-fast: false
+              name: Upload metadata
+              script:
+                - ./upload-metadata.sh

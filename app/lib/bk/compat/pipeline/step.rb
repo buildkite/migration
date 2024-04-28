@@ -218,7 +218,7 @@ module BK
       def to_h
         { group: @label, key: @key, steps: @steps.map(&:to_h) }.tap do |h|
           h[:if] = @conditional unless @conditional.nil?
-        end
+        end.compact
       end
     end
   end

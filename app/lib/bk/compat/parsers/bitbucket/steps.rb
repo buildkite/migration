@@ -6,6 +6,7 @@ require_relative '../../pipeline/plugin'
 require_relative 'caches'
 require_relative 'image'
 require_relative 'services'
+require_relative 'shared'
 
 module BK
   module Compat
@@ -29,18 +30,9 @@ module BK
         end
 
         def translator(conf, *, defaults: {}, **)
-          base = base_step(defaults.merge(conf['step']))
+          base = [base_step(defaults.merge(conf['step'])), BK::Compat::WaitStep.new]
 
-          if conf['step'].fetch('trigger', 'automatic') == 'manual'
-            # TODO: ensure this is a valid, deterministic and unique key
-            k = base.key || base.label || 'cmd'
-
-            input = BK::Compat::InputStep.new(key: "execute-#{k}", prompt: "Execute step #{k}?")
-            base.depends_on = [input.key]
-            [input, base]
-          else
-            base
-          end
+          BK::Compat::BitBucket.translate_trigger(conf['step'].fetch('trigger', 'automatic'), base)
         end
 
         def base_step(step)
@@ -58,7 +50,7 @@ module BK
 
         def pre_keys(step)
           [
-            translate_conditional(step.fetch('condition', {})),
+            BK::Compat::BitBucket.translate_conditional(step.fetch('condition', {})),
             translate_oidc(step.fetch('oidc', false)),
             translate_services(step.fetch('services', []))
           ]
@@ -122,22 +114,6 @@ module BK
             cmd.env['BUILKITE_REPO'] = '' unless enabled.nil? || enabled
             cmd << sparse_checkout_plugin(sparse_checkout)
           end
-        end
-
-        def translate_conditional(conf)
-          return [] if conf.empty?
-
-          globs = conf['changesets']['includePaths'].map { |p| "'#{p}'" }
-          diff_cmd = 'git diff --exit-code --name-only HEAD "${BUILDKITE_PULL_REQUEST_BASE_BRANCH:HEAD^}"'
-
-          BK::Compat::CommandStep.new(
-            commands: [
-              "if #{diff_cmd} -- #{globs.join(' ')}; then",
-              "  echo '+++ :warning: no changes found in #{globs.join(' ')}, exiting step as OK",
-              '  exit 0',
-              'fi'
-            ]
-          )
         end
 
         def sparse_checkout_plugin(conf)

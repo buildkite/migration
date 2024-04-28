@@ -5,6 +5,8 @@ require_relative '../pipeline'
 require_relative '../pipeline/step'
 
 require_relative 'bitbucket/import'
+require_relative 'bitbucket/parallel'
+require_relative 'bitbucket/stages'
 require_relative 'bitbucket/steps'
 require_relative 'bitbucket/variables'
 
@@ -37,6 +39,14 @@ module BK
         @options = options
 
         BK::Compat::BitBucketSteps::Import.new(register: method(:register_translator))
+        BK::Compat::BitBucketSteps::Parallel.new(
+          register: method(:register_translator),
+          recursor: method(:translate_step)
+        )
+        BK::Compat::BitBucketSteps::Stages.new(
+          register: method(:register_translator),
+          recursor: method(:translate_step)
+        )
         BK::Compat::BitBucketSteps::Step.new(
           register: method(:register_translator),
           definitions: @config.fetch('definitions', {})
@@ -45,33 +55,40 @@ module BK
       end
 
       def parse
-        pps = %w[branches custom pull-requests tags].freeze
         defaults = @config.slice('image', 'clone').merge(@config.fetch('options', {}))
         conf = @config['pipelines']
 
-        # TODO: change group1 to default
-        main_steps = [parse_pipeline('group1', conf['default'], defaults)]
-        others = pps.map do |p|
-          named_pipelines(conf.fetch(p, {}), defaults)
-          # post: method("post_process_#{p}".to_sym)
-        end
-        definitions = named_pipelines(@config.dig('definitions', 'pipelines'), defaults)
+        main_steps = [parse_pipeline('default', conf['default'], defaults)]
+        others = non_default_pipelines(defaults)
         Pipeline.new(
-          steps: [main_steps, definitions, others].flatten.compact
+          steps: [main_steps, others].flatten.compact
         )
       end
 
       private
 
-      def named_pipelines(conf, defaults)
+      def non_default_pipelines(defaults)
+        pps = %w[branches custom pull-requests tags].freeze
+        others = pps.map do |p|
+          named_pipelines(@config['pipelines'].fetch(p, {}), defaults, post: method("post_process_#{p.gsub('-', '_')}"))
+        end
+        definitions = named_pipelines(@config.dig('definitions', 'pipelines'), defaults)
+
+        [others, definitions]
+      end
+
+      def named_pipelines(conf, defaults, post: method(:post_process_nothing))
         return [] if Hash(conf).empty?
 
         conf.map do |name, steps|
-          parse_pipeline(name, steps, defaults)
+          post&.call(name, parse_pipeline(name, steps, defaults))
         end
       end
 
       def simplify_group(group)
+        # if ther last step is a wait, remove it
+        group.steps.pop if group.steps.last.is_a?(WaitStep)
+
         # If there ended up being only 1 stage, skip the group and just
         # pull the steps out.
         if group.steps.length == 1
@@ -88,10 +105,40 @@ module BK
         steps = Array(conf).map { |s| translate_step(s, defaults: defaults) }
         simplify_group(
           BK::Compat::GroupStep.new(
-            key: name,
+            label: name,
             steps: steps.flatten
           )
         )
+      end
+
+      def post_process_nothing(_name, steps)
+        steps
+      end
+
+      def post_process_branches(name, steps)
+        [steps].flatten.map do |s|
+          s.conditional = "build.branch =~ /#{name.gsub('/', '\/')}/"
+          s
+        end
+      end
+
+      def post_process_custom(_name, steps)
+        # custom pipelines are always manual
+        BK::Compat::BitBucket.translate_trigger('manual', steps)
+      end
+
+      def post_process_pull_requests(name, steps)
+        [steps].flatten.map do |s|
+          s.conditional = "pull_request.id != null && build.branch =~ /#{name.gsub('/', '\/')}/"
+          s
+        end
+      end
+
+      def post_process_tags(name, steps)
+        [steps].flatten.map do |s|
+          s.conditional = "build.tag =~ /#{name.gsub('/', '\/')}/"
+          s
+        end
       end
     end
   end
