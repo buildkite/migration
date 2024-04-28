@@ -1,7 +1,6 @@
 ---
 steps:
-- group: "~"
-  key: group1
+- group: default
   steps:
   - commands:
     - echo 'basic auth'
@@ -12,6 +11,7 @@ steps:
         username: test-user
         password-env: ENV_VAR
     label: basic auth
+  - wait
   - commands:
     - echo 'from ecr key'
     - "# use AWS_ACCESS_KEY and AWS_SECRET_ACCESS_KEY variables for authentication"
@@ -23,6 +23,7 @@ steps:
         account-ids: ACCT
         region: REGION
     label: ecr key auth
+  - wait
   - commands:
     - echo 'aws odic'
     plugins:
