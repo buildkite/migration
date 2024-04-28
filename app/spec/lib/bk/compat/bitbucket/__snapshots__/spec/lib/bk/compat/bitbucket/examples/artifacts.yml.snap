@@ -1,7 +1,6 @@
 ---
 steps:
-- group: "~"
-  key: group1
+- group: default
   steps:
   - artifact_paths:
     - dist/**
@@ -15,6 +14,7 @@ steps:
     - docker#v5.10.0:
         image: node:10.15.0
     label: Build and test
+  - wait
   - commands:
     - cat reports/tests.txt
     - npm run integration-test
@@ -22,12 +22,14 @@ steps:
     - docker#v5.10.0:
         image: node:10.15.0
     label: Integration test
+  - wait
   - commands:
     - python deploy-to-beanstalk.py
     plugins:
     - docker#v5.10.0:
         image: python:3.5.1
     label: Deploy to beanstalk
+  - wait
   - artifact_paths:
     - success.txt
     commands:

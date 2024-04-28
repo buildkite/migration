@@ -1,0 +1,18 @@
+# source: https://support.atlassian.com/bitbucket-cloud/docs/pipeline-start-conditions/#Branches
+
+image: node:lts
+pipelines:
+  default:
+    - step:
+        script:
+          - echo "This script runs on all branches that don't have any specific pipeline assigned in 'branches'."
+  branches:
+    main:
+      - step:
+          script:
+            - echo "This script runs only on commit to the main branch."
+    feature/*:
+      - step:
+          image: openjdk:8 # This step uses its own image
+          script:
+            - echo "This script runs only on commit to branches with names that match the feature/* pattern."

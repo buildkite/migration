@@ -48,8 +48,16 @@ module BK
 
     # input steps are almost the same as block steps
     class InputStep < BlockStep
+      attr_accessor :fields
+
+      def initialize(*, fields: nil, **)
+        super(*, **)
+        @fields = fields
+      end
+
       def to_h
         super.tap do |h|
+          h[:fields] = @fields unless @fields.nil?
           h[:input] = h.delete(:block)
         end
       end
@@ -210,7 +218,7 @@ module BK
       def to_h
         { group: @label, key: @key, steps: @steps.map(&:to_h) }.tap do |h|
           h[:if] = @conditional unless @conditional.nil?
-        end
+        end.compact
       end
     end
   end
