@@ -3,12 +3,20 @@
 require_relative '../../pipeline/step'
 require_relative '../../pipeline/plugin'
 
+require_relative 'caches'
+require_relative 'image'
+require_relative 'services'
+require_relative 'shared'
+
 module BK
   module Compat
     module BitBucketSteps
       # Implementation of native step translation
       class Step
-        def initialize(register:)
+        def initialize(register:, definitions: {})
+          load_caches!(definitions.fetch('caches', nil))
+          load_services!(definitions.fetch('services', nil))
+
           register.call(
             method(:matcher),
             method(:translator)
@@ -21,19 +29,10 @@ module BK
           conf.include?('step')
         end
 
-        def translator(conf, *, **)
-          base = base_step(conf['step'])
+        def translator(conf, *, defaults: {}, **)
+          base = [base_step(defaults.merge(conf['step'])), BK::Compat::WaitStep.new]
 
-          if conf['step'].fetch('trigger', 'automatic') == 'manual'
-            # TODO: ensure this is a valid, deterministic and unique key
-            k = base.key || base.label || 'cmd'
-
-            input = BK::Compat::InputStep.new(key: "execute-#{k}", prompt: "Execute step #{k}?")
-            base.depends_on = [input.key]
-            [input, base]
-          else
-            base
-          end
+          BK::Compat::BitBucket.translate_trigger(conf['step'].fetch('trigger', 'automatic'), base)
         end
 
         def base_step(step)
@@ -43,16 +42,27 @@ module BK
             agents: translate_agents(step.slice('size', 'runs-on')),
             timeout_in_minutes: step.delete('max-time')
           )
+          pre_keys(step).each { |k| cmd >> k }
+          post_keys(step).each { |k| cmd << k }
 
-          other_keys(step).each { |k| cmd << k }
           cmd
         end
 
-        def other_keys(step)
+        def pre_keys(step)
+          [
+            BK::Compat::BitBucket.translate_conditional(step.fetch('condition', {})),
+            translate_oidc(step.fetch('oidc', false)),
+            translate_services(step.fetch('services', []))
+          ]
+        end
+
+        def post_keys(step)
           [
             translate_image(step.delete('image')),
             untranslatable(step),
-            translate_clone(step.fetch('clone', {}))
+            translate_artifacts(step.delete('artifacts')),
+            translate_clone(step.fetch('clone', {})),
+            translate_caches(step.fetch('caches', []))
           ]
         end
 
@@ -61,12 +71,35 @@ module BK
             'deployment' => '# `deployments` has no direct translation.',
             'fail-fast' =>
               '# `fail-fast` has no direct translation - consider using `soft_fail`/`cancel_on_build_failing`.',
-            'after-script' => '# The after-script property should be configured as a pre-exit repository hook'
+            'after-script' => '# The after-script property should be configured as a pre-exit repository hook',
+            'docker' => '# The availability of docker in steps depend on the agent configuration'
           }
 
           msgs.map do |k, message|
             message if step.include?(k)
           end.compact
+        end
+
+        def translate_artifacts(conf)
+          return [] if conf.nil?
+
+          normalized = conf.is_a?(Array) ? conf : conf['paths']
+
+          BK::Compat::CommandStep.new(
+            artifact_paths: normalized,
+            commands: [
+              '# IMPORTANT: artifacts are not automatically downloaded in future steps'
+            ]
+          )
+        end
+
+        def translate_oidc(enabled)
+          return [] if enabled.nil? || !enabled
+
+          [
+            'BITBUCKET_STEP_OIDC_TOKEN="$(buildkite-agent oidc request-token)"',
+            'export BITBUCKET_STEP_OIDC_TOKEN'
+          ]
         end
 
         def translate_clone(opts)
@@ -93,15 +126,6 @@ module BK
               'no-cone' => !conf.fetch('cone-mode', true)
             }
           )
-        end
-
-        def translate_image(image)
-          BK::Compat::Plugin.new(
-            name: 'docker',
-            config: {
-              'image' => "#{image}"
-            }
-          ) unless image.nil?
         end
 
         def translate_agents(conf)

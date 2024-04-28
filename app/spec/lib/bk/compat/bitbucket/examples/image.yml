@@ -13,6 +13,8 @@ pipelines:
           - go build src/*
     - step:
         name: Test
+        image:
+          name: golang:1.22
         script:
           - mkdir test-reports
           - go get -u github.com/jstemmer/go-junit-report

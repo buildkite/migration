@@ -3,8 +3,12 @@
 require_relative '../translator'
 require_relative '../pipeline'
 require_relative '../pipeline/step'
-require_relative 'bitbucket/steps'
+
 require_relative 'bitbucket/import'
+require_relative 'bitbucket/parallel'
+require_relative 'bitbucket/stages'
+require_relative 'bitbucket/steps'
+require_relative 'bitbucket/variables'
 
 module BK
   module Compat
@@ -34,43 +38,107 @@ module BK
         @config = YAML.safe_load(text, aliases: true)
         @options = options
 
-        BK::Compat::BitBucketSteps::Step.new(register: method(:register_translator))
         BK::Compat::BitBucketSteps::Import.new(register: method(:register_translator))
+        BK::Compat::BitBucketSteps::Parallel.new(
+          register: method(:register_translator),
+          recursor: method(:translate_step)
+        )
+        BK::Compat::BitBucketSteps::Stages.new(
+          register: method(:register_translator),
+          recursor: method(:translate_step)
+        )
+        BK::Compat::BitBucketSteps::Step.new(
+          register: method(:register_translator),
+          definitions: @config.fetch('definitions', {})
+        )
+        BK::Compat::BitBucketSteps::Variables.new(register: method(:register_translator))
       end
 
       def parse
-        # custom is also valid, but not supported just yet
-        pps = %w[branches default pull-requests tags].freeze
-        image_base = @config['image']
+        defaults = @config.slice('image', 'clone').merge(@config.fetch('options', {}))
         conf = @config['pipelines']
+
+        main_steps = [parse_pipeline('default', conf['default'], defaults)]
+        others = non_default_pipelines(defaults)
         Pipeline.new(
-          steps: pps.map { |p| parse_pipeline(conf[p], image_base) if conf.include?(p) }.compact
+          steps: [main_steps, others].flatten.compact
         )
       end
 
       private
 
+      def non_default_pipelines(defaults)
+        pps = %w[branches custom pull-requests tags].freeze
+        others = pps.map do |p|
+          named_pipelines(@config['pipelines'].fetch(p, {}), defaults, post: method("post_process_#{p.gsub('-', '_')}"))
+        end
+        definitions = named_pipelines(@config.dig('definitions', 'pipelines'), defaults)
+
+        [others, definitions]
+      end
+
+      def named_pipelines(conf, defaults, post: method(:post_process_nothing))
+        return [] if Hash(conf).empty?
+
+        conf.map do |name, steps|
+          post&.call(name, parse_pipeline(name, steps, defaults))
+        end
+      end
+
       def simplify_group(group)
+        # if ther last step is a wait, remove it
+        group.steps.pop if group.steps.last.is_a?(WaitStep)
+
         # If there ended up being only 1 stage, skip the group and just
         # pull the steps out.
         if group.steps.length == 1
           group.steps[0].conditional = group.conditional
-          group = group.steps.first
+          return group.steps[0]
+        elsif group.steps.empty?
+          return []
         end
+
         group
       end
 
-      def parse_pipeline(conf, image_base)
-        steps = Array(conf).map { |s| 
-          s['step']['image'] = image_base if s['step']['image'].nil? && !image_base.nil?  
-          translate_step(s) 
-        }
+      def parse_pipeline(name, conf, defaults)
+        steps = Array(conf).map { |s| translate_step(s, defaults: defaults) }
         simplify_group(
           BK::Compat::GroupStep.new(
-            key: 'group1',
+            label: name,
             steps: steps.flatten
           )
         )
+      end
+
+      def post_process_nothing(_name, steps)
+        steps
+      end
+
+      def post_process_branches(name, steps)
+        [steps].flatten.map do |s|
+          s.conditional = "build.branch =~ /#{name.gsub('/', '\/')}/"
+          s
+        end
+      end
+
+      def post_process_custom(_name, steps)
+        # custom pipelines are always manual
+        BK::Compat::BitBucket.translate_trigger('manual', steps)
+      end
+
+      def post_process_pull_requests(name, steps)
+        [steps].flatten.map do |s|
+          s.conditional = "pull_request.id != null && build.branch =~ /#{name.gsub('/', '\/')}/"
+          s
+        end
+      end
+
+      def post_process_tags(name, steps)
+        [steps].flatten.map do |s|
+          s.conditional = "build.tag =~ /#{name.gsub('/', '\/')}/"
+          s
+        end
       end
     end
   end
