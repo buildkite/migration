@@ -1,7 +1,6 @@
 ---
 steps:
-- group: "~"
-  key: group1
+- group: default
   steps:
   - commands:
     - if git diff --exit-code --name-only HEAD "${BUILDKITE_PULL_REQUEST_BASE_BRANCH:HEAD^}"
@@ -11,6 +10,7 @@ steps:
     - fi
     - echo 'should never run'
     label: single file condition
+  - wait
   - commands:
     - if git diff --exit-code --name-only HEAD "${BUILDKITE_PULL_REQUEST_BASE_BRANCH:HEAD^}"
       -- 'file1' 'path1/*' '**/glob.ext'; then

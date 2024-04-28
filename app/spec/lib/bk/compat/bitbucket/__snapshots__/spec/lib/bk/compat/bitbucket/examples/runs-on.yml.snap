@@ -1,30 +1,33 @@
 ---
 steps:
-- group: "~"
-  key: group1
+- group: default
   steps:
   - commands:
     - echo 'step 1'
     agents:
       linux: "*"
     label: Simple label
+  - wait
   - commands:
     - echo 'step 2'
     agents:
       size: 2x
     label: Simple size
+  - wait
   - commands:
     - echo 'step 3'
     agents:
       linux: "*"
       aws: "*"
     label: Complex label
+  - wait
   - commands:
     - echo 'step 4'
     agents:
       size: 4x
       linux: "*"
     label: Combination
+  - wait
   - commands:
     - echo 'step 1'
     agents:

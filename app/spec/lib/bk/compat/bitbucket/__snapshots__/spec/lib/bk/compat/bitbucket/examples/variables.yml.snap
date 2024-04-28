@@ -1,7 +1,6 @@
 ---
 steps:
-- group: "~"
-  key: group1
+- group: default
   steps:
   - key: custom-vars
     fields:
