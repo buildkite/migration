@@ -7,7 +7,7 @@ module BK
     # extending class with some shared code
     class BitBucket
       def self.translate_conditional(conf)
-        return [] if conf.empty?
+        return [] if Hash(conf).empty?
 
         globs = conf['changesets']['includePaths'].map { |p| "'#{p}'" }
         diff_cmd = 'git diff --exit-code --name-only HEAD "${BUILDKITE_PULL_REQUEST_BASE_BRANCH:HEAD^}"'
