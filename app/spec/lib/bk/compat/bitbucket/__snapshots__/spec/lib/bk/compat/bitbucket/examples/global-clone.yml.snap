@@ -1,0 +1,28 @@
+---
+steps:
+- group: "~"
+  key: group1
+  steps:
+  - commands:
+    - echo 'simple'
+    - "# repository interactions (clone options) should be configured in the agent
+      itself"
+    plugins:
+    - sparse-checkout:
+        paths:
+        - path1/*
+        - path2
+        no-cone: false
+    label: simple
+  - commands:
+    - echo 'no cloning'
+    - "# repository interactions (clone options) should be configured in the agent
+      itself"
+    env:
+      BUILKITE_REPO: ''
+    label: no clone
+  - commands:
+    - echo 'no sparse'
+    - "# repository interactions (clone options) should be configured in the agent
+      itself"
+    label: no sparse
