@@ -22,15 +22,17 @@ module BK
         end
 
         def translator(conf, *, defaults: {}, **)
-          stage = conf['parallel']
+          parallel = conf['parallel']
+          parallel = { 'steps' => parallel } if parallel.is_a?(Array)
 
-          defaults['fail-fast'] = stage['fail-fast']
+          # may be a good idea when/if fail-fast is properly supported
+          # defaults['fail-fast'] = parallel['fail-fast']
 
-          steps = Array(stage['steps']).map { |s| @recursor&.call(s, defaults: defaults) }
+          steps = Array(parallel['steps']).map { |s| @recursor&.call(s, defaults: defaults) }
           BK::Compat::GroupStep.new(
             # TODO: make stage names unique
-            label: stage.fetch('name', 'parallel'),
-            steps: [condition, steps].flatten
+            label: "parallel-#{BK::Compat::BitBucket.step_id(steps[0])}",
+            steps: steps
           )
         end
       end
