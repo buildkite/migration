@@ -1,7 +1,6 @@
 ---
 steps:
-- group: "~"
-  key: group1
+- group: default
   steps:
   - group: parallel-7745d6f42f7f67b5b911003efa6bdd7a809f392c
     steps:
