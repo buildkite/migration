@@ -35,8 +35,7 @@ module BK
         @config = YAML.safe_load(text)
         @options = options
 
-        GHABuiltins.new(register: method(:register_translator))
-        GHAActions.new(register: method(:register_translator))
+        register_translators
       end
 
       def parse
@@ -57,6 +56,13 @@ module BK
           steps: steps,
           env: @config.fetch('env', {})
         )
+      end
+
+      private
+      
+      def register_translators
+        GHABuiltins.new(register: method(:register_translator))
+        GHAActions.new(register: method(:register_translator))
       end
     end
   end
