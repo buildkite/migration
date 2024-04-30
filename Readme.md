@@ -79,5 +79,6 @@ Buildkite has its own suggested best practices, these may differ to those from o
 
 Further information on the currently supported attributes of CI provider pipeline translation to Buildkite pipelines can be found below (within the `/docs` directory):
 
-- [GitHub Actions](/docs/GHA.md)
+- [Bitbucket Pipelines](/docs/Bitbucket.md)
 - [CircleCI](/docs/CircleCI.md)
+- [GitHub Actions](/docs/GHA.md)
