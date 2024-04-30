@@ -39,6 +39,7 @@ The Buildkite Migration tool's currently supported (✅), partially supported (�
 | `image.name` | ✅ | The name of the image to utilise within all Bitbucket pipeline steps. Translated to the `image` property within the [docker-buildkite-plugin](https://github.com/buildkite-plugins/docker-buildkite-plugin) (if the image name was already not set in the `image` property above itself). |
 | `image.username` | ✅ | The username of the user for private Docker images hosted on a given registry. Translated to the `username` property within the [docker-login-buildkite-plugin](https://github.com/buildkite-plugins/docker-login-buildkite-plugin) |
 | `image.password` | ✅ | The password of the user for private Docker images hosted on a given registry. Translated to the `password` property within the [docker-login-buildkite-plugin](https://github.com/buildkite-plugins/docker-login-buildkite-plugin). Be sure to utilise [best practices](https://buildkite.com/docs/pipelines/secrets) for storing and accessing secrets within a Buildkite pipeline! |
+
 ### Options (`options`)
 
 | Key | Supported? | Notes |
