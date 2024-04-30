@@ -57,7 +57,7 @@ module BK
 
       def register_translators
         BK::Compat::HarnessSteps::Run.new(register: method(:register_translator))
-      end
+      end      
 
       def simplify_group(group)
         # If there ended up being only 1 stage, skip the group and just

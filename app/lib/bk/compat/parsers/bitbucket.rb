@@ -42,8 +42,6 @@ module BK
       end
 
       def parse
-        p @config
-        s = @config.slice('image', 'clone')]
         defaults = @config.slice('image', 'clone').merge(@config.fetch('options', {}))
         conf = @config['pipelines']
 
@@ -59,8 +57,8 @@ module BK
       def register_translators
         BK::Compat::BitBucketSteps::Import.new(register: method(:register_translator))
         BK::Compat::BitBucketSteps::Parallel.new(register: method(:register_translator), recursor: method(:translate_step))
-        BK::Compat::BitBucketSteps::Stages.new(register: method(:register_translator),recursor: method(:translate_step))
-        BK::Compat::BitBucketSteps::Step.new(register: method(:register_translator),definitions: @config.fetch('definitions', {}))
+        BK::Compat::BitBucketSteps::Stages.new(register: method(:register_translator), recursor: method(:translate_step))
+        BK::Compat::BitBucketSteps::Step.new(register: method(:register_translator), definitions: @config.fetch('definitions', {}))
         BK::Compat::BitBucketSteps::Variables.new(register: method(:register_translator))
       end
 
