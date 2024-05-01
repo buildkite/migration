@@ -45,7 +45,7 @@ module BK
         @commands_by_key = {}
         @executors = {}
 
-        register_translators
+        register_translators!
       end
 
       def parse
@@ -62,8 +62,11 @@ module BK
 
       private
 
-      def register_translators
-        BK::Compat::CircleCISteps::Builtins.new(register: method(:register_translator), recursor: method(:translate_steps))
+      def register_translators!
+        BK::Compat::CircleCISteps::Builtins.new(
+          register: method(:register_translator),
+          recursor: method(:translate_steps)
+        )     
       end
 
       def load_elements!

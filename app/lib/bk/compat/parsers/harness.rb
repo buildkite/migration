@@ -36,7 +36,7 @@ module BK
         @config = YAML.safe_load(text, aliases: true)
         @options = options
 
-        register_translators
+        register_translators!
       end
 
       def parse
@@ -55,7 +55,7 @@ module BK
 
       private
 
-      def register_translators
+      def register_translators!
         BK::Compat::HarnessSteps::Run.new(register: method(:register_translator))
       end      
 

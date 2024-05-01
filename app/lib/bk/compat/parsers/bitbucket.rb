@@ -38,7 +38,7 @@ module BK
         @config = YAML.safe_load(text, aliases: true)
         @options = options
 
-        register_translators
+        register_translators!
       end
 
       def parse
@@ -54,11 +54,20 @@ module BK
 
       private
 
-      def register_translators
+      def register_translators!
         BK::Compat::BitBucketSteps::Import.new(register: method(:register_translator))
-        BK::Compat::BitBucketSteps::Parallel.new(register: method(:register_translator), recursor: method(:translate_step))
-        BK::Compat::BitBucketSteps::Stages.new(register: method(:register_translator), recursor: method(:translate_step))
-        BK::Compat::BitBucketSteps::Step.new(register: method(:register_translator), definitions: @config.fetch('definitions', {}))
+        BK::Compat::BitBucketSteps::Parallel.new(
+          register: method(:register_translator),
+          recursor: method(:translate_step)
+        )
+        BK::Compat::BitBucketSteps::Stages.new(
+          register: method(:register_translator),
+          recursor: method(:translate_step)
+        )
+        BK::Compat::BitBucketSteps::Step.new(
+          register: method(:register_translator),
+          definitions: @config.fetch('definitions', {})
+        )
         BK::Compat::BitBucketSteps::Variables.new(register: method(:register_translator))
       end
 
