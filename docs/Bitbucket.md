@@ -106,6 +106,7 @@ The Buildkite Migration tool's currently supported (âœ…), partially supported (â
 
 ## Pipeline Properties (`pipelines.<start-condition>.<property>`)
 
+> [!NOTE]
 > Each starting pipeline condition listed [above](#pipeline-starting-conditions-pipelinesstart-condition) can support various pipeline properties:
 > - `parallel`: The grouping of multiple steps within a Bitbucket pipeline to run concurrently.
 > - `step`: A logical execution unit that makes up a specific workflow within a Bitbucket pipeline.
