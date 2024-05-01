@@ -73,7 +73,7 @@ The Buildkite Migration tool's currently supported (✅), partially supported (�
 | `pipelines.custom.<name>.parallel` | ❌ | Parallel (concurrent step) configuration for custom Bitbucket pipelines. |
 | `pipelines.custom.<name>.step` | ✅ | Individual step configuration for a custom Bitbucket pipeline. View the available step [properties](#step-pipelinestypestep) supported by the Migrations Tool - and additional property information in the Bitbucket Pipelines [documentation](https://support.atlassian.com/bitbucket-cloud/docs/step-options/#The-Step-property). |
 | `pipelines.custom.<name>.stage` | ❌ | Stage configuration for custom Bitbucket pipelines. |
-| `pipelines.custom.<name>.variables` | ❌ | Variable configuration for custom Bitbucket pipelines. |
+| `pipelines.custom.<name>.variables` | ⚠️ | Variable configuration for custom Bitbucket pipelines. View the available variable [properties](#variables-pipelinesstart-conditionvariables) supported by the Migrations Tool - and additional property information in the Bitbucket Pipelines [documentation](https://support.atlassian.com/bitbucket-cloud/docs/pipeline-start-conditions/#Custom--manual--pipeline-variables). |
 
 ### Default (`pipelines.default`)
 
@@ -160,7 +160,7 @@ The Buildkite Migration tool's currently supported (✅), partially supported (�
 
 | Key | Supported? | Notes |
 | --- | --- | --- |
-| `pipelines.<start-condition>.variables` | ✅ | Custom variables that are passed to Bitbucket pipeline steps. Each variable defined in a Bitbucket pipeline step is translated to a Buildkite [input step](https://buildkite.com/docs/pipelines/input-step) with/without defaults and allowed values specified below. |
+| `pipelines.<start-condition>.variables` | ⚠️ | Custom variables that are passed to Bitbucket pipeline steps. Each variable defined in a Bitbucket pipeline step is translated to a Buildkite [input step](https://buildkite.com/docs/pipelines/input-step) with/without defaults and allowed values specified below. <br/><br/> Variables that are translated into the corresponding [input step](https://buildkite.com/docs/pipelines/input-step) within the generated Buildkite pipeline will require to be fetched in subsequent steps through a `buildkite-agent meta-data get` [commmand](https://buildkite.com/docs/agent/v3/cli-meta-data#getting-data). |
 | `pipelines.<start-condition>.variables.name` | ✅ | The variables' name: translated to the `key` attribute of a specific `field` of an [input step](https://buildkite.com/docs/pipelines/input-step) (text entry).|
 | `pipelines.<start-condition>.variables.default` | ✅ | The default variable value if no value is set. Set as the `default` attribute within the `field` of an [input step](https://buildkite.com/docs/pipelines/input-step). |
 | `pipelines.<start-condition>.variables.description` | ✅ | The description of the variable. Translated to the `text` attribute of a specific `field` within the generated  [input step](https://buildkite.com/docs/pipelines/input-step). |
