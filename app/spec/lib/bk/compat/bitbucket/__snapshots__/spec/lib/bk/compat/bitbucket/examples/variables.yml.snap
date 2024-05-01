@@ -1,6 +1,9 @@
 ---
 steps:
-- group: default
+- key: execute-34fda39a698739f93a76af1583cf0b9e937f3561
+  prompt: Execute step 34fda39a698739f93a76af1583cf0b9e937f3561?
+  input: execute-34fda39a698739f93a76af1583cf0b9e937f3561
+- group: deployer
   steps:
   - key: custom-vars
     fields:
@@ -23,3 +26,5 @@ steps:
   - commands:
     - echo "$Username manually triggered for a build for $Region as $Role!"
     label: Script step
+  depends_on:
+  - execute-34fda39a698739f93a76af1583cf0b9e937f3561
