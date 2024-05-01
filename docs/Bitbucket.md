@@ -68,12 +68,12 @@ The Buildkite Migration tool's currently supported (✅), partially supported (�
 | Key | Supported? | Notes |
 | --- | --- | --- |
 | `pipelines.custom` | ✅ | Bitbucket pipelines that are only able to be triggered manually. The corresponding Buildkite pipeline is first generated with an [input step](https://buildkite.com/docs/pipelines/input-step) before any command jobs to ensure that triggered builds must be manually processed. |
-| `pipelines.custom.<name>` | ❌ | The name of the custom Bitbucket pipeline |
+| `pipelines.custom.<name>` | ✅ | The name of the custom Bitbucket pipeline. |
 | `pipelines.custom.<name>.import-pipeline.import` | ❌ | The specification of importing a pipeline from within a specific repository defined in top-level `definitions`. |
-| `pipelines.custom.<name>.parallel` | ❌ | Parallel (concurrent step) configuration for custom Bitbucket pipelines. |
+| `pipelines.custom.<name>.parallel` | ✅ | Parallel (concurrent step) configuration for a custom Bitbucket pipeline. View the available parallel [properties](#parallel-pipelinestypeparallel) supported by the Migrations Tool - and additional property information in the Bitbucket Pipelines [documentation](https://support.atlassian.com/bitbucket-cloud/docs/parallel-step-options/#Parallel). |
 | `pipelines.custom.<name>.step` | ✅ | Individual step configuration for a custom Bitbucket pipeline. View the available step [properties](#step-pipelinestypestep) supported by the Migrations Tool - and additional property information in the Bitbucket Pipelines [documentation](https://support.atlassian.com/bitbucket-cloud/docs/step-options/#The-Step-property). |
-| `pipelines.custom.<name>.stage` | ❌ | Stage configuration for custom Bitbucket pipelines. |
-| `pipelines.custom.<name>.variables` | ⚠️ | Variable configuration for custom Bitbucket pipelines. View the available variable [properties](#variables-pipelinesstart-conditionvariables) supported by the Migrations Tool - and additional property information in the Bitbucket Pipelines [documentation](https://support.atlassian.com/bitbucket-cloud/docs/pipeline-start-conditions/#Custom--manual--pipeline-variables). |
+| `pipelines.custom.<name>.stage` | ✅ | Stage configuration for a custom Bitbucket pipeline. View the available stage [properties](#stage-pipelinestypestage) supported by the Migrations Tool - and additional property information in the Bitbucket Pipelines [documentation](https://support.atlassian.com/bitbucket-cloud/docs/stage-options/#Stage). |
+| `pipelines.custom.<name>.variables` | ⚠️ | Variable configuration for a custom Bitbucket pipeline. View the available variable [properties](#variables-pipelinesstart-conditionvariables) supported by the Migrations Tool - and additional property information in the Bitbucket Pipelines [documentation](https://support.atlassian.com/bitbucket-cloud/docs/pipeline-start-conditions/#Custom--manual--pipeline-variables). |
 
 ### Default (`pipelines.default`)
 
