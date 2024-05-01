@@ -36,7 +36,7 @@ module BK
         @config = YAML.safe_load(text, aliases: true)
         @options = options
 
-        BK::Compat::HarnessSteps::Run.new(register: method(:register_translator))
+        register_translators!
       end
 
       def parse
@@ -54,6 +54,10 @@ module BK
       end
 
       private
+
+      def register_translators!
+        BK::Compat::HarnessSteps::Run.new(register: method(:register_translator))
+      end      
 
       def simplify_group(group)
         # If there ended up being only 1 stage, skip the group and just
