@@ -1,0 +1,8 @@
+---
+steps:
+- commands:
+  - IMAGE_NAME=$BITBUCKET_REPO_SLUG
+  - docker build . --file Dockerfile --tag ${IMAGE_NAME}
+  - docker save ${IMAGE_NAME} --output "${IMAGE_NAME}.tar"
+  label: Build and Test
+  timeout_in_minutes: 100

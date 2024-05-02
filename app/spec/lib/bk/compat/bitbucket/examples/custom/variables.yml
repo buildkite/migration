@@ -1,0 +1,18 @@
+# from https://support.atlassian.com/bitbucket-cloud/docs/pipeline-start-conditions/#Example-%E2%80%94-using-the-variables-property-to-define-custom-pipeline-variables
+
+pipelines:
+  default:
+    - variables:
+        - name: Username
+        - name: Role
+          default: "admin"          # optionally provide a default variable value
+          description: "Add user role"
+        - name: Region
+          default: "us-east-1"
+          allowed-values:           # optionally restrict variable values
+            - "ap-southeast-2"
+            - "us-east-1"
+            - "us-west-2"
+    - step:
+        script:
+          - echo "$Username manually triggered for a build for $Region as $Role!"

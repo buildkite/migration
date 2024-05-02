@@ -1,0 +1,25 @@
+---
+steps:
+- group: default
+  steps:
+  - key: custom-vars
+    fields:
+    - key: Username
+      text: Username
+    - key: Role
+      default: admin
+      text: Add user role
+    - key: Region
+      default: us-east-1
+      options:
+      - label: ap-southeast-2
+        value: ap-southeast-2
+      - label: us-east-1
+        value: us-east-1
+      - label: us-west-2
+        value: us-west-2
+      select: Region
+    input: custom-vars
+  - commands:
+    - echo "$Username manually triggered for a build for $Region as $Role!"
+    label: Script step

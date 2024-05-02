@@ -1,0 +1,12 @@
+pipelines:
+  default:
+    - step:
+        oidc: true
+        script:
+          - echo "I can access data through OpenID Connect!"
+          - |-
+            aws sts assume-role-with-web-identity \
+              --role-arn arn:aws:iam::XXXXXX:role/projectx-build \
+              --role-session-name build-session \
+              --web-identity-token "$BITBUCKET_STEP_OIDC_TOKEN" \
+              --duration-seconds 1000
