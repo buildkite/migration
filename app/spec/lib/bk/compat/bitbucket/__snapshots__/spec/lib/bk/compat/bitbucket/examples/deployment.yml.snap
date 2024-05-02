@@ -1,6 +1,0 @@
----
-steps:
-- commands:
-  - python deploy.py prod_env_1
-  - "# `deployments` has no direct translation."
-  label: Deploy to production
