@@ -6,19 +6,21 @@ module BK
     class StepTranslator
       def initialize(default: nil)
         @default_func = default.nil? ? method(:default_value) : default
+        @translators = []
       end
 
-      def register_translator(matcher, function)
-        @translators ||= [] # utilize an instance variable that may not exist
-
-        @translators << { matcher: matcher, function: function }
+      def register(*translators)
+        translators.each do |tr|
+          tr.define_singleton_method(:recursor, method(:translate_step).to_proc)
+          @translators << tr
+        end
       end
 
       def translate_step(*, **)
         @translators ||= [] # utilize an instance variable that may not exist
 
-        result = @translators.select { |translator| translator[:matcher]&.call(*, **) }
-                             .map { |translator| translator[:function]&.call(*, **) }
+        result = @translators.select { |translator| translator.matcher(*, **) }
+                             .map { |translator| translator.translator(*, **) }
 
         simplify_result(result.flatten, *, **)
       end
