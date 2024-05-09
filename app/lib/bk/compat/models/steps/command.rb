@@ -1,69 +1,10 @@
 # frozen_string_literal: true
 
+require_relative 'wait'
+require_relative '../plugin'
+
 module BK
   module Compat
-    # simple waiting step
-    class WaitStep
-      def to_h
-        'wait'
-      end
-
-      def <<(_obj)
-        raise 'Can not add to a wait step'
-      end
-
-      def instantiate
-        dup
-      end
-    end
-
-    # simple block step
-    class BlockStep
-      attr_accessor :conditional, :depends_on, :key, :prompt
-
-      def initialize(key:, conditional: nil, depends_on: [], prompt: nil)
-        @key = key
-        @depends_on = depends_on
-        @conditional = conditional
-        @prompt = prompt
-      end
-
-      def <<(_obj)
-        raise 'Can not add to a block step'
-      end
-
-      def to_h
-        { block: @key, key: @key }.tap do |h|
-          # rename conditional to if (a reserved word as an attribute or instance variable is complicated)
-          h[:depends_on] = @depends_on unless @depends_on.empty?
-          h[:if] = @conditional unless @conditional.nil?
-          h[:prompt] = @prompt unless @prompt.nil?
-        end
-      end
-
-      def instantiate
-        dup
-      end
-    end
-
-    # input steps are almost the same as block steps
-    class InputStep < BlockStep
-      attr_accessor :fields
-
-      def initialize(*, fields: nil, **)
-        super(*, **)
-        @fields = fields
-      end
-
-      def to_h
-        super.tap do |h|
-          h[:fields] = @fields unless @fields.nil?
-          h[:input] = h.delete(:block)
-        end
-      end
-    end
-
-    # basic command step
     class CommandStep
       attr_accessor :agents, :artifact_paths, :branches, :concurrency, :concurrency_group,
                     :conditional, :depends_on, :env, :key, :label, :matrix, :parameters,
@@ -201,26 +142,6 @@ module BK
           # if we don't know how to do this, do nothing
           value
         end
-      end
-    end
-
-    # group step
-    class GroupStep
-      attr_accessor :label, :key, :steps, :depends_on, :conditional
-
-      def initialize(label: '~', key: nil, steps: [], depends_on: [], conditional: nil)
-        @label = label
-        @key = key
-        @depends_on = depends_on
-        @steps = steps
-        @conditional = conditional
-      end
-
-      def to_h
-        { group: @label, key: @key, steps: @steps.map(&:to_h) }.tap do |h|
-          h[:depends_on] = @depends_on unless @depends_on.empty?
-          h[:if] = @conditional unless @conditional.nil?
-        end.compact
       end
     end
   end

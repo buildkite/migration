@@ -5,6 +5,8 @@ require_relative 'matrix'
 require_relative 'services'
 require_relative 'steps'
 
+require_relative '../../models/steps/gha/gha_step'
+
 module BK
   module Compat
     # GHA translation scaffolding

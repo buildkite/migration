@@ -2,6 +2,9 @@
 
 require 'digest'
 
+require_relative '../../models/steps/command'
+require_relative '../../models/steps/input'
+
 module BK
   module Compat
     # extending class with some shared code

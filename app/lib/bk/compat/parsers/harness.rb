@@ -2,7 +2,6 @@
 
 require_relative '../translator'
 require_relative '../models/pipeline'
-require_relative '../pipeline/step'
 require_relative 'harness/steps/run'
 
 module BK

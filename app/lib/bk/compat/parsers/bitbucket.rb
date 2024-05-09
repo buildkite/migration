@@ -2,7 +2,8 @@
 
 require_relative '../translator'
 require_relative '../models/pipeline'
-require_relative '../pipeline/step'
+require_relative '../models/steps/group'
+require_relative '../models/steps/wait'
 
 require_relative 'bitbucket/import'
 require_relative 'bitbucket/parallel'
