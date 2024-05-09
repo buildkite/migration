@@ -3,7 +3,11 @@
 module BK
   module Compat
     # Dispatch pattern for step translation
-    module StepTranslator
+    class StepTranslator
+      def initialize(default: nil)
+        @default_func = default.nil? ? method(:default_value) : default
+      end
+
       def register_translator(matcher, function)
         @translators ||= [] # utilize an instance variable that may not exist
 
@@ -19,11 +23,16 @@ module BK
         simplify_result(result.flatten, *, **)
       end
 
-      def simplify_result(result_list, *args, **kwargs)
-        return [" # step #{args} #{kwargs} not implemented yet :("] if result_list.empty?
+      def simplify_result(result_list, *, **)
+        return @default_func.call(*, **) if result_list.empty?
 
         result_list = result_list.first if result_list.one?
         result_list
+      end
+
+      def default_value(*args, **kwargs)
+        # Default implementation when the translator doesn't know what to do
+        [" # step #{args} #{kwargs} not implemented yet :("]
       end
     end
   end
