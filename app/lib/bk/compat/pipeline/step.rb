@@ -19,13 +19,15 @@ module BK
 
     # simple block step
     class BlockStep
-      attr_accessor :conditional, :depends_on, :key, :prompt
+      attr_accessor :conditional, :depends_on, :fields, :label, :key, :prompt
 
-      def initialize(key:, conditional: nil, depends_on: [], prompt: nil)
+      def initialize(key:, conditional: nil, depends_on: [], fields: [], label: nil, prompt: nil)
         @key = key
         @depends_on = depends_on
         @conditional = conditional
         @prompt = prompt
+        @fields = fields
+        @label = label
       end
 
       def <<(_obj)
@@ -35,9 +37,11 @@ module BK
       def to_h
         { block: @key, key: @key }.tap do |h|
           # rename conditional to if (a reserved word as an attribute or instance variable is complicated)
+          h[:label] = @label unless @label.nil?
           h[:depends_on] = @depends_on unless @depends_on.empty?
           h[:if] = @conditional unless @conditional.nil?
           h[:prompt] = @prompt unless @prompt.nil?
+          h[:fields] = @fields unless Array(@fields).empty?
         end
       end
 
