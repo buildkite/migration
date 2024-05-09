@@ -1,0 +1,11 @@
+---
+steps:
+- block: approval
+  key: approval
+  label: Approval
+  prompt: |-
+    Please review the following information
+    and approve the pipeline progression
+  fields:
+  - key: myvar
+    text: Default myvalue
