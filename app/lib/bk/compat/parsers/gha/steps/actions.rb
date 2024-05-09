@@ -4,14 +4,11 @@ module BK
   module Compat
     # Implement GHA actions
     class GHAActions
-      def initialize(register:)
-        register.call(
-          ->(conf) { conf.include?('uses') },
-          method(:translate_uses)
-        )
+      def matcher(conf)
+        conf.include?('uses')
       end
 
-      def translate_uses(step)
+      def translator(step)
         root, version = step['uses'].split('@')
 
         # make the action a valid function name

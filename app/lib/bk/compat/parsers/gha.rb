@@ -12,7 +12,6 @@ module BK
   module Compat
     # GitHub Actions converter
     class GitHubActions
-      include StepTranslator
       require 'yaml'
 
       def self.name
@@ -59,10 +58,14 @@ module BK
       end
 
       private
-      
+
       def register_translators!
-        GHABuiltins.new(register: method(:register_translator))
-        GHAActions.new(register: method(:register_translator))
+        @translator = BK::Compat::StepTranslator.new
+
+        @translator.register(
+          GHABuiltins.new,
+          GHAActions.new
+        )
       end
     end
   end
