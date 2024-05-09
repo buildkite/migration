@@ -11,14 +11,14 @@ module BK
 
       def register(*translators)
         translators.each do |tr|
+          # allow translator to have a `recursor` function available
           tr.define_singleton_method(:recursor, method(:translate_step).to_proc)
           @translators << tr
         end
       end
 
       def translate_step(*, **)
-        @translators ||= [] # utilize an instance variable that may not exist
-
+        # we assume each translator has a matcher and a translator method
         result = @translators.select { |translator| translator.matcher(*, **) }
                              .map { |translator| translator.translator(*, **) }
 
