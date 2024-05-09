@@ -13,17 +13,10 @@ module BK
     module BitBucketSteps
       # Implementation of native step translation
       class Step
-        def initialize(register:, definitions: {})
+        def initialize(definitions: {})
           load_caches!(definitions.fetch('caches', nil))
           load_services!(definitions.fetch('services', nil))
-
-          register.call(
-            method(:matcher),
-            method(:translator)
-          )
         end
-
-        private
 
         def matcher(conf, *, **)
           conf.include?('step')
@@ -34,6 +27,8 @@ module BK
 
           BK::Compat::BitBucket.translate_trigger(conf['step'].fetch('trigger', 'automatic'), base)
         end
+
+        private
 
         def base_step(step)
           cmd = BK::Compat::CommandStep.new(

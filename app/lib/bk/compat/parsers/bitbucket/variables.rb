@@ -8,15 +8,6 @@ module BK
     module BitBucketSteps
       # Implementation of native step translation
       class Variables
-        def initialize(register:)
-          register.call(
-            method(:matcher),
-            method(:translator)
-          )
-        end
-
-        private
-
         def matcher(conf, *, **)
           conf.include?('variables')
         end
