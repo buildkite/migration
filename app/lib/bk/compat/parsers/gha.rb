@@ -2,7 +2,7 @@
 
 require_relative '../error'
 require_relative '../translator'
-require_relative '../pipeline'
+require_relative '../models/pipeline'
 require_relative 'gha/branches'
 require_relative 'gha/jobs'
 require_relative 'gha/steps'
