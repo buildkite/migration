@@ -9,7 +9,6 @@ module BK
   module Compat
     # Harness translation scaffolding
     class Harness
-      include StepTranslator
       require 'yaml'
 
       def self.name
@@ -55,9 +54,18 @@ module BK
 
       private
 
+      def default_step(*, **)
+        BK::Compat::CommandStep.new(
+          commands: @translator.default_value(*, **)
+        )
+      end
+
       def register_translators!
-        BK::Compat::HarnessSteps::Run.new(register: method(:register_translator))
-      end      
+        @translator = BK::Compat::StepTranslator.new(default: method(:default_step))
+        @translator.register(
+          BK::Compat::HarnessSteps::Run.new
+        )
+      end
 
       def simplify_group(group)
         # If there ended up being only 1 stage, skip the group and just
@@ -75,7 +83,7 @@ module BK
           key: identifier
         ).tap do |cmd|
           spec.dig('execution', 'steps').map do |step|
-            cmd << translate_step(**step['step'].transform_keys(&:to_sym))
+            cmd << @translator.translate_step(**step['step'].transform_keys(&:to_sym))
           end
         end
       end

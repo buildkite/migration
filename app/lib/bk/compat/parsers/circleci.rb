@@ -12,7 +12,6 @@ module BK
   module Compat
     # CircleCI translation scaffolding
     class CircleCI
-      include StepTranslator
       require 'yaml'
 
       def self.name
@@ -63,10 +62,10 @@ module BK
       private
 
       def register_translators!
-        BK::Compat::CircleCISteps::Builtins.new(
-          register: method(:register_translator),
-          recursor: method(:translate_steps)
-        )     
+        @translator = BK::Compat::StepTranslator.new
+        @translator.register(
+          BK::Compat::CircleCISteps::Builtins.new
+        )
       end
 
       def load_elements!

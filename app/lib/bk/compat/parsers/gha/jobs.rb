@@ -13,7 +13,7 @@ module BK
         bk_step = generate_base_step(name, config)
         bk_step << translate_concurrency(config['concurrency'])
         bk_step.matrix = generate_matrix(config['strategy']&.fetch('matrix'))
-        config['steps'].each { |step| bk_step << translate_step(step) }
+        config['steps'].each { |step| bk_step << @translator.translate_step(step) }
         bk_step.agents.update(config.slice('runs-on'))
         bk_step.conditional = generate_if(config['if'])
 

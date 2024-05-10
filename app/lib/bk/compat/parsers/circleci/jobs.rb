@@ -49,7 +49,7 @@ module BK
 
         step_list.map do |circle_step|
           key, config = string_or_key(circle_step)
-          @commands_by_key[key]&.instantiate(config) || translate_step(key, config)
+          @commands_by_key[key]&.instantiate(config) || @translator.translate_step(key, config)
         end
       end
     end

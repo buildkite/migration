@@ -8,16 +8,6 @@ module BK
     module CircleCISteps
       # Implementation of native step translation
       class Builtins
-        def initialize(register:, recursor: nil)
-          @recursor = recursor # to call back to translate steps further
-          register.call(
-            method(:matcher),
-            method(:translator)
-          )
-        end
-
-        private
-
         VALID_ACTIONS = %w[
           add_ssh_keys attach_workspace checkout deploy persist_to_workspace restore_cache
           run save_cache setup_remote_docker store_artifacts store_test_results when
@@ -30,6 +20,8 @@ module BK
         def translator(action, config)
           send("translate_#{action.gsub('-', '_')}", config)
         end
+
+        private
 
         def translate_add_ssh_keys(_config)
           ['# `add_ssh_keys` has no translation, your agent should have the keys to connect where it needs to']
@@ -117,7 +109,7 @@ module BK
 
         def translate_when(config)
           condition = BK::Compat::CircleCI.parse_condition(config['condition'])
-          commands = @recursor&.call(config['steps'])
+          commands = config['steps'].map { |s| recursor(*s.to_a.flatten) }
           [
             '# when condition translation may not be compatible with your shell',
             "if [ #{condition} ]; then"

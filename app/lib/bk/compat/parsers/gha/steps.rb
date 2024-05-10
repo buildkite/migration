@@ -6,16 +6,11 @@ module BK
   module Compat
     # Implement GHA Builtin Steps
     class GHABuiltins
-      def initialize(register:)
-        register.call(
-          ->(conf) { conf.include?('run') },
-          method(:translate_run)
-        )
+      def matcher(conf)
+        conf.include?('run')
       end
 
-      private
-
-      def translate_run(step)
+      def translator(step)
         [
           step.include?('name') ? "echo '~~~ #{step['name']}'" : nil,
           step.include?('shell') ? '# Shell is determined in the agent' : nil,
@@ -28,6 +23,8 @@ module BK
           )
         ].flatten.compact
       end
+
+      private
 
       def generate_command_string(commands: [], env: {}, workdir: nil, id: nil)
         vars = env.map { |k, v| "#{k}=\"#{v}\"" }

@@ -7,16 +7,6 @@ module BK
     module BitBucketSteps
       # Implementation of stage translation
       class Stages
-        def initialize(register:, recursor: nil)
-          @recursor = recursor # to call back to translate steps further
-          register.call(
-            method(:matcher),
-            method(:translator)
-          )
-        end
-
-        private
-
         def matcher(conf, *, **)
           conf.include?('stage')
         end
@@ -33,9 +23,11 @@ module BK
           )
         end
 
+        private
+
         def translate_steps(stage, defaults)
           # TODO: these steps can not have conditions
-          steps = Array(stage['steps']).map { |s| @recursor&.call(s, defaults: defaults) }
+          steps = Array(stage['steps']).map { |s| recursor(s, defaults: defaults) }
           steps = BK::Compat::BitBucket.translate_trigger(stage['trigger'], steps.flatten)
           steps.pop if steps.last.is_a?(BK::Compat::WaitStep)
           steps

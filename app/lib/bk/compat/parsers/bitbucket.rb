@@ -14,7 +14,6 @@ module BK
   module Compat
     # BitBucket translation scaffolding
     class BitBucket
-      include StepTranslator
       require 'yaml'
 
       def self.name
@@ -55,20 +54,14 @@ module BK
       private
 
       def register_translators!
-        BK::Compat::BitBucketSteps::Import.new(register: method(:register_translator))
-        BK::Compat::BitBucketSteps::Parallel.new(
-          register: method(:register_translator),
-          recursor: method(:translate_step)
+        @translator = BK::Compat::StepTranslator.new
+        @translator.register(
+          BK::Compat::BitBucketSteps::Import.new,
+          BK::Compat::BitBucketSteps::Parallel.new,
+          BK::Compat::BitBucketSteps::Stages.new,
+          BK::Compat::BitBucketSteps::Step.new(definitions: @config.fetch('definitions', {})),
+          BK::Compat::BitBucketSteps::Variables.new
         )
-        BK::Compat::BitBucketSteps::Stages.new(
-          register: method(:register_translator),
-          recursor: method(:translate_step)
-        )
-        BK::Compat::BitBucketSteps::Step.new(
-          register: method(:register_translator),
-          definitions: @config.fetch('definitions', {})
-        )
-        BK::Compat::BitBucketSteps::Variables.new(register: method(:register_translator))
       end
 
       def non_default_pipelines(defaults)
@@ -106,7 +99,7 @@ module BK
       end
 
       def parse_pipeline(name, conf, defaults)
-        steps = Array(conf).map { |s| translate_step(s, defaults: defaults) }
+        steps = Array(conf).map { |s| @translator.translate_step(s, defaults: defaults) }
         simplify_group(
           BK::Compat::GroupStep.new(
             label: name,
