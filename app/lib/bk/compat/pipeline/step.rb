@@ -109,8 +109,8 @@ module BK
     # basic command step
     class CommandStep < BaseStep
       attr_accessor :agents, :artifact_paths, :branches, :concurrency, :concurrency_group,
-                    :conditional, :depends_on, :env, :key, :label, :matrix, :parameters,
-                    :plugins, :soft_fail, :timeout_in_minutes, :transformer
+                    :conditional, :depends_on, :env, :key, :label, :matrix,
+                    :plugins, :soft_fail, :timeout_in_minutes
 
       attr_reader :commands # we define special writers
 

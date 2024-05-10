@@ -43,6 +43,8 @@ module BK
 
     # wrapper class to setup parameters
     class GHAStep < BK::Compat::CommandStep
+      attr_accessor :transformer
+
       def initialize(*, **)
         super
         @transformer = method(:gha_params)
@@ -56,6 +58,12 @@ module BK
           d = EXPRESSION_REGEXP.match(v)
           EXPRESSION_TRANSFORMER.transform(d[:data])
         end
+      end
+
+      def to_h
+        @transformer = nil
+
+        super
       end
     end
   end
