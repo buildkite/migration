@@ -8,6 +8,11 @@ Style/HashSyntax:
 Naming/BlockForwarding:
   EnforcedStyle: explicit
 
+# TODO: solve this
+Metrics/BlockLength:
+  Exclude:
+    - spec/**/*.rb
+
 Metrics/MethodLength:
   CountAsOne: [ 'array', 'hash', 'heredoc' ]
 
