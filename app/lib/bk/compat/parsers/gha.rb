@@ -47,7 +47,7 @@ module BK
 
         steps = @config.fetch('jobs', []).map do |key, config|
           parse_job(key, defaults.merge(config)).tap do |bk_step|
-            bk_step.branches = branches
+            bk_step.branches = branches unless branches.empty?
           end
         end
 

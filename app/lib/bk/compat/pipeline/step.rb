@@ -121,6 +121,10 @@ module BK
       def hash_attributes
         %w[agents env matrix].freeze
       end
+
+      # only for backwards compatibility
+      def key_order
+        %i[artifact_paths commands depends_on plugins agents env matrix label key].freeze
       end
 
       def commands=(value)
@@ -191,6 +195,7 @@ module BK
         @concurrency = [@concurrency, other.concurrency].compact.min
         @concurrency_group ||= other.concurrency_group
         @branches = "#{@branches} #{other.branches}".strip
+        @branches = nil if @branches.empty?
         @timeout_in_minutes = [@timeout_in_minutes, other.timeout_in_minutes].compact.max
 
         # TODO: these could be a hash with exit codes

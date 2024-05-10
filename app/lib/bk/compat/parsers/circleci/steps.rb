@@ -142,7 +142,6 @@ module BK
         def to_h
           @transformer = nil
           @parameters = nil
-          @branches = nil if @branches == ''
           super
         end
       end
