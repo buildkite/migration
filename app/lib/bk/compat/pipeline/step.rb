@@ -101,7 +101,6 @@ module BK
     class InputStep < BlockStep
       def to_h
         super.tap do |h|
-          h[:fields] = @fields unless @fields.nil?
           h[:input] = h.delete(:block)
         end
       end
@@ -115,18 +114,13 @@ module BK
 
       attr_reader :commands # we define special writers
 
-      LIST_ATTRIBUTES = %w[artifact_paths commands depends_on plugins].freeze
-      HASH_ATTRIBUTES = %w[agents env matrix parameters].freeze
+      def list_attributes
+        %w[artifact_paths commands depends_on plugins].freeze
+      end
 
-      def initialize(**kwargs)
-        # nil as default are not acceptable
-        LIST_ATTRIBUTES.each { |k| send("#{k}=", []) }
-        HASH_ATTRIBUTES.each { |k| send("#{k}=", {}) }
-
-        kwargs.map do |k, v|
-          # set attributes passed through as-is
-          send("#{k}=", v)
-        end
+      def hash_attributes
+        %w[agents env matrix].freeze
+      end
       end
 
       def commands=(value)
@@ -237,12 +231,10 @@ module BK
         %w[depends_on steps].freeze
       end
 
-      def initialize(label: '~', key: nil, steps: [], depends_on: [], conditional: nil)
-        @label = label
-        @key = key
-        @depends_on = depends_on
-        @steps = steps
-        @conditional = conditional
+      def initialize(*, **kwargs)
+        # ensure label has a ~ default value
+        repack = { label: '~' }.merge(kwargs)
+        super(*, **repack)
       end
 
       def to_h
