@@ -53,7 +53,7 @@ module BK
 
       def clean_dict(dict)
         # remove empty and nil values
-        dict.delete_if { |_, v| v.nil? || (v.is_a?(Enumerable) && v.empty?) }
+        dict.delete_if { |_, v| v.nil? || ((v.is_a?(Enumerable) || v.is_a?(String)) && v.empty?) }
 
         # sort values for stable and consistent outputs
         dict.sort { |a, b| _order(a[0]) - _order(b[0]) }.to_h
@@ -195,7 +195,6 @@ module BK
         @concurrency = [@concurrency, other.concurrency].compact.min
         @concurrency_group ||= other.concurrency_group
         @branches = "#{@branches} #{other.branches}".strip
-        @branches = nil if @branches.empty?
         @timeout_in_minutes = [@timeout_in_minutes, other.timeout_in_minutes].compact.max
 
         # TODO: these could be a hash with exit codes
