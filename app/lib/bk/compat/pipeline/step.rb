@@ -149,12 +149,12 @@ module BK
 
       # add/merge step
       def <<(other)
-        case other
-        when BK::Compat::WaitStep
+        # would love to use `case/when` but it does not handle inheritance
+        if [BK::Compat::WaitStep, BK::Compat::BlockStep].include?(other.class)
           raise 'Can not add a wait step to another step'
-        when self.class
+        elsif other.class <= BK::Compat::BaseStep
           merge!(other)
-        when BK::Compat::Plugin
+        elsif other.class <= BK::Compat::Plugin
           @plugins << other
         else
           add_commands(*other) unless other.nil?
@@ -163,12 +163,12 @@ module BK
 
       # prepend/merge steps
       def >>(other)
-        case other
-        when BK::Compat::WaitStep
+        # would love to use `case/when` but it does not handle inheritance
+        if [BK::Compat::WaitStep, BK::Compat::BlockStep].include?(other.class)
           raise 'Can not add a wait step to another step'
-        when self.class
+        elsif other.class <= BK::Compat::BaseStep
           pre_merge!(other)
-        when BK::Compat::Plugin
+        elsif other.class <= BK::Compat::Plugin
           @plugins.prepend(other)
         else
           prepend_commands(*other) unless other.nil?
