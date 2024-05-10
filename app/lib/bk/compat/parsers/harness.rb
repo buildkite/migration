@@ -3,7 +3,7 @@
 require_relative '../translator'
 require_relative '../pipeline'
 require_relative '../pipeline/step'
-require_relative 'harness/steps/run'
+require_relative 'harness/steps'
 
 module BK
   module Compat
@@ -39,17 +39,11 @@ module BK
       end
 
       def parse
-        # map stages to groups
-        grp = BK::Compat::GroupStep.new(
-          label: @config['pipeline']['name'],
-          key: @config['pipeline']['identifier']
+        Pipeline.new(
+          steps: @config['pipeline']['stages'].map do |stage|
+            parse_stage(**stage['stage'].transform_keys(&:to_sym))
+          end
         )
-
-        grp.steps = @config['pipeline']['stages'].map do |stage|
-          parse_stage(**stage['stage'].transform_keys(&:to_sym))
-        end
-
-        Pipeline.new(steps: [simplify_group(grp)])
       end
 
       private
@@ -62,30 +56,30 @@ module BK
 
       def register_translators!
         @translator = BK::Compat::StepTranslator.new(default: method(:default_step))
-        @translator.register(
-          BK::Compat::HarnessSteps::Run.new
-        )
+        @translator.register(BK::Compat::HarnessSteps::Translator.new)
       end
 
       def simplify_group(group)
         # If there ended up being only 1 stage, skip the group and just
         # pull the steps out.
         if group.steps.length == 1
-          group.steps.map! { |step| step.conditional = group.conditional }
-          group = groups.steps.first
+          step = group.steps.first
+          step.conditional = group.conditional
+          group = step
         end
         group
       end
 
       def parse_stage(name:, identifier:, spec:, **_rest)
-        BK::Compat::CommandStep.new(
+        grp = BK::Compat::GroupStep.new(
           label: name,
-          key: identifier
-        ).tap do |cmd|
-          spec.dig('execution', 'steps').map do |step|
-            cmd << @translator.translate_step(**step['step'].transform_keys(&:to_sym))
+          key: identifier,
+          steps: spec.dig('execution', 'steps').map do |step|
+            @translator.translate_step(**step['step'].transform_keys(&:to_sym))
           end
-        end
+        )
+
+        simplify_group(grp)
       end
     end
   end
