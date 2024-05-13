@@ -27,17 +27,20 @@ module BK
       private
 
       def generate_command_string(commands: [], env: {}, workdir: nil, id: nil)
+        cwd = "cd '#{workdir}'" unless workdir.nil?
         vars = env.map { |k, v| "#{k}=\"#{v}\"" }
         cmds = commands.lines(chomp: true)
+        step_id = "#{BK::Compat.var_name(id, 'GHA_STEP')}=\"$$?\"" unless id.nil?
+
         avoid_parens = vars.empty? && workdir.nil? && (id.nil? || cmds.one?)
-        [
-          avoid_parens ? nil : '(',
-          workdir.nil? ? nil : "cd '#{workdir}'",
-          vars.empty? ? nil : vars,
-          cmds,
-          avoid_parens ? nil : ')',
-          id.nil? ? nil : "#{BK::Compat.var_name(id, 'GHA_STEP')}=\"$$?\""
-        ].compact
+
+        ret = parens(avoid_parens, [cwd, vars, cmds]) + [step_id]
+
+        ret.flatten.compact
+      end
+
+      def parens(skip, arr)
+        skip ? arr : ['('] + arr + [')']
       end
     end
 

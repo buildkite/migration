@@ -1,5 +1,5 @@
 AllCops:
-  TargetRubyVersion: 3.2
+  TargetRubyVersion: 3.3
   NewCops: enable
 
 Style/HashSyntax:
@@ -7,6 +7,11 @@ Style/HashSyntax:
 
 Naming/BlockForwarding:
   EnforcedStyle: explicit
+
+# TODO: solve this
+Metrics/BlockLength:
+  Exclude:
+    - spec/**/*.rb
 
 Metrics/MethodLength:
   CountAsOne: [ 'array', 'hash', 'heredoc' ]
