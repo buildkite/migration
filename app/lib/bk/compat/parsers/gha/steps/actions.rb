@@ -97,23 +97,20 @@ module BK
       end
 
       def obtain_java_distribution_image(distribution, java_version)
-        case distribution
-        # seemru, adopt-openj9 (moved to semeru)
-        when /semeru|adopt-openj9/
-          "ibm-semeru-runtimes:open-#{java_version}-jdk"
-        # temurin, adpot (moved to temurin), oracle (deprecated)
-        when /temurin|adopt|oracle/
-          "eclipse-temurin:#{java_version}-jdk-alpine"
-        when /zulu/
-          "azul/zulu-openjdk-alpine:t#{java_version}-latest"
-        when /liberica/
-          "bellsoft/liberica-openjdk-alpine:#{java_version}"
-        when /microsoft/
-          "mcr.microsoft.com/openjdk/jdk:#{java_version}-ubuntu"
-        when /coretto/
-          "amazoncorretto:#{java_version}-al2023-jdk"
-        when /dragonwell/
-          "alibabadragonwell/dragonwell:#{java_version}-alpine"
+        mapping = {
+          # seemru, adopt-openj9 (moved to semeru)
+          /semeru|adopt-openj9/ => "ibm-semeru-runtimes:open-#{java_version}-jdk",
+          # temurin, adpot (moved to temurin), oracle (deprecated)
+          /temurin|adopt|oracle/ => "eclipse-temurin:#{java_version}-jdk-alpine",
+          /zulu/ => "azul/zulu-openjdk-alpine:t#{java_version}-latest",
+          /liberica/ => "bellsoft/liberica-openjdk-alpine:#{java_version}",
+          /microsoft/ => "mcr.microsoft.com/openjdk/jdk:#{java_version}-ubuntu",
+          /coretto/ => "amazoncorretto:#{java_version}-al2023-jdk",
+          /dragonwell/ => "alibabadragonwell/dragonwell:#{java_version}-alpine"
+        }
+
+        mapping.each do |regex, result|
+          return result if distribution.match(regex)
         end
       end
     end

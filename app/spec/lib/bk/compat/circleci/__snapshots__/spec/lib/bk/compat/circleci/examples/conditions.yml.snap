@@ -2,6 +2,8 @@
 steps:
 - group: ":circleci: my-workflow"
   key: my-workflow
+  if: '!(/^main$/ ~= << pipeline.git.branch >>) && "<< pipeline.git.tag >>" == "canary"
+    || << pipeline.parameters.deploy-canary >>'
   steps:
   - commands:
     - echo 'Hello'
@@ -10,10 +12,9 @@ steps:
     - echo 'Running in main'
     - fi
     key: test
-  if: '!(/^main$/ ~= << pipeline.git.branch >>) && "<< pipeline.git.tag >>" == "canary"
-    || << pipeline.parameters.deploy-canary >>'
 - group: ":circleci: my-workflow-2"
   key: my-workflow-2
+  if: '"<< pipeline.git.branch >>" == "main"'
   steps:
   - commands:
     - "# No need for checkout, the agent takes care of that"
@@ -49,4 +50,3 @@ steps:
     env:
       DEPLOY_ENV: staging
     key: publish
-  if: '"<< pipeline.git.branch >>" == "main"'

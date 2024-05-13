@@ -12,10 +12,7 @@ module BK
       def parse_job(name, config)
         bk_step = generate_base_step(name, config)
         bk_step << translate_concurrency(config['concurrency'])
-        bk_step.matrix = generate_matrix(config['strategy']&.fetch('matrix'))
         config['steps'].each { |step| bk_step << @translator.translate_step(step) }
-        bk_step.agents.update(config.slice('runs-on'))
-        bk_step.conditional = generate_if(config['if'])
 
         # these two should be last because they need to execute commands at the end
         bk_step << translate_outputs(config['outputs'], name)
@@ -31,7 +28,10 @@ module BK
           depends_on: Array(config['needs']),
           env: config.fetch('env', {}),
           timeout_in_minutes: config['timeout-minutes'],
-          soft_fail: config['continue-on-error']
+          soft_fail: config['continue-on-error'],
+          conditional: generate_if(config['if']),
+          agents: config.slice('runs-on'),
+          matrix: generate_matrix(config['strategy']&.fetch('matrix'))
         )
       end
 
