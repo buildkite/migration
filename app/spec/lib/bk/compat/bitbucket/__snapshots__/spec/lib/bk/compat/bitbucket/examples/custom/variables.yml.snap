@@ -1,6 +1,11 @@
 ---
 steps:
-- group: default
+- key: execute-34fda39a698739f93a76af1583cf0b9e937f3561
+  prompt: Execute step 34fda39a698739f93a76af1583cf0b9e937f3561?
+  input: execute-34fda39a698739f93a76af1583cf0b9e937f3561
+- group: deployer
+  depends_on:
+  - execute-34fda39a698739f93a76af1583cf0b9e937f3561
   steps:
   - key: custom-vars
     fields:
