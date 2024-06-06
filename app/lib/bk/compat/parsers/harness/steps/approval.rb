@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-#require_relative '../../../models/steps/block'
-
 module BK
   module Compat
     module HarnessSteps
