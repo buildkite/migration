@@ -2,40 +2,10 @@
 
 require_relative '../models/steps/base'
 require_relative '../models/steps/wait'
+require_relative '../models/steps/block'
 
 module BK
   module Compat
-    # simple block step
-    class BlockStep < BaseStep
-      attr_accessor :conditional, :depends_on, :fields, :key, :label, :prompt
-
-      def list_attributes
-        %w[depends_on fields].freeze
-      end
-
-      def <<(_other)
-        raise 'Can not add to a block step'
-      end
-
-      def >>(_other)
-        raise 'Can not add to a block step'
-      end
-
-      def to_h
-        @block = @key
-        super
-      end
-    end
-
-    # input steps are almost the same as block steps (difference is dependency semantics)
-    class InputStep < BlockStep
-      def to_h
-        super.tap do |h|
-          h[:input] = h.delete(:block)
-        end
-      end
-    end
-
     # basic command step
     class CommandStep < BaseStep
       attr_accessor :agents, :artifact_paths, :branches, :concurrency, :concurrency_group,
