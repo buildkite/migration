@@ -3,7 +3,7 @@
 require_relative '../renderer'
 
 # for easier usage (modules just have to import)
-require_relative '../pipeline/plugin'
+require_relative 'pipeline'
 require_relative '../pipeline/step'
 
 module BK

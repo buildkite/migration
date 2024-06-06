@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative '../../pipeline/step'
-require_relative '../../pipeline/plugin'
+require_relative '../../models/plugin'
 
 module BK
   module Compat
