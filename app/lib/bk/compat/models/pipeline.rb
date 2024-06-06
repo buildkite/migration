@@ -2,9 +2,6 @@
 
 require_relative '../renderer'
 
-# for easier usage (modules just have to import)
-require_relative 'pipeline'
-
 module BK
   module Compat
     # Base BuildKite pipeline
