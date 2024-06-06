@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../../models/plugin'
-require_relative '../../pipeline/step'
-
 require_relative 'docker'
 
 module BK

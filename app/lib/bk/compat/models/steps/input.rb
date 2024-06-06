@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'block'
+
 module BK
   module Compat
     # input steps are almost the same as block steps (difference is dependency semantics)

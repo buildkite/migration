@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative 'logic'
-require_relative '../../pipeline/step'
 
 module BK
   module Compat

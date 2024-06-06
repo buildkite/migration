@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../models/steps/base'
-require_relative '../models/steps/wait'
-require_relative '../models/steps/block'
+require_relative 'wait'
 
 module BK
   module Compat
@@ -124,29 +122,6 @@ module BK
           # if we don't know how to do this, do nothing
           value
         end
-      end
-    end
-
-    # group step
-    class GroupStep < BaseStep
-      attr_accessor :depends_on, :key, :label, :steps, :conditional
-
-      def list_attributes
-        %w[depends_on steps].freeze
-      end
-
-      def initialize(*, **kwargs)
-        # ensure label has a ~ default value
-        repack = { label: '~' }.merge(kwargs)
-        super(*, **repack)
-      end
-
-      def to_h
-        @group = @label unless @label.nil?
-        @label = nil
-        @steps = @steps.map(&:to_h)
-
-        super
       end
     end
   end
