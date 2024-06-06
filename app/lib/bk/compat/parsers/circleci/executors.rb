@@ -32,7 +32,7 @@ module BK
       def parse_executor(type: nil, conf: {}, working_directory: nil, shell: nil, resource_class: nil, environment: {})
         raise 'Invalid executor configuration' if type.nil?
 
-        BK::Compat::CircleCISteps::CircleCIStep.new(
+        BK::Compat::CircleCIStep.new(
           key: "Executor #{type}",
           env: environment
         ).tap do |step|
@@ -45,7 +45,7 @@ module BK
 
       def executor_machine(config)
         config = { 'image' => 'self-hosted' } if config == true
-        BK::Compat::CircleCISteps::CircleCIStep.new.tap do |step|
+        BK::Compat::CircleCIStep.new.tap do |step|
           step.agents['executor_type'] = 'machine'
           step.agents['executor_image'] = config['image']
           if config.include?('docker_layer_caching')
@@ -55,14 +55,14 @@ module BK
       end
 
       def executor_macos(config)
-        BK::Compat::CircleCISteps::CircleCIStep.new.tap do |step|
+        BK::Compat::CircleCIStep.new.tap do |step|
           step.agents['executor_type'] = 'osx'
           step.agents['executor_xcode'] = config['xcode']
         end
       end
 
       def executor_windows(_config)
-        BK::Compat::CircleCISteps::CircleCIStep.new.tap do |step|
+        BK::Compat::CircleCIStep.new.tap do |step|
           step.agents['executor_type'] = 'windows'
         end
       end

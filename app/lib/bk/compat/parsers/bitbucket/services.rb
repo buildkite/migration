@@ -17,7 +17,7 @@ module BK
 
           plugin_config = { 'run' => 'app' }
 
-          @services = BK::Compat::CircleCISteps::CircleCIStep.new(
+          @services = BK::Compat::CircleCIStep.new(
             key: 'docker compose',
             commands: cmds,
             agents: { 'executor_type' => 'docker_compose' },

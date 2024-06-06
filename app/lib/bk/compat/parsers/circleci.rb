@@ -2,6 +2,8 @@
 
 require_relative '../translator'
 require_relative '../models/pipeline'
+require_relative '../models/steps/circleci/circleci_step'
+
 require_relative 'circleci/executors'
 require_relative 'circleci/jobs'
 require_relative 'circleci/orbs'
