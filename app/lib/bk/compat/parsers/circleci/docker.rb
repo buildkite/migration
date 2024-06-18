@@ -28,7 +28,7 @@ module BK
           name: 'docker-login',
           config: {
             'username' => auth_config['username'],
-            'password-env' => auth_config['password'].ltrim('$')
+            'password-env' => auth_config['password'].delete_prefix('$')
           }
         )
       end
