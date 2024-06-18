@@ -109,11 +109,14 @@ module BK
 
         def translate_when(config)
           condition = BK::Compat::CircleCI.parse_condition(config['condition'])
-          commands = recursor(config['steps'])
-          [
-            '# when condition translation may not be compatible with your shell',
-            "if [ #{condition} ]; then"
-          ] + commands.compact + ['fi']
+          CircleCIStep.new.tap do |c|
+            c << [
+              '# when condition translation may not be compatible with your shell',
+              "if [ #{condition} ]; then"
+            ]
+            recursor(config['steps']).each { |s| c << s }
+            c << 'fi'
+          end
         end
       end
 
