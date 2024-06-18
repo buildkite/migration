@@ -62,7 +62,7 @@ module BK
       private
 
       def register_translators!
-        @translator = BK::Compat::StepTranslator.new
+        @translator = BK::Compat::StepTranslator.new(recursor: method(:translate_steps).to_proc)
         @translator.register(
           BK::Compat::CircleCISteps::Builtins.new
         )
@@ -85,6 +85,15 @@ module BK
         groups = groups.first.steps.each { |step| step.conditional = groups.first.conditional } if groups.length == 1
 
         groups
+      end
+
+      def translate_steps(step_list)
+        return [] if step_list.nil?
+
+        step_list.map do |circle_step|
+          key, config = string_or_key(circle_step)
+          @commands_by_key[key]&.instantiate(config) || @translator.translate_step(key, config)
+        end
       end
 
       def string_or_key(job)

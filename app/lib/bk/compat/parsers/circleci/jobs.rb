@@ -43,15 +43,6 @@ module BK
           bk_step.parameters = config.fetch('parameters', {})
         end
       end
-
-      def translate_steps(step_list)
-        return [] if step_list.nil?
-
-        step_list.map do |circle_step|
-          key, config = string_or_key(circle_step)
-          @commands_by_key[key]&.instantiate(config) || @translator.translate_step(key, config)
-        end
-      end
     end
   end
 end
