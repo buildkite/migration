@@ -4,15 +4,16 @@ module BK
   module Compat
     # Dispatch pattern for step translation
     class StepTranslator
-      def initialize(default: nil)
+      def initialize(default: nil, recursor: nil)
         @default_func = default.nil? ? method(:default_value) : default
+        @recursor = recursor || method(:translate_step).to_proc
         @translators = []
       end
 
       def register(*translators)
         translators.each do |tr|
           # allow translator to have a `recursor` function available
-          tr.define_singleton_method(:recursor, method(:translate_step).to_proc)
+          tr.define_singleton_method(:recursor, @recursor)
           @translators << tr
         end
       end
