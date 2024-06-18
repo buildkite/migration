@@ -10,6 +10,7 @@ steps:
     - "# when condition translation may not be compatible with your shell"
     - if [ "<< pipeline.git.branch >>" == "main" ]; then
     - echo 'Running in main'
+    - echo 'Running command'
     - fi
     key: test
 - group: ":circleci: my-workflow-2"
