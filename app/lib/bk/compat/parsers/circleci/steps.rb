@@ -109,7 +109,7 @@ module BK
 
         def translate_when(config)
           condition = BK::Compat::CircleCI.parse_condition(config['condition'])
-          commands = config['steps'].map { |s| recursor(*s.to_a.flatten) }
+          commands = recursor(config['steps'])
           [
             '# when condition translation may not be compatible with your shell',
             "if [ #{condition} ]; then"
