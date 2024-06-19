@@ -60,8 +60,8 @@ module BK
         error_message(
           [
             'Whoops! You found a bug!',
-            'Please email support@buildkite.com about this',
-            '(with a copy of the file you are trying to convert if possible).'
+            'Please open an issue in the GH repo with a copy of the file you are trying to convert if possible.',
+            'Otherwise email support@buildkite.com about this with the file attached.'
           ].join(' ')
         )
       end
