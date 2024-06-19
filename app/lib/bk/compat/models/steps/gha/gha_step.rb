@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "../../../parsers/gha/expressions"
+
 module BK
   module Compat
     # wrapper class to setup parameters
