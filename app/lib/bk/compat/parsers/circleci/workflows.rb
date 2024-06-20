@@ -55,6 +55,7 @@ module BK
           # rename step (to respect dependencies and avoid clashes)
           step.key = config.fetch('name', key)
           step.conditional = parse_filters(config.fetch('filters', {}))
+          step.matrix = parse_matrix(config.fetch('matrix', {}))
         end
       end
 
@@ -63,6 +64,17 @@ module BK
         tags = BK::Compat::CircleCI.build_condition(config.fetch('tags', {}), 'build.tag')
 
         BK::Compat.xxand(branches, tags)
+      end
+
+      def parse_matrix(config)
+        params, exclude = config.values_at('parameters', 'exclude')
+
+        return {} if params.nil?
+
+        {
+          setup: params,
+          adjustments: exclude&.map { |x| { with: x, skip: true } }
+        }.compact
       end
     end
   end
