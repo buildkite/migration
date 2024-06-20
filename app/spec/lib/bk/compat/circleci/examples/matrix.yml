@@ -1,0 +1,29 @@
+version: 2.1
+
+command:
+
+jobs:
+  build:
+    parameters:
+      version:
+        type: string
+        default: ""
+      platform:
+        type: string
+        default: "linux"
+      other:
+        type: string
+    steps:
+      - run: 'echo "Version: << parameters.version >>"'
+      - run: 'echo "Platform: << parameters.platform >>"'
+      - run: 'echo "Other: << parameters.other >>"'
+
+workflows:
+  workflow:
+    jobs:
+      - build:
+          name: build-<<matrix.version>>
+          other: 'test'
+          matrix:
+            parameters:
+              version: ["0.1", "0.2", "0.3"]

@@ -47,14 +47,19 @@ module BK
       end
 
       def process_job(key, config)
-        @commands_by_key[key].instantiate(config).tap do |step|
+        get_command(key, config).tap do |step|
           step >> translate_steps(config['pre-steps'])
           step << translate_steps(config['post-steps'])
-          step.depends_on = config.fetch('requires', [])
+        end.instantiate(config)
+      end
 
+      def get_command(key, config)
+        @commands_by_key[key].dup.tap do |step|
           # rename step (to respect dependencies and avoid clashes)
           step.key = config.fetch('name', key)
+          step.depends_on = config.fetch('requires', [])
           step.conditional = parse_filters(config.fetch('filters', {}))
+          step.matrix = parse_matrix(config.fetch('matrix', {}))
         end
       end
 
@@ -63,6 +68,17 @@ module BK
         tags = BK::Compat::CircleCI.build_condition(config.fetch('tags', {}), 'build.tag')
 
         BK::Compat.xxand(branches, tags)
+      end
+
+      def parse_matrix(config)
+        params, exclude = config.values_at('parameters', 'exclude')
+
+        return {} if params.nil?
+
+        {
+          setup: params,
+          adjustments: exclude&.map { |x| { with: x, skip: true } }
+        }.compact
       end
     end
   end
