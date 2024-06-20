@@ -134,12 +134,18 @@ module BK
         end
 
         def circle_ci_params(value, config)
-          return value if @parameters.empty?
-
-          @parameters.each_with_object(value.dup) do |(name, param), str|
-            val = config.fetch(name, param.fetch('default', nil))
-            str.sub!(/<<\s*parameters\.#{name}\s*>>/, val)
+          matrix = config.dig('matrix', 'parameters') || {}
+          val = @parameters.each_with_object(value.dup) do |(name, param), str|
+            possible = [
+              config[name], # passed directly
+              matrix.keys.include?(name) ? "{{ matrix.#{name} }}" : nil, # matrix params
+              param['default'] # default parameter value
+            ]
+            str.gsub!(/<<\s*parameters\.#{name}\s*>>/, possible.compact.first)
           end
+          val.gsub!(/<<\s*matrix\.([^\s]+)\s*>>/, '{{ matrix.\1 }}')
+
+          val
         end
 
         def to_h
