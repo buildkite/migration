@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../../pipeline/plugin'
-require_relative '../../pipeline/step'
+require_relative '../../models/plugin'
 
 module BK
   module Compat
@@ -12,7 +11,7 @@ module BK
       def executor_docker(config)
         first, *rest = config # split first configuration
 
-        BK::Compat::CircleCISteps::CircleCIStep.new.tap do |step|
+        BK::Compat::CircleCIStep.new.tap do |step|
           step.agents['executor_type'] = 'docker'
           step << executor_docker_auth_plugin(first.fetch('auth', {}))
           step << executor_docker_aws_auth(first.fetch('aws-auth', {}))
@@ -42,7 +41,7 @@ module BK
         cfg[:login] = true
         cfg['assume-role'] = { 'role-arn' => config['oidc_role_arn'] } if config.include?('oidc_role_arn')
 
-        BK::Compat::CircleCISteps::CircleCIStep.new(
+        BK::Compat::CircleCIStep.new(
           plugins: [BK::Compat::Plugin.new(name: 'ecr', config: cfg)]
         ).tap do |step|
           if config.include?('aws_access_key_id')
@@ -77,7 +76,7 @@ module BK
         ]
         plugin_config = { 'run' => apps[0].fetch('name', 'service0') }
 
-        BK::Compat::CircleCISteps::CircleCIStep.new(
+        BK::Compat::CircleCIStep.new(
           key: 'docker compose',
           commands: cmds,
           agents: { 'executor_type' => 'docker_compose' },

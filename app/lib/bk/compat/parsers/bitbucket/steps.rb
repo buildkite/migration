@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../../pipeline/step'
-
 require_relative 'caches'
 require_relative 'clone'
 require_relative 'image'

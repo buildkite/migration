@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../../pipeline/step'
-
 module BK
   module Compat
     # Translate matrix configurations

@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../../pipeline/step'
-require_relative '../../pipeline/plugin'
-
 module BK
   module Compat
     module BitBucketSteps
@@ -20,7 +17,7 @@ module BK
 
           plugin_config = { 'run' => 'app' }
 
-          @services = BK::Compat::CircleCISteps::CircleCIStep.new(
+          @services = BK::Compat::CircleCIStep.new(
             key: 'docker compose',
             commands: cmds,
             agents: { 'executor_type' => 'docker_compose' },

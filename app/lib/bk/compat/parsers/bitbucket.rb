@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 require_relative '../translator'
-require_relative '../pipeline'
-require_relative '../pipeline/step'
+require_relative '../models/pipeline'
+require_relative '../models/steps/command'
 
 require_relative 'bitbucket/import'
 require_relative 'bitbucket/parallel'
