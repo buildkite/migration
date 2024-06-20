@@ -1,0 +1,13 @@
+---
+steps:
+- commands:
+  - 'echo "Version: {{ matrix.version }}"'
+  - 'echo "Platform: linux"'
+  - 'echo "Other: test"'
+  matrix:
+    setup:
+      version:
+      - '0.1'
+      - '0.2'
+      - '0.3'
+  key: build-{{ matrix.version }}
