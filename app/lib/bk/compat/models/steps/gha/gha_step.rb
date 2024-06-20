@@ -6,35 +6,26 @@ module BK
   module Compat
     # wrapper class to setup parameters
     class GHAStep < CommandStep
-      attr_accessor :transformer, :parameters
+      attr_accessor :transformer
 
       def initialize(*, **)
         super
-        @transformer = method(:circle_ci_params)
+        @transformer = method(:gha_params)
       end
 
-      def hash_attributes
-        super + ['parameters']
-      end
+      EXPRESSION_REGEXP = /\${{\s*(?<data>.*)\s*}}/
+      EXPRESSION_TRANSFORMER = BK::Compat::GithubExpressions.new
 
-      def circle_ci_params(value, config)
-        matrix = config.dig('matrix', 'parameters') || {}
-        val = @parameters.each_with_object(value.dup) do |(name, param), str|
-          possible = [
-            config[name], # passed directly
-            matrix.keys.include?(name) ? "{{ matrix.#{name} }}" : nil, # matrix params
-            param['default'] # default parameter value
-          ]
-          str.gsub!(/<<\s*parameters\.#{name}\s*>>/, possible.compact.first)
+      def gha_params(value)
+        value.gsub(EXPRESSION_REGEXP) do |v|
+          d = EXPRESSION_REGEXP.match(v)
+          EXPRESSION_TRANSFORMER.transform(d[:data])
         end
-        val.gsub!(/<<\s*matrix\.([^\s]+)\s*>>/, '{{ matrix.\1 }}')
-
-        val
       end
 
       def to_h
         @transformer = nil
-        @parameters = nil
+
         super
       end
     end
