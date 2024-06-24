@@ -8,19 +8,29 @@ module BK
       # Implementation of native step translation
       class Translator
         def translate_run(name:, identifier:, spec:, **_rest)
+          base_step(name, identifier, spec)
+        end
+
+        def base_step(name, identifier, spec)
           cmd = BK::Compat::CommandStep.new(
             label: name,
             key: identifier,
             commands: [spec['command']]
           )
-          cmd << translate_image(spec['image'])
+
+          post_keys(spec).each { |k| cmd << k }
           cmd
         end
 
-        def translate_image(image)
-          p image
-          return nil if image.nil?
+        def post_keys(spec)
+          [
+            translate_image(spec['image'])
+          ]
+        end
 
+        def translate_image(image)
+          return nil if image.nil?
+          
           BK::Compat::Plugin.new(
             name: 'docker',
             config: {
