@@ -13,22 +13,21 @@ module BK
             key: identifier,
             commands: [spec['command']]
           )
-          cmd << translate_image(spec['image'])      
+          cmd << translate_image(spec['image'])
           cmd
         end
 
-        def translate_image(image) 
+        def translate_image(image)
           p image
           return nil if image.nil?
 
           BK::Compat::Plugin.new(
             name: 'docker',
             config: {
-              'image' => image,
+              'image' => image
             }.compact
           )
         end
-        
       end
     end
   end
