@@ -12,14 +12,13 @@ module BK
         end
 
         def base_step(name, identifier, spec)
-          cmd = BK::Compat::CommandStep.new(
+          BK::Compat::CommandStep.new(
             label: name,
             key: identifier,
             commands: [spec['command']]
-          )
-
-          post_keys(spec).each { |k| cmd << k }
-          cmd
+          ).tap do |cmd|
+            post_keys(spec).each { |k| cmd << k }
+          end
         end
 
         def post_keys(spec)
@@ -30,7 +29,7 @@ module BK
 
         def translate_image(image)
           return nil if image.nil?
-          
+
           BK::Compat::Plugin.new(
             name: 'docker',
             config: {
