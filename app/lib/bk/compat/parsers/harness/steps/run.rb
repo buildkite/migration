@@ -12,7 +12,6 @@ module BK
         end
 
         def base_step(name, identifier, spec)
-          puts spec['shell']
           BK::Compat::CommandStep.new(
             label: name,
             key: identifier,
