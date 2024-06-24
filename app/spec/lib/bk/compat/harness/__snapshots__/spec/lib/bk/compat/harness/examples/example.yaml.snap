@@ -10,6 +10,7 @@ steps:
       "POSTGRES_DB"=>"postgres"}}} not implemented yet :('
   - commands:
     - echo "this runs on openjdk"
+    - "# shell is environment-dependent and should be configured in the agent'"
     plugins:
     - docker#v5.10.0:
         image: openjdk:17.0-jdk
@@ -20,6 +21,7 @@ steps:
     echo "pipeline var:" <+pipeline.variables.pipelinevar1>
     echo "project level var:" <+variable.proj_var>
     echo "secret example :" <+secrets.getValue("DbPasswordSecret")>
+  - "# shell is environment-dependent and should be configured in the agent'"
   plugins:
   - docker#v5.10.0:
       image: node:13.0.0
@@ -27,5 +29,6 @@ steps:
   key: Run_2
 - commands:
   - echo "Testing on  <+matrix.testparam>"
+  - "# shell is environment-dependent and should be configured in the agent'"
   label: Run_3
   key: Run_3
