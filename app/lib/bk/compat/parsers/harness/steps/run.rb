@@ -23,8 +23,13 @@ module BK
 
         def post_keys(spec)
           [
-            translate_image(spec['image'])
+            translate_image(spec['image']),
+            translate_shell(spec['shell'])
           ]
+        end
+
+        def translate_shell(shell)
+          ["# shell is environment-dependent and should be configured in the agent'"] unless shell.nil?
         end
 
         def translate_image(image)
@@ -34,7 +39,7 @@ module BK
             name: 'docker',
             config: {
               'image' => image
-            }.compact
+            }
           )
         end
       end
