@@ -34,7 +34,7 @@ module BK
             name: 'docker',
             config: {
               'image' => image
-            }.compact
+            }
           )
         end
       end
