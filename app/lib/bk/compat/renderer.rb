@@ -56,7 +56,7 @@ module BK
       # prevent quoting single parenthesis in a line (used for commants)
       class CustomEmitter < Psych::TreeBuilder
         def scalar(*, **)
-          s = super(*, **)
+          s = super
           s.style = Psych::Nodes::Scalar::PLAIN if s.value.match(/^[()]$/)
           s
         end
