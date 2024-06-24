@@ -10,6 +10,9 @@ steps:
       "POSTGRES_DB"=>"postgres"}}} not implemented yet :('
   - commands:
     - echo "this runs on openjdk"
+    plugins:
+    - docker#v5.10.0:
+        image: openjdk:17.0-jdk
     label: Run_1
     key: Run_1
 - commands:
@@ -17,6 +20,9 @@ steps:
     echo "pipeline var:" <+pipeline.variables.pipelinevar1>
     echo "project level var:" <+variable.proj_var>
     echo "secret example :" <+secrets.getValue("DbPasswordSecret")>
+  plugins:
+  - docker#v5.10.0:
+      image: node:13.0.0
   label: Run_2
   key: Run_2
 - commands:
