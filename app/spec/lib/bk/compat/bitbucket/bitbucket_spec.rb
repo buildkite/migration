@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../../../../../lib/bk/compat/parsers/bitbucket'
+require_relative '../../../../../lib/bk/compat'
 
 RSpec.describe BK::Compat::BitBucket do
   let(:bitbucket) { BK::Compat::BitBucket }
