@@ -3,6 +3,8 @@
 require_relative '../../../../../lib/bk/compat'
 
 RSpec.describe BK::Compat::GitHubActions do
+  let(:gha) {BK::Compat::GitHubActions }
+
   context 'it runs a snapshot test on each example' do
     directory_path = 'spec/lib/bk/compat/gha/examples'
 
@@ -11,7 +13,7 @@ RSpec.describe BK::Compat::GitHubActions do
 
       it "compares the generated pipeline for #{file} to the original" do
         gha_content = File.read(file)
-        parsed_content = BK::Compat::GitHubActions.new(gha_content).parse
+        parsed_content = gha.new(gha_content).parse
 
         actual = parsed_content.render(colors: false)
         expect(actual).to match_snapshot(file)
