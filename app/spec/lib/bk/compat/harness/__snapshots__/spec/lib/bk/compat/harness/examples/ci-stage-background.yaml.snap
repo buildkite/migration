@@ -1,0 +1,14 @@
+---
+steps:
+- group: DB Start
+  key: db_start
+  steps:
+  - commands:
+    - "# Background CI stage steps should be configured as an agent-startup hook."
+    label: Postgres Background
+    key: postgres_background
+  - commands:
+    - psql -U postgres -d app
+    - "# shell is environment-dependent and should be configured in the agent'"
+    label: PSQL connect
+    key: psql_connect
