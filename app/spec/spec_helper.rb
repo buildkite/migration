@@ -99,5 +99,5 @@ RSpec.configure do |config|
   # Kernel.srand config.seed
 
   # Store snapshots made from rspec/snapshot into this directory
-  config.snapshot_dir = "spec/lib/bk/compat/snapshots/"
-end 
+  config.snapshot_dir = 'spec/lib/bk/compat/snapshots/'
+end
