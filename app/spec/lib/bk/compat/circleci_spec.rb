@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require_relative '../../../../../lib/bk/compat'
+require_relative '../../../../lib/bk/compat'
 
 RSpec.describe BK::Compat::CircleCI do
   let(:circleci) { BK::Compat::CircleCI }
 
   context 'it runs a snapshot test on each example' do
-    directory_path = 'spec/lib/bk/compat/circleci/examples'
+    directory_path = 'examples/circleci'
 
     Dir.glob("#{directory_path}/*").each do |file|
       next if File.directory?(file)
