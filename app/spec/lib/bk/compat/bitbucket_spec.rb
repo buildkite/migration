@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require_relative '../../../../../lib/bk/compat'
+require_relative '../../../../lib/bk/compat'
 
 RSpec.describe BK::Compat::BitBucket do
   let(:bitbucket) { BK::Compat::BitBucket }
 
   context 'it runs a snapshot test on each example' do
-    directory_path = 'spec/lib/bk/compat/bitbucket/examples'
+    directory_path = 'examples/bitbucket'
 
     Dir.glob("#{directory_path}/*").each do |file|
       next if File.directory?(file)
