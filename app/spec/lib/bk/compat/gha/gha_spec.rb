@@ -3,7 +3,7 @@
 require_relative '../../../../../lib/bk/compat'
 
 RSpec.describe BK::Compat::GitHubActions do
-  let(:gha) {BK::Compat::GitHubActions }
+  let(:gha) { BK::Compat::GitHubActions }
 
   context 'it runs a snapshot test on each example' do
     directory_path = 'spec/lib/bk/compat/gha/examples'
