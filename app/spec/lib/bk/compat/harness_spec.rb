@@ -16,7 +16,7 @@ RSpec.describe BK::Compat::Harness do
         parsed_content = harness.new(harness_content).parse
 
         actual = parsed_content.render(colors: false)
-        
+
         expect(actual).to match_snapshot(file)
       end
     end
