@@ -44,7 +44,7 @@ module BK
 
         bk_groups = stages.map { |stage| parse_stage(**stage['stage'].transform_keys(&:to_sym)) }
 
-        Pipeline.new.tap { |p| p.steps.concat(simplify_group(bk_groups))}
+        Pipeline.new.tap { |p| p.steps.concat(simplify_group(bk_groups)) }
       end
 
       private
@@ -61,15 +61,15 @@ module BK
       end
 
       def simplify_group(groups)
-        groups.map! { |group| 
+        groups.map! do |group|
           if group.steps.length == 1
             step = group.steps.first
             step.conditional = group.conditional
-            group = step
-          else 
+            step
+          else
             group
           end
-        }
+        end
       end
     end
   end
