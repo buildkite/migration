@@ -33,9 +33,8 @@ module BK
       end
 
       def parse
-        Pipeline.new()
+        Pipeline.new
       end
-
     end
   end
 end
