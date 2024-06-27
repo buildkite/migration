@@ -4,12 +4,6 @@ require_relative '../translator'
 require_relative '../pipeline'
 require_relative '../pipeline/step'
 
-require_relative 'bitbucket/import'
-require_relative 'bitbucket/parallel'
-require_relative 'bitbucket/stages'
-require_relative 'bitbucket/steps'
-require_relative 'bitbucket/variables'
-
 module BK
   module Compat
     # Bitrise translation scaffolding
@@ -27,7 +21,7 @@ module BK
       def self.matches?(text)
         config = YAML.safe_load(text, aliases: true)
 
-        # only required field is pipelines
+        # Only required field for Bitrise YAML is format_version
         mandatory_keys = %w[format_version].freeze
 
         config.is_a?(Hash) && mandatory_keys & config.keys == mandatory_keys
