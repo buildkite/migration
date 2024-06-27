@@ -4,6 +4,7 @@ require_relative '../translator'
 require_relative '../pipeline'
 require_relative '../pipeline/step'
 require_relative 'harness/steps'
+require_relative 'harness/stage'
 
 module BK
   module Compat
@@ -39,11 +40,11 @@ module BK
       end
 
       def parse
-        Pipeline.new(
-          steps: @config['pipeline']['stages'].map do |stage|
-            parse_stage(**stage['stage'].transform_keys(&:to_sym))
-          end
-        )
+        stages = @config['pipeline']['stages']
+
+        bk_groups = stages.map { |stage| parse_stage(**stage['stage'].transform_keys(&:to_sym)) }
+
+        Pipeline.new.tap { |p| p.steps.concat(simplify_group(bk_groups)) }
       end
 
       private
@@ -59,27 +60,16 @@ module BK
         @translator.register(BK::Compat::HarnessSteps::Translator.new)
       end
 
-      def simplify_group(group)
-        # If there ended up being only 1 stage, skip the group and just
-        # pull the steps out.
-        if group.steps.length == 1
-          step = group.steps.first
-          step.conditional = group.conditional
-          group = step
-        end
-        group
-      end
-
-      def parse_stage(name:, identifier:, spec:, **_rest)
-        grp = BK::Compat::GroupStep.new(
-          label: name,
-          key: identifier,
-          steps: spec.dig('execution', 'steps').map do |step|
-            @translator.translate_step(**step['step'].transform_keys(&:to_sym))
+      def simplify_group(groups)
+        groups.map! do |group|
+          if group.steps.length == 1
+            step = group.steps.first
+            step.conditional = group.conditional
+            step
+          else
+            group
           end
-        )
-
-        simplify_group(grp)
+        end
       end
     end
   end
