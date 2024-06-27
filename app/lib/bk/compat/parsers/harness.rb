@@ -44,9 +44,7 @@ module BK
 
         bk_groups = stages.map { |stage| parse_stage(**stage['stage'].transform_keys(&:to_sym)) }
 
-        Pipeline.new(
-          steps: bk_groups.flatten.compact
-        )
+        Pipeline.new.tap { |p| p.steps.concat(simplify_group(bk_groups))}
       end
 
       private
@@ -62,15 +60,16 @@ module BK
         @translator.register(BK::Compat::HarnessSteps::Translator.new)
       end
 
-      def simplify_group(group)
-        # If there ended up being only 1 stage, skip the group and just
-        # pull the steps out.
-        if group.steps.length == 1
-          step = group.steps.first
-          step.conditional = group.conditional
-          group = step
-        end
-        group
+      def simplify_group(groups)
+        groups.map! { |group| 
+          if group.steps.length == 1
+            step = group.steps.first
+            step.conditional = group.conditional
+            group = step
+          else 
+            group
+          end
+        }
       end
     end
   end
