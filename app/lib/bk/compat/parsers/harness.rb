@@ -4,6 +4,7 @@ require_relative '../translator'
 require_relative '../pipeline'
 require_relative '../pipeline/step'
 require_relative 'harness/steps'
+require_relative 'harness/stage'
 
 module BK
   module Compat
@@ -39,10 +40,12 @@ module BK
       end
 
       def parse
+        stages = @config['pipeline']['stages']
+
+        bk_groups = stages.map { |stage| parse_stage(**stage['stage'].transform_keys(&:to_sym)) }
+
         Pipeline.new(
-          steps: @config['pipeline']['stages'].map do |stage|
-            parse_stage(**stage['stage'].transform_keys(&:to_sym))
-          end
+          steps: bk_groups.flatten.compact
         )
       end
 
@@ -68,18 +71,6 @@ module BK
           group = step
         end
         group
-      end
-
-      def parse_stage(name:, identifier:, spec:, **_rest)
-        grp = BK::Compat::GroupStep.new(
-          label: name,
-          key: identifier,
-          steps: spec.dig('execution', 'steps').map do |step|
-            @translator.translate_step(**step['step'].transform_keys(&:to_sym))
-          end
-        )
-
-        simplify_group(grp)
       end
     end
   end
