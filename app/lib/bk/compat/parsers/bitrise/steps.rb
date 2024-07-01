@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
-require_relative 'steps/script'
-
 module BK
   module Compat
     module BitriseSteps
-      # Implementation of native step translation
+      # Implementation of Bitrise step translations
       class Translator
         VALID_STEP_TYPES = %w[script].freeze
 
@@ -15,6 +13,12 @@ module BK
 
         def translator(type, config)
           send("translate_#{type.downcase.gsub('-', '_')}", config)
+        end
+
+        def translate_script(config)
+          BK::Compat::CommandStep.new(
+            commands: [config['inputs'].first['content']]
+          )
         end
       end
     end
