@@ -1,2 +1,7 @@
 ---
-steps: []
+steps:
+- group: ":bitrise: test"
+  key: test
+  steps:
+  - commands:
+    - echo "Hello ${MY_NAME}!"

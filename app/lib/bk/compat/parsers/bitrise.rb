@@ -3,6 +3,8 @@
 require_relative '../translator'
 require_relative '../pipeline'
 require_relative '../pipeline/step'
+require_relative 'bitrise/steps'
+require_relative 'bitrise/workflows'
 
 module BK
   module Compat
@@ -30,10 +32,24 @@ module BK
       def initialize(text, options = {})
         @config = YAML.safe_load(text, aliases: true)
         @options = options
+
+        register_translators!
       end
 
       def parse
-        Pipeline.new
+        workflows = @config.fetch('workflows', {})
+        bk_groups = workflows.map { |wf_name, wf_config| parse_workflow(wf_name, wf_config) }
+
+        Pipeline.new(
+          steps: bk_groups
+        )
+      end
+
+      private
+
+      def register_translators!
+        @translator = BK::Compat::StepTranslator.new
+        @translator.register(BK::Compat::BitriseSteps::Translator.new)
       end
     end
   end
