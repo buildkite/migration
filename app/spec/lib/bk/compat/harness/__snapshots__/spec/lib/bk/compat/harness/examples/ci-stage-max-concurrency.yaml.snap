@@ -1,0 +1,20 @@
+---
+steps:
+- group: Build and Publish
+  key: Build_and_publish
+  steps:
+  - commands:
+    - "./build-image.sh"
+    - "# shell is environment-dependent and should be configured in the agent'"
+    plugins:
+    - docker#v5.10.0:
+        image: openjdk:17.0-jdk
+    label: Build_Image
+    key: Build_Image
+  - commands:
+    - "./publish.sh"
+    plugins:
+    - docker#v5.10.0:
+        image: alpine:latest
+    label: Push
+    key: Push
