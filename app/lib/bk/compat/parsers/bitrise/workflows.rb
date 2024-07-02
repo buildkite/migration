@@ -9,25 +9,29 @@ module BK
       private
 
       def parse_workflow(wf_name, wf_config)
+        bk_steps = parse_workflow_steps(wf_config)
+
         BK::Compat::GroupStep.new(
-          label: ":bitrise: #{wf_name}",
+          label: wf_name,
           key: wf_name,
-          steps: parse_workflow_steps(wf_config)
+          steps: bk_steps
         )
       end
 
       def parse_workflow_steps(wf_config)
-        cmds = []
-        wf_config['steps'].each do |step|
-          step_key = step.first.first
-          step_conf = step[step.first.first]
-          key_normalized = normalize_step_type(step_key)
-          cmds << @translator.translate_step(key_normalized, step_conf)
-        end
-        cmds
+        wf_config['steps'].map { |step| process_step(step) }
+      end
+
+      def process_step(step)
+        # Obtain steps' key, config, and normalize it
+        step_key, step_config = step.first
+        step_key_normalized = normalize_step_type(step_key)
+
+        @translator.translate_step(step_key_normalized, step_config)
       end
 
       def normalize_step_type(step)
+        # Pull out the step type without its version to match translator's supported steps
         step.match?(STEP_TYPE_REGEX) ? step.match(STEP_TYPE_REGEX)[1] : step
       end
     end
