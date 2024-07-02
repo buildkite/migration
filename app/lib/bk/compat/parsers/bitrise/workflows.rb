@@ -12,11 +12,11 @@ module BK
         BK::Compat::GroupStep.new(
           label: ":bitrise: #{wf_name}",
           key: wf_name,
-          steps: parse_workflow_step(wf_config)
+          steps: parse_workflow_steps(wf_config)
         )
       end
 
-      def parse_workflow_step(wf_config)
+      def parse_workflow_steps(wf_config)
         cmds = []
         wf_config['steps'].each do |step|
           step_key = step.first.first
