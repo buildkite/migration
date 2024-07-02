@@ -1,6 +1,6 @@
 ---
 steps:
-- group: ":bitrise: test"
+- group: test
   key: test
   steps:
   - commands:
