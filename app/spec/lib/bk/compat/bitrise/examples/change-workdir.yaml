@@ -13,6 +13,15 @@ workflows:
     - script@1.1.5:
         inputs:
         - content: ./build-app.sh
+  test:
+    steps:
+    - git-clone@2.2.1:
+        repository_url: git@github.com:example/example-repository.git
+    - change-workdir@1.0.3:
+        is_create_path: true
+    - script@1.1.5:
+        inputs:
+        - content: ./test.sh
   deploy:
     steps:  
     - change-workdir@1.0.3:

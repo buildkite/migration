@@ -18,18 +18,18 @@ module BK
         end
 
         def translate_change_workdir(config)
-          generate_change_workdir_command(config['path'], config['is_create_path'])
+          [
+            generate_change_workdir_command(config['path'], config['is_create_path'])
+          ]
         end
 
         def generate_change_workdir_command(path, create_directory)
           if create_directory && path.present?
-            [
-              "mkdir #{path} && cd #{path}"
-            ]
+            "mkdir #{path} && cd #{path}" 
           elsif !create_directory && path.present?
-            [
-              "cd #{path}"
-            ]
+            "cd #{path}"
+          else
+            "# Invalid change-workdir step configuration!"
           end
         end
 

@@ -7,6 +7,12 @@ steps:
   label: build
   key: build
 - commands:
+  - "# No need for cloning, the agent takes care of that"
+  - "# Invalid change-workdir step configuration!"
+  - "./test.sh"
+  label: test
+  key: test
+- commands:
   - cd bitrise-ex/deploy/
   - "./deploy-app.sh"
   label: deploy
