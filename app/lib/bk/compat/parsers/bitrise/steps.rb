@@ -23,10 +23,10 @@ module BK
           ]
         end
 
-        def generate_change_workdir_command(path, create_directory)
-          if create_directory && path.present?
+        def generate_change_workdir_command(path, is_create_path)
+          if is_create_path && path.present?
             "mkdir #{path} && cd #{path}" 
-          elsif !create_directory && path.present?
+          elsif !is_create_path && path.present?
             "cd #{path}"
           else
             "# Invalid change-workdir step configuration!"
