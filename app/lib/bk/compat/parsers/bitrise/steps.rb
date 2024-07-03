@@ -9,17 +9,17 @@ module BK
       class Translator
         VALID_STEP_TYPES = %w[change-workdir git-clone script].freeze
 
-        def matcher(type, _config)
+        def matcher(type, _inputs)
           VALID_STEP_TYPES.include?(type.downcase)
         end
 
-        def translator(type, config)
-          send("translate_#{type.downcase.gsub('-', '_')}", config)
+        def translator(type, inputs)
+          send("translate_#{type.downcase.gsub('-', '_')}", inputs)
         end
 
-        def translate_change_workdir(config)
+        def translate_change_workdir(inputs)
           [
-            generate_change_workdir_command(config['path'], config['is_create_path'])
+            generate_change_workdir_command(inputs['path'], inputs['is_create_path'])
           ]
         end
 
@@ -33,15 +33,15 @@ module BK
           end
         end
 
-        def translate_git_clone(_config)
+        def translate_git_clone(_inputs)
           [
             ['# No need for cloning, the agent takes care of that']
           ]
         end
 
-        def translate_script(config)
+        def translate_script(inputs)
           [
-            config['inputs'].first['content']
+            inputs['content']
           ]
         end
       end

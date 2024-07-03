@@ -6,27 +6,32 @@ workflows:
   build:
     steps:
     - git-clone@2.2.1:
-        repository_url: git@github.com:example/example-repository.git
+        inputs:
+        - repository_url: git@github.com:example/example-repository.git
     - change-workdir@1.0.3:
-        path: bitrise-ex/build
-        is_create_path: true
+        inputs:
+        - path: bitrise-ex/build
+        - is_create_path: true
     - script@1.1.5:
         inputs:
         - content: ./build-app.sh
   test:
     steps:
     - git-clone@2.2.1:
-        repository_url: git@github.com:example/example-repository.git
+        inputs:
+        - repository_url: git@github.com:example/example-repository.git
     - change-workdir@1.0.3:
-        is_create_path: true
+        inputs:
+        - is_create_path: true
     - script@1.1.5:
         inputs:
         - content: ./test.sh
   deploy:
     steps:  
     - change-workdir@1.0.3:
-        path: bitrise-ex/deploy/
-        is_create_path: false
+        inputs:
+        - path: bitrise-ex/deploy/
+        - is_create_path: false
     - script@1.1.5:
         inputs:
         - content: ./deploy-app.sh

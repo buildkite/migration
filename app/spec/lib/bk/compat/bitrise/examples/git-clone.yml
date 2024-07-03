@@ -6,8 +6,9 @@ workflows:
   build:
     steps:
     - git-clone@8.2.2:
-        clone_into_dir: /tmp/bitrise-ex/
-        repository_url: git@github.com:example/example-repository.git
+        inputs:
+        - clone_into_dir: /tmp/bitrise-ex/
+        - repository_url: git@github.com:example/example-repository.git
     - script@1.1.5:
         inputs:
         - content: ./build-app.sh
