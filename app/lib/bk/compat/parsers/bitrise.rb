@@ -42,10 +42,10 @@ module BK
         load_workflows!
 
         workflows = @config.fetch('workflows', {})
-        bk_groups = workflows.map { |wf_name, wf_config| parse_workflow(wf_name, wf_config) }
+        bk_steps = workflows.map { |wf_name, wf_config| parse_workflow(wf_name, wf_config) }
 
         Pipeline.new(
-          steps: bk_groups
+          steps: bk_steps
         )
       end
 

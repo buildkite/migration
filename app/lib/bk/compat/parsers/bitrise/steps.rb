@@ -16,9 +16,9 @@ module BK
         end
 
         def translate_script(config)
-          BK::Compat::CommandStep.new(
-            commands: [config['inputs'].first['content']]
-          )
+          [
+            config['inputs'].first['content']
+          ]
         end
       end
     end
