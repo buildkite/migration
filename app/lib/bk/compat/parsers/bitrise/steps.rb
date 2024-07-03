@@ -15,6 +15,12 @@ module BK
           send("translate_#{type.downcase.gsub('-', '_')}", config)
         end
 
+        def translate_git_clone(_config)
+          [
+            ['# No need for cloning, the agent takes care of that']
+          ]
+        end
+
         def translate_script(config)
           [
             config['inputs'].first['content']
