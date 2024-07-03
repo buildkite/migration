@@ -5,7 +5,7 @@ module BK
     module BitriseSteps
       # Implementation of Bitrise step translations
       class Translator
-        VALID_STEP_TYPES = %w[script].freeze
+        VALID_STEP_TYPES = %w[git-clone script].freeze
 
         def matcher(type, _config)
           VALID_STEP_TYPES.include?(type.downcase)

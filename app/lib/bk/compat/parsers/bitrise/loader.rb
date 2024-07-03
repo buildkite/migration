@@ -4,7 +4,7 @@ module BK
   module Compat
     # Bitrise workflow configuration loader
     class Bitrise
-      STEP_KEY_REGEX = /([a-zA-Z]*)@(\d*|0)(\.((\d*)|0)){0,3}/
+      STEP_KEY_REGEX = /([a-zA-Z-]*)@(\d*|0)(\.((\d*)|0)){0,3}/
 
       def load_workflow(key, config)
         raise "Duplicate workflow name: #{key}" if @steps_by_key.include?(key)

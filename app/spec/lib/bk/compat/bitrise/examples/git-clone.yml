@@ -1,0 +1,18 @@
+format_version: 11
+default_step_lib_source: https://github.com/example/example-bitrise.git
+project_type: ios
+
+workflows:
+  build:
+    steps:
+    - git-clone@2.2.1:
+        clone_into_dir: /tmp/bitrise-ex/
+        repository_url: git@github.com:example/example-repository.git
+    - script@1.1.5:
+        inputs:
+        - content: ./build-app.sh
+  deploy:
+    steps:  
+    - script@1.1.5:
+        inputs:
+        - content: ./deploy-app.sh
