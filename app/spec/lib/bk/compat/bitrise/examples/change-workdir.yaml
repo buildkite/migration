@@ -1,0 +1,37 @@
+format_version: 11
+default_step_lib_source: https://github.com/example/example-bitrise.git
+project_type: ios
+
+workflows:
+  build:
+    steps:
+    - git-clone@2.2.1:
+        inputs:
+        - repository_url: git@github.com:example/example-repository.git
+    - change-workdir@1.0.3:
+        inputs:
+        - path: bitrise-ex/build
+        - is_create_path: true
+    - script@1.1.5:
+        inputs:
+        - content: ./build-app.sh
+  test:
+    steps:
+    - git-clone@2.2.1:
+        inputs:
+        - repository_url: git@github.com:example/example-repository.git
+    - change-workdir@1.0.3:
+        inputs:
+        - is_create_path: true
+    - script@1.1.5:
+        inputs:
+        - content: ./test.sh
+  deploy:
+    steps:  
+    - change-workdir@1.0.3:
+        inputs:
+        - path: bitrise-ex/deploy/
+        - is_create_path: false
+    - script@1.1.5:
+        inputs:
+        - content: ./deploy-app.sh
