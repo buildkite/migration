@@ -7,7 +7,7 @@ module BK
     module BitriseSteps
       # Implementation of Bitrise step translations
       class Translator
-        VALID_STEP_TYPES = %w[brew-install change-workdir git-clone script].freeze
+        VALID_STEP_TYPES = %w[bundler brew-install change-workdir git-clone script].freeze
 
         def matcher(type, _inputs)
           VALID_STEP_TYPES.include?(type.downcase)
@@ -32,6 +32,23 @@ module BK
             'brew bundle'
           else
             'brew install'
+          end
+        end
+
+        def translate_bundler(inputs)
+          [
+            generate_bundler_command(inputs)
+          ]
+        end
+
+        def generate_bundler_command(inputs)
+          install_jobs = inputs['bundle_install_jobs']
+          install_retry = inputs['bundle_install_retry']
+
+          if install_jobs.present? && install_retry.present?
+            "bundle check || bundle install --jobs #{install_jobs} --retry #{install_retry}"
+          else
+            '# Invalid bundler step configuration!'
           end
         end
 
