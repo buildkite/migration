@@ -34,7 +34,7 @@ module BK
             'brew install'
           end
         end
-        
+
         def translate_bundler(inputs)
           [
             generate_bundler_command(inputs)
