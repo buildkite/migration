@@ -7,7 +7,7 @@ module BK
     module BitriseSteps
       # Implementation of Bitrise step translations
       class Translator
-        VALID_STEP_TYPES = %w[bundler brew-install change-workdir git-clone script].freeze
+        VALID_STEP_TYPES = %w[bundler brew-install change-workdir git-clone git-tag script].freeze
 
         def matcher(type, _inputs)
           VALID_STEP_TYPES.include?(type.downcase)
@@ -71,6 +71,12 @@ module BK
         def translate_git_clone(_inputs)
           [
             ['# No need for cloning, the agent takes care of that']
+          ]
+        end
+
+        def translate_git_tag(inputs)
+          [
+            ["To be implemented"]
           ]
         end
 

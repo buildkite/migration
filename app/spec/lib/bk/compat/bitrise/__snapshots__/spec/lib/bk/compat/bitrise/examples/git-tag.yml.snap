@@ -1,0 +1,12 @@
+---
+steps:
+- commands:
+  - "# No need for cloning, the agent takes care of that"
+  - "./build-app.sh"
+  - To be implemented
+  label: build
+  key: build
+- commands:
+  - "./deploy-app.sh"
+  label: deploy
+  key: deploy
