@@ -1,0 +1,12 @@
+---
+steps:
+- commands:
+  - "# No need for cloning, the agent takes care of that"
+  - brew install
+  label: build
+  key: build
+- commands:
+  - "# No need for cloning, the agent takes care of that"
+  - brew install
+  label: deploy
+  key: deploy

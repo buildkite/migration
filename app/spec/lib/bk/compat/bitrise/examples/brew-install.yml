@@ -1,0 +1,22 @@
+format_version: 11
+default_step_lib_source: https://github.com/example/example-bitrise.git
+project_type: ios
+
+workflows:
+  build:
+    steps:
+    - git-clone@2.2.1:
+        inputs:
+        - repository_url: git@github.com:example/example-repository.git
+    - brew-install@1.0.0:
+        inputs:
+        - packages: jq yq git
+        - upgrade: yes
+  deploy:
+    steps:
+    - git-clone@2.2.1:
+        inputs:
+        - repository_url: git@github.com:example/example-repository-deploy.git
+    - brew-install@1.0.0:
+        inputs:
+        - use_brewfile: yes

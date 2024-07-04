@@ -7,7 +7,7 @@ module BK
     module BitriseSteps
       # Implementation of Bitrise step translations
       class Translator
-        VALID_STEP_TYPES = %w[change-workdir git-clone script].freeze
+        VALID_STEP_TYPES = %w[brew-install change-workdir git-clone script].freeze
 
         def matcher(type, _inputs)
           VALID_STEP_TYPES.include?(type.downcase)
@@ -15,6 +15,12 @@ module BK
 
         def translator(type, inputs)
           send("translate_#{type.downcase.gsub('-', '_')}", inputs)
+        end
+
+        def translate_brew_install(inputs)
+          [
+            "brew install"
+          ]
         end
 
         def translate_change_workdir(inputs)
