@@ -2,11 +2,16 @@
 steps:
 - commands:
   - "# No need for cloning, the agent takes care of that"
-  - brew install
+  - brew reinstall jq yq git
   label: build
   key: build
 - commands:
   - "# No need for cloning, the agent takes care of that"
-  - brew install
+  - brew install jq yq git selenium-server cucumber-ruby
+  label: test
+  key: test
+- commands:
+  - "# No need for cloning, the agent takes care of that"
+  - brew bundle
   label: deploy
   key: deploy

@@ -19,8 +19,20 @@ module BK
 
         def translate_brew_install(inputs)
           [
-            "brew install"
+            generate_brew_install_command(inputs)
           ]
+        end
+
+        def generate_brew_install_command(inputs)
+          if inputs['packages'].present? && inputs['upgrade']
+            "brew reinstall #{inputs['packages']}"
+          elsif inputs['packages'].present? && !inputs['upgrade']
+            "brew install #{inputs['packages']}"
+          elsif inputs['use_brewfile'].present?
+            'brew bundle'
+          else
+            'brew install'
+          end
         end
 
         def translate_change_workdir(inputs)

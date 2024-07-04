@@ -12,6 +12,15 @@ workflows:
         inputs:
         - packages: jq yq git
         - upgrade: yes
+  test:
+    steps:
+    - git-clone@2.2.1:
+        inputs:
+        - repository_url: git@github.com:example/example-repository.git
+    - brew-install@1.0.0:
+        inputs:
+        - packages: jq yq git selenium-server cucumber-ruby 
+        - upgrade: no
   deploy:
     steps:
     - git-clone@2.2.1:
