@@ -1,19 +1,22 @@
 ---
 steps:
-- commands:
-  - "# No need for cloning, the agent takes care of that"
-  - mkdir bitrise-ex/build && cd bitrise-ex/build
-  - "./build-app.sh"
-  label: build
+- group: build
   key: build
-- commands:
-  - "# No need for cloning, the agent takes care of that"
-  - "# Invalid change-workdir step configuration!"
-  - "./test.sh"
-  label: test
+  steps:
+  - commands:
+    - "# No need for cloning, the agent takes care of that"
+    - mkdir bitrise-ex/build && cd bitrise-ex/build
+    - "./build-app.sh"
+- group: test
   key: test
-- commands:
-  - cd bitrise-ex/deploy/
-  - "./deploy-app.sh"
-  label: deploy
+  steps:
+  - commands:
+    - "# No need for cloning, the agent takes care of that"
+    - "# Invalid change-workdir step configuration!"
+    - "./test.sh"
+- group: deploy
   key: deploy
+  steps:
+  - commands:
+    - cd bitrise-ex/deploy/
+    - "./deploy-app.sh"

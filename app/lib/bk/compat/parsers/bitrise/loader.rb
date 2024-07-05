@@ -9,12 +9,12 @@ module BK
       def load_workflow(key, config)
         raise "Duplicate workflow name: #{key}" if @steps_by_key.include?(key)
 
-        @steps_by_key[key] = load_workflow_steps(key, config)
+        @steps_by_key[key] = load_workflow_steps(config)
       end
 
-      def load_workflow_steps(key, config)
+      def load_workflow_steps(config)
         # Extend for other types of steps - approvals/waits for example.
-        BK::Compat::CommandStep.new(label: key, key: key).tap do |cmd_step|
+        BK::Compat::CommandStep.new.tap do |cmd_step|
           config['steps'].each do |step|
             step_key, step_config = step.first
             step_inputs = step_config['inputs'].reduce({}, :merge)
