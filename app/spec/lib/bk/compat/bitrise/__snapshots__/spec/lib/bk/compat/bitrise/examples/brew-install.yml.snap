@@ -1,17 +1,20 @@
 ---
 steps:
-- commands:
-  - "# No need for cloning, the agent takes care of that"
-  - brew reinstall jq yq git
-  label: build
+- group: build
   key: build
-- commands:
-  - "# No need for cloning, the agent takes care of that"
-  - brew install jq yq git selenium-server cucumber-ruby
-  label: test
+  steps:
+  - commands:
+    - "# No need for cloning, the agent takes care of that"
+    - brew reinstall jq yq git
+- group: test
   key: test
-- commands:
-  - "# No need for cloning, the agent takes care of that"
-  - brew bundle
-  label: deploy
+  steps:
+  - commands:
+    - "# No need for cloning, the agent takes care of that"
+    - brew install jq yq git selenium-server cucumber-ruby
+- group: deploy
   key: deploy
+  steps:
+  - commands:
+    - "# No need for cloning, the agent takes care of that"
+    - brew bundle

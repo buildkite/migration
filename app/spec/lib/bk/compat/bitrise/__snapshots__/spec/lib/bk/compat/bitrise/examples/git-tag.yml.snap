@@ -1,19 +1,22 @@
 ---
 steps:
-- commands:
-  - "# No need for cloning, the agent takes care of that"
-  - "./build-app.sh"
-  - git tag -fa $BITRISE_BUILD_NUMBER -m v1.0.0 && git push --tags
-  label: build
+- group: build
   key: build
-- commands:
-  - "# No need for cloning, the agent takes care of that"
-  - "./test.sh"
-  - git tag -fa test-$BITRISE_BUILD_NUMBER && git push --tags
-  label: test
+  steps:
+  - commands:
+    - "# No need for cloning, the agent takes care of that"
+    - "./build-app.sh"
+    - git tag -fa $BITRISE_BUILD_NUMBER -m v1.0.0 && git push --tags
+- group: test
   key: test
-- commands:
-  - "./deploy-app.sh"
-  - "# Invalid git-tag step configuration!"
-  label: deploy
+  steps:
+  - commands:
+    - "# No need for cloning, the agent takes care of that"
+    - "./test.sh"
+    - git tag -fa test-$BITRISE_BUILD_NUMBER && git push --tags
+- group: deploy
   key: deploy
+  steps:
+  - commands:
+    - "./deploy-app.sh"
+    - "# Invalid git-tag step configuration!"
