@@ -19,7 +19,7 @@ module BK
 
         def translate_brew_install(inputs)
           [
-            generate_brew_install_command(inputs)
+            validate_brew_install_command(inputs)
           ]
         end
 

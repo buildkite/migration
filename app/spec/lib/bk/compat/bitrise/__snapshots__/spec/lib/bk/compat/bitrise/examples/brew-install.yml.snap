@@ -1,11 +1,16 @@
 ---
 steps:
+- group: setup
+  key: setup
+  steps:
+  - commands:
+    - "# Invalid brew-install configuration!"
 - group: build
   key: build
   steps:
   - commands:
     - "# No need for cloning, the agent takes care of that"
-    - brew reinstall jq yq git
+    - brew reinstall -vd jq yq git
 - group: test
   key: test
   steps:
@@ -17,4 +22,4 @@ steps:
   steps:
   - commands:
     - "# No need for cloning, the agent takes care of that"
-    - brew bundle
+    - brew bundle -vd

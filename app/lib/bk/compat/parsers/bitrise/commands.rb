@@ -7,15 +7,22 @@ module BK
     module BitriseSteps
       # Implementation of Bitrise step translations
       class Translator
+        def validate_brew_install_command(inputs)
+          inputs['verbose_log'].nil? ? '# Invalid brew-install configuration!' : generate_brew_install_command(inputs)
+        end
+
         def generate_brew_install_command(inputs)
-          if inputs['packages'].present? && inputs['upgrade']
-            "brew reinstall #{inputs['packages']}"
-          elsif inputs['packages'].present? && !inputs['upgrade']
-            "brew install #{inputs['packages']}"
-          elsif inputs['use_brewfile'].present?
-            'brew bundle'
+          cmd_reinstall = "brew reinstall#{inputs['verbose_log'] ? ' -vd' : nil} #{inputs['packages']}"
+          cmd_install = "brew install#{inputs['verbose_log'] ? ' -vd' : nil} #{inputs['packages']}"
+          cmd_bundle = "brew bundle#{inputs['verbose_log'] ? ' -vd' : nil}"
+
+          if inputs['packages'].present?
+            inputs['upgrade'].present? ? cmd_reinstall : cmd_install
+          elsif inputs['use_brewfile']
+            cmd_bundle
           else
-            'brew install'
+            # verbose_log defined, packages and use_brewfile not defined - invalid
+            '# Invalid brew-install configuration!'
           end
         end
 
