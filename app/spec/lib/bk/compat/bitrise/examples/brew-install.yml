@@ -38,3 +38,4 @@ workflows:
         inputs:
         - verbose_log: true
         - use_brewfile: yes
+        - brewfile_path: brew/ex-repo-deploy/Brewfile

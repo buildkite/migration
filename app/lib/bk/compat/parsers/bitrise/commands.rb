@@ -12,18 +12,25 @@ module BK
         end
 
         def generate_brew_install_command(inputs)
-          cmd_reinstall = "brew reinstall#{inputs['verbose_log'] ? ' -vd' : nil} #{inputs['packages']}"
-          cmd_install = "brew install#{inputs['verbose_log'] ? ' -vd' : nil} #{inputs['packages']}"
-          cmd_bundle = "brew bundle#{inputs['verbose_log'] ? ' -vd' : nil}"
-
           if inputs['packages'].present?
-            inputs['upgrade'].present? ? cmd_reinstall : cmd_install
-          elsif inputs['use_brewfile']
-            cmd_bundle
+            generate_brew_install_package_command(inputs)
+          elsif inputs['use_brewfile'] && inputs['brewfile_path'].present?
+            generate_brew_bundle_command(inputs)
           else
-            # verbose_log defined, packages and use_brewfile not defined - invalid
+            # verbose_log defined, packages and use_brewfile/brewfile_path not defined - invalid
             '# Invalid brew-install configuration!'
           end
+        end
+
+        def generate_brew_install_package_command(inputs)
+          cmd_reinstall = "brew reinstall#{inputs['verbose_log'] ? ' -vd' : nil} #{inputs['packages']}"
+          cmd_install = "brew install#{inputs['verbose_log'] ? ' -vd' : nil} #{inputs['packages']}"
+
+          inputs['upgrade'].present? ? cmd_reinstall : cmd_install
+        end
+
+        def generate_brew_bundle_command(inputs)
+          "brew bundle#{inputs['verbose_log'] ? ' -vd' : nil} --file=#{inputs['brewfile_path']}"
         end
 
         def generate_bundler_command(inputs)
