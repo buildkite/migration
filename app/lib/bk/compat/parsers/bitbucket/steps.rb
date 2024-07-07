@@ -5,6 +5,8 @@ require_relative 'clone'
 require_relative 'image'
 require_relative 'services'
 require_relative 'shared'
+require_relative '../../models/steps/command'
+require_relative '../../models/steps/wait'
 
 module BK
   module Compat

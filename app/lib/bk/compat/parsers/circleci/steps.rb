@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'logic'
+require_relative '../../models/steps/circleci'
 
 module BK
   module Compat
@@ -108,7 +109,7 @@ module BK
 
         def translate_when(config)
           condition = BK::Compat::CircleCI.parse_condition(config['condition'])
-          CircleCIStep.new.tap do |c|
+          BK::Compat::CircleCIStep.new.tap do |c|
             c << [
               '# when condition translation may not be compatible with your shell',
               "if [ #{condition} ]; then"

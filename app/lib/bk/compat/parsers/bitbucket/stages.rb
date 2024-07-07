@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require_relative '../../models/steps/group'
+require_relative '../../models/steps/wait'
+
 module BK
   module Compat
     module BitBucketSteps

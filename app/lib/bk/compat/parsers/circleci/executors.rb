@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require_relative 'docker'
+require_relative 'executor/docker'
+require_relative '../../models/steps/circleci'
 
 module BK
   module Compat

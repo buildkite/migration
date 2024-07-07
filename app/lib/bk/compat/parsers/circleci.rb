@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 require_relative '../translator'
-require_relative '../models/pipeline'
-require_relative '../models/steps/circleci/circleci_step'
+require_relative '../models/steps/group'
 
 require_relative 'circleci/executors'
 require_relative 'circleci/jobs'

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'command'
+
 module BK
   module Compat
     # wrapper class to setup parameters

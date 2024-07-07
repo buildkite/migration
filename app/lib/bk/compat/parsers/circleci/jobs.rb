@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'executors'
-require_relative 'steps'
+require_relative '../../models/steps/circleci'
 
 module BK
   module Compat

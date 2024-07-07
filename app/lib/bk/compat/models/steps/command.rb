@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
+require_relative 'base'
+require_relative 'block'
 require_relative 'wait'
+require_relative '../plugin'
 
 module BK
   module Compat

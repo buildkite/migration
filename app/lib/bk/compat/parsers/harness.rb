@@ -2,6 +2,7 @@
 
 require_relative '../translator'
 require_relative '../models/pipeline'
+require_relative '../models/steps/command'
 require_relative '../models/steps/group'
 require_relative 'harness/steps'
 

@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 require 'digest'
+require_relative '../../models/steps/command'
+require_relative '../../models/steps/input'
+require_relative '../../models/steps/wait'
 
 module BK
   module Compat
