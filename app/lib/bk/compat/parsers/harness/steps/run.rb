@@ -8,10 +8,38 @@ module BK
       # Implementation of native step translation
       class Translator
         def translate_run(name:, identifier:, spec:, **_rest)
+          base_step(name, identifier, spec)
+        end
+
+        def base_step(name, identifier, spec)
           BK::Compat::CommandStep.new(
             label: name,
             key: identifier,
             commands: [spec['command']]
+          ).tap do |cmd|
+            post_keys(spec).each { |k| cmd << k }
+          end
+        end
+
+        def post_keys(spec)
+          [
+            translate_image(spec['image']),
+            translate_shell(spec['shell'])
+          ]
+        end
+
+        def translate_shell(shell)
+          ["# shell is environment-dependent and should be configured in the agent'"] unless shell.nil?
+        end
+
+        def translate_image(image)
+          return nil if image.nil?
+
+          BK::Compat::Plugin.new(
+            name: 'docker',
+            config: {
+              'image' => image
+            }
           )
         end
       end

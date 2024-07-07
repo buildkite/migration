@@ -1,0 +1,45 @@
+pipeline:
+  name: shell-example
+  identifier: shellex
+  projectIdentifier: shell_ex
+  orgIdentifier: default
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: account.myscm
+        repoName: test
+        build: <+input>
+  stages:
+    - stage:
+        name: Build and Publish
+        identifier: Build_and_publish
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: Build_Image
+                  identifier: Build_Image
+                  spec:
+                    connectorRef: myDockerHubConnector
+                    image: openjdk:17.0-jdk
+                    shell: Bash
+                    command: ./build-image.sh
+              - step:
+                  type: Run
+                  name: Push
+                  identifier: Push
+                  spec:
+                    connectorRef: myDockerHubConnector
+                    image: alpine:latest
+                    command: ./publish.sh
