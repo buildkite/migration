@@ -4,6 +4,7 @@ require_relative 'concurrency'
 require_relative 'matrix'
 require_relative 'services'
 require_relative 'steps'
+require_relative '../../models/steps/gha'
 
 module BK
   module Compat
