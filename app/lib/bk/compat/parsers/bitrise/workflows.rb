@@ -7,7 +7,7 @@ module BK
       private
 
       def parse_workflow(wf_name, wf_config)
-        bk_steps = process_workflow_steps(wf_name)
+        bk_steps = process_workflow_steps(wf_name, wf_config)
 
         BK::Compat::GroupStep.new(
           label: wf_name,
@@ -16,7 +16,7 @@ module BK
         )
       end
 
-      def process_workflow_steps(wf_name)
+      def process_workflow_steps(wf_name, wf_config)
         # Extend for other types of steps - approvals/waits for example.
         BK::Compat::CommandStep.new(label: wf_name, key: wf_name).tap do |cmd_step|
           wf_config['steps'].each do |step|

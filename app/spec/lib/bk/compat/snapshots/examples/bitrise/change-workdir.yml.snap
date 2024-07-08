@@ -8,6 +8,8 @@ steps:
     - mkdir bitrise-ex/build
     - cd bitrise-ex/build
     - "./build-app.sh"
+    label: build
+    key: build
 - group: test
   key: test
   steps:
@@ -15,9 +17,13 @@ steps:
     - "# No need for cloning, the agent takes care of that"
     - "# Invalid change-workdir step configuration!"
     - "./test.sh"
+    label: test
+    key: test
 - group: deploy
   key: deploy
   steps:
   - commands:
     - cd bitrise-ex/deploy/
     - "./deploy-app.sh"
+    label: deploy
+    key: deploy

@@ -6,8 +6,12 @@ steps:
   - commands:
     - "# No need for cloning, the agent takes care of that"
     - "./build-app.sh"
+    label: build
+    key: build
 - group: deploy
   key: deploy
   steps:
   - commands:
     - "./deploy-app.sh"
+    label: deploy
+    key: deploy

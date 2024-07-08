@@ -7,3 +7,5 @@ steps:
     - "# No need for cloning, the agent takes care of that"
     - bundle check || bundle install --jobs 4 --retry 1
     - "./build-app.sh"
+    label: build
+    key: build
