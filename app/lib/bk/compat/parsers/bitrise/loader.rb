@@ -16,7 +16,7 @@ module BK
           config['steps'].each do |step|
             step_key, step_config = step.first
             step_inputs = step_config['inputs'].reduce({}, :merge)
-            cmd_step.commands << load_workflow_step(step_key, step_inputs)
+            cmd_step << load_workflow_step(step_key, step_inputs)
           end
         end
       end

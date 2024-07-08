@@ -2,7 +2,8 @@
 steps:
 - commands:
   - "# No need for cloning, the agent takes care of that"
-  - mkdir bitrise-ex/build && cd bitrise-ex/build
+  - mkdir bitrise-ex/build
+  - cd bitrise-ex/build
   - "./build-app.sh"
   label: build
   key: build

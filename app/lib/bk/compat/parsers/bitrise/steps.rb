@@ -18,31 +18,24 @@ module BK
         end
 
         def translate_change_workdir(inputs)
-          [
-            generate_change_workdir_command(inputs['path'], inputs['is_create_path'])
-          ]
+          generate_change_workdir_command(inputs)
         end
 
-        def generate_change_workdir_command(path, is_create_path)
-          if is_create_path && path.present?
-            "mkdir #{path} && cd #{path}"
-          elsif !is_create_path && path.present?
-            "cd #{path}"
-          else
-            '# Invalid change-workdir step configuration!'
-          end
+        def generate_change_workdir_command(inputs)
+          return '# Invalid change-workdir step configuration!' unless inputs.include?('path')
+          
+          [
+            inputs['is_create_path'] ? "mkdir #{inputs['path']}" : nil,
+            "cd #{inputs['path']}"
+          ].compact
         end
 
         def translate_git_clone(_inputs)
-          [
-            ['# No need for cloning, the agent takes care of that']
-          ]
+          '# No need for cloning, the agent takes care of that'
         end
 
         def translate_script(inputs)
-          [
-            inputs['content']
-          ]
+          inputs['content']
         end
       end
     end
