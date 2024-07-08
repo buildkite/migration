@@ -22,9 +22,7 @@ module BK
         end
 
         def translate_bundler(inputs)
-          [
-            generate_bundler_command(inputs)
-          ]
+          generate_bundler_command(inputs)
         end
 
         def translate_change_workdir(inputs)
