@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 require_relative '../translator'
-require_relative '../pipeline'
-require_relative '../pipeline/step'
+require_relative '../models/pipeline'
+require_relative '../models/steps/command'
+require_relative '../models/steps/group'
 require_relative 'harness/steps'
 
 module BK

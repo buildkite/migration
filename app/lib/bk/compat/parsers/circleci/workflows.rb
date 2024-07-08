@@ -3,6 +3,8 @@
 require_relative 'jobs'
 require_relative 'logic'
 require_relative '../../error'
+require_relative '../../models/steps/block'
+require_relative '../../models/steps/group'
 
 module BK
   module Compat

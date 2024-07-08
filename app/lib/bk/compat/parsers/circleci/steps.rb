@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'logic'
-require_relative '../../pipeline/step'
+require_relative '../../models/steps/circleci'
 
 module BK
   module Compat
@@ -109,7 +109,7 @@ module BK
 
         def translate_when(config)
           condition = BK::Compat::CircleCI.parse_condition(config['condition'])
-          CircleCIStep.new.tap do |c|
+          BK::Compat::CircleCIStep.new.tap do |c|
             c << [
               '# when condition translation may not be compatible with your shell',
               "if [ #{condition} ]; then"
@@ -117,41 +117,6 @@ module BK
             recursor(config['steps']).each { |s| c << s }
             c << 'fi'
           end
-        end
-      end
-
-      # wrapper class to setup parameters
-      class CircleCIStep < BK::Compat::CommandStep
-        attr_accessor :transformer, :parameters
-
-        def initialize(*, **)
-          super
-          @transformer = method(:circle_ci_params)
-        end
-
-        def hash_attributes
-          super + ['parameters']
-        end
-
-        def circle_ci_params(value, config)
-          matrix = config.dig('matrix', 'parameters') || {}
-          val = @parameters.each_with_object(value.dup) do |(name, param), str|
-            possible = [
-              config[name], # passed directly
-              matrix.keys.include?(name) ? "{{ matrix.#{name} }}" : nil, # matrix params
-              param['default'] # default parameter value
-            ]
-            str.gsub!(/<<\s*parameters\.#{name}\s*>>/, possible.compact.first)
-          end
-          val.gsub!(/<<\s*matrix\.([^\s]+)\s*>>/, '{{ matrix.\1 }}')
-
-          val
-        end
-
-        def to_h
-          @transformer = nil
-          @parameters = nil
-          super
         end
       end
     end

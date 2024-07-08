@@ -3,7 +3,7 @@
 require 'spec_helper'
 require 'parslet/rig/rspec'
 
-require_relative '../../../../../lib/bk/compat/parsers/gha/expressions'
+require_relative '../../../../lib/bk/compat/parsers/gha/expressions'
 
 RSpec.describe BK::Compat::ExpressionParser do
   let(:p) { BK::Compat::ExpressionParser.new }
