@@ -16,10 +16,6 @@ module BK
         end
 
         def translate_change_workdir(inputs)
-          generate_change_workdir_command(inputs)
-        end
-
-        def generate_change_workdir_command(inputs)
           return '# Invalid change-workdir step configuration!' unless inputs.include?('path')
 
           [
