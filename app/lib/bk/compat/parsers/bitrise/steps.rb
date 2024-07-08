@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative 'commands'
-
 module BK
   module Compat
     module BitriseSteps
@@ -18,7 +16,21 @@ module BK
         end
 
         def translate_brew_install(inputs)
-          validate_brew_install_command(inputs)
+          return '# Invalid brew-install configuration!' unless inputs.include?('verbose_log')
+
+          generate_brew_install_command(inputs)
+        end
+
+        def generate_brew_install_command(inputs)
+          if !inputs['packages'].nil?
+            install_type = inputs['upgrade'] ? 'reinstall' : 'install'
+            "brew #{install_type}#{inputs['verbose_log'] ? ' -vd' : nil} #{inputs['packages']}"
+          elsif inputs['use_brewfile'] && !inputs['brewfile_path'].nil?
+            "brew bundle#{inputs['verbose_log'] ? ' -vd' : nil} --file=#{inputs['brewfile_path']}"
+          else
+            # verbose_log defined, packages and use_brewfile/brewfile_path not defined - invalid
+            '# Invalid brew-install configuration!'
+          end
         end
 
         def translate_bundler(inputs)
