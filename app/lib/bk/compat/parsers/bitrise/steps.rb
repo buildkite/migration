@@ -26,7 +26,12 @@ module BK
         end
 
         def translate_change_workdir(inputs)
-          generate_change_workdir_command(inputs)
+          return '# Invalid change-workdir step configuration!' unless inputs.include?('path')
+
+          [
+            inputs['is_create_path'] ? "mkdir #{inputs['path']}" : nil,
+            "cd #{inputs['path']}"
+          ].compact
         end
 
         def translate_git_clone(_inputs)
