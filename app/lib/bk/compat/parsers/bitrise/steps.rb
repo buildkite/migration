@@ -22,7 +22,16 @@ module BK
         end
 
         def translate_bundler(inputs)
-          generate_bundler_command(inputs)
+          return '# Invalid bundler step configuration!' unless required_bundler_inputs(inputs)
+
+          install_jobs = inputs['bundle_install_jobs']
+          install_retry = inputs['bundle_install_retry']
+
+          "bundle check || bundle install --jobs #{install_jobs} --retry #{install_retry}"
+        end
+
+        def required_bundler_inputs(inputs)
+          inputs.include?('bundle_install_jobs') && inputs.include?('bundle_install_retry')
         end
 
         def translate_change_workdir(inputs)
@@ -39,7 +48,15 @@ module BK
         end
 
         def translate_git_tag(inputs)
-          generate_git_tag_command(inputs)
+          return '# Invalid git-tag step configuration!' unless inputs.include?('tag')
+
+          cmd_all_params = "git tag -fa #{inputs['tag']} -m #{inputs['tag_message']}"
+          cmd_no_message = "git tag -fa #{inputs['tag']}"
+
+          [
+            inputs['tag_message'].nil? ? cmd_no_message : cmd_all_params,
+            !inputs['push'].nil? && inputs['push'] ? 'git push --tags' : nil
+          ].compact
         end
 
         def translate_script(inputs)
