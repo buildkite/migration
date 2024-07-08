@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require_relative '../../../../../lib/bk/compat/parsers/bitrise'
+require_relative '../../../../lib/bk/compat'
 
 RSpec.describe BK::Compat::Bitrise do
   let(:bitrise) { BK::Compat::Bitrise }
 
   context 'it runs a snapshot test on each example' do
-    directory_path = 'spec/lib/bk/compat/bitrise/examples'
+    directory_path = 'examples/bitrise'
 
     Dir.glob("#{directory_path}/*").each do |file|
       next if File.directory?(file)
