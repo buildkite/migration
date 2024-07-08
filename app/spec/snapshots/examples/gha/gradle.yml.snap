@@ -1,0 +1,14 @@
+---
+steps:
+- commands:
+  - "# action actions/checkout@v3 is not necessary in Buildkite"
+  - "# action gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25
+    can not be translated just yet"
+  plugins:
+  - docker#v5.10.0:
+      image: eclipse-temurin:11-jdk-alpine
+  agents:
+    runs-on: ubuntu-latest
+  label: ":github: build"
+  key: build
+  branches: master

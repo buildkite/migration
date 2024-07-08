@@ -1,0 +1,19 @@
+---
+steps:
+- commands:
+  - "# action actions/checkout@v2 is not necessary in Buildkite"
+  - echo '~~~ SwiftFormat'
+  - swiftformat . --lint
+  - echo '~~~ SwiftLint'
+  - swiftlint lint --strict
+  - echo '~~~ Build and Test'
+  - xcodebuild \
+  - " -project Test-App \\"
+  - " -scheme MyScheme \\"
+  - " -sdk iphonesimulator \\"
+  - " -destination 'platform=iOS Simulator,name=iPhone 14,OS=16.2' \\"
+  - "  test || exit 1"
+  agents:
+    runs-on: xcode
+  label: ":github: build_project"
+  key: build_project

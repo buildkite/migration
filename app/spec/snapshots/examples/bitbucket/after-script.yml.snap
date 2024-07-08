@@ -1,0 +1,7 @@
+---
+steps:
+- commands:
+  - npm install
+  - npm test
+  - "# The after-script property should be configured as a pre-exit repository hook"
+  label: Build and test

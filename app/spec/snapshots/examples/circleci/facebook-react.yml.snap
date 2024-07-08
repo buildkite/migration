@@ -1,0 +1,498 @@
+---
+steps:
+- group: ":circleci: stable"
+  key: stable
+  steps:
+  - commands:
+    - "# No need for checkout, the agent takes care of that"
+    - echo '~~~ Nodejs Version'
+    - node --version
+    - "# `restore_cache` not implemented yet"
+    - echo '~~~ Install Packages'
+    - yarn --frozen-lockfile
+    - "# `save_cache` not implemented yet"
+    plugins:
+    - docker#v5.10.0: &2
+        image: circleci/openjdk:8-jdk-node-browsers
+    agents: &3
+      executor_type: docker
+    env: &1
+      TZ: "/usr/share/zoneinfo/America/Los_Angeles"
+    key: setup
+  - commands:
+    - "# No need for checkout, the agent takes care of that"
+    - "# `restore_cache` not implemented yet"
+    - echo '~~~ Install Packages'
+    - yarn --frozen-lockfile
+    - node ./scripts/prettier/index
+    - node ./scripts/tasks/eslint
+    - "./scripts/circleci/check_license.sh"
+    - "./scripts/circleci/check_modules.sh"
+    - "./scripts/circleci/test_print_warnings.sh"
+    depends_on:
+    - setup
+    plugins:
+    - docker#v5.10.0:
+        image: circleci/openjdk:8-jdk-node-browsers
+    agents:
+      executor_type: docker
+    env: *1
+    key: lint
+  - commands:
+    - "# No need for checkout, the agent takes care of that"
+    - "# `restore_cache` not implemented yet"
+    - echo '~~~ Install Packages'
+    - yarn --frozen-lockfile
+    - node ./scripts/tasks/flow-ci
+    depends_on:
+    - setup
+    plugins:
+    - docker#v5.10.0:
+        image: circleci/openjdk:8-jdk-node-browsers
+    agents:
+      executor_type: docker
+    env: *1
+    key: flow
+  - commands:
+    - "# No need for checkout, the agent takes care of that"
+    - "# `restore_cache` not implemented yet"
+    - echo '~~~ Install Packages'
+    - yarn --frozen-lockfile
+    - (
+    - RELEASE_CHANNEL='stable'
+    - yarn test --maxWorkers=2
+    - )
+    depends_on:
+    - setup
+    plugins:
+    - docker#v5.10.0:
+        image: circleci/openjdk:8-jdk-node-browsers
+    agents:
+      executor_type: docker
+    env: *1
+    key: test_source
+  - commands:
+    - "# No need for checkout, the agent takes care of that"
+    - "# `restore_cache` not implemented yet"
+    - echo '~~~ Install Packages'
+    - yarn --frozen-lockfile
+    - (
+    - RELEASE_CHANNEL='stable'
+    - yarn test-prod --maxWorkers=2
+    - )
+    depends_on:
+    - setup
+    plugins:
+    - docker#v5.10.0:
+        image: circleci/openjdk:8-jdk-node-browsers
+    agents:
+      executor_type: docker
+    env: *1
+    key: test_source_prod
+  - commands:
+    - "# No need for checkout, the agent takes care of that"
+    - "# `restore_cache` not implemented yet"
+    - echo '~~~ Install Packages'
+    - yarn --frozen-lockfile
+    - (
+    - RELEASE_CHANNEL='stable'
+    - yarn test-persistent --maxWorkers=2
+    - )
+    depends_on:
+    - setup
+    plugins:
+    - docker#v5.10.0:
+        image: circleci/openjdk:8-jdk-node-browsers
+    agents:
+      executor_type: docker
+    env: *1
+    key: test_source_persistent
+  - commands:
+    - "# No need for checkout, the agent takes care of that"
+    - "# `restore_cache` not implemented yet"
+    - echo '~~~ Install Packages'
+    - yarn --frozen-lockfile
+    - (
+    - RELEASE_CHANNEL='stable'
+    - "./scripts/circleci/add_build_info_json.sh"
+    - "./scripts/circleci/update_package_versions.sh"
+    - yarn build
+    - )
+    - echo "stable" >> build/RELEASE_CHANNEL
+    - cd build
+    - buildkite-agent artifact upload 'RELEASE_CHANNEL;facebook-www;node_modules;react-native;dist;sizes/*.json'
+    - cd -
+    depends_on:
+    - setup
+    plugins:
+    - docker#v5.10.0:
+        image: circleci/openjdk:8-jdk-node-browsers
+    agents:
+      executor_type: docker
+    env: *1
+    key: build
+  - commands:
+    - "# No need for checkout, the agent takes care of that"
+    - "# :circleci: attach_workspace "
+    - if [ ! -d 'build' ]; then mkdir 'build'; fi
+    - cd 'build'
+    - buildkite agent artifact download *
+    - "# `restore_cache` not implemented yet"
+    - echo '~~~ Install Packages'
+    - yarn --frozen-lockfile
+    - node ./scripts/rollup/consolidateBundleSizes.js
+    - "./scripts/circleci/upload_build.sh"
+    - "./scripts/circleci/pack_and_store_artifact.sh"
+    - "# `store_artifacts` not implemented yet"
+    - "# `store_artifacts` not implemented yet"
+    - "# `store_artifacts` not implemented yet"
+    - "# `store_artifacts` not implemented yet"
+    - cd build
+    - buildkite-agent artifact upload 'bundle-sizes.json'
+    - cd -
+    depends_on:
+    - build
+    plugins:
+    - docker#v5.10.0:
+        image: circleci/openjdk:8-jdk-node-browsers
+    agents:
+      executor_type: docker
+    env: *1
+    key: process_artifacts
+  - commands:
+    - "# No need for checkout, the agent takes care of that"
+    - "# :circleci: attach_workspace "
+    - if [ ! -d 'build' ]; then mkdir 'build'; fi
+    - cd 'build'
+    - buildkite agent artifact download *
+    - "# `restore_cache` not implemented yet"
+    - echo '~~~ Install Packages'
+    - yarn --frozen-lockfile
+    - node ./scripts/rollup/consolidateBundleSizes.js
+    - (
+    - RELEASE_CHANNEL='stable'
+    - node ./scripts/tasks/danger
+    - )
+    depends_on:
+    - build
+    plugins:
+    - docker#v5.10.0:
+        image: circleci/openjdk:8-jdk-node-browsers
+    agents:
+      executor_type: docker
+    env: *1
+    key: sizebot
+  - commands:
+    - "# No need for checkout, the agent takes care of that"
+    - "# :circleci: attach_workspace "
+    - if [ ! -d 'build' ]; then mkdir 'build'; fi
+    - cd 'build'
+    - buildkite agent artifact download *
+    - "# `restore_cache` not implemented yet"
+    - echo '~~~ Install Packages'
+    - yarn --frozen-lockfile
+    - yarn lint-build
+    - scripts/circleci/check_minified_errors.sh
+    depends_on:
+    - build
+    plugins:
+    - docker#v5.10.0: &4
+        image: circleci/openjdk:8-jdk-node-browsers
+    agents: &5
+      executor_type: docker
+    env: *1
+    key: lint_build
+  - commands:
+    - "# No need for checkout, the agent takes care of that"
+    - "# :circleci: attach_workspace "
+    - if [ ! -d 'build' ]; then mkdir 'build'; fi
+    - cd 'build'
+    - buildkite agent artifact download *
+    - "# `restore_cache` not implemented yet"
+    - echo '~~~ Install Packages'
+    - yarn --frozen-lockfile
+    - (
+    - RELEASE_CHANNEL='stable'
+    - yarn test-build --maxWorkers=2
+    - )
+    depends_on:
+    - build
+    plugins:
+    - docker#v5.10.0:
+        image: circleci/openjdk:8-jdk-node-browsers
+    agents:
+      executor_type: docker
+    env: *1
+    key: test_build
+  - commands:
+    - "# No need for checkout, the agent takes care of that"
+    - "# :circleci: attach_workspace "
+    - if [ ! -d 'build' ]; then mkdir 'build'; fi
+    - cd 'build'
+    - buildkite agent artifact download *
+    - "# `restore_cache` not implemented yet"
+    - echo '~~~ Install Packages'
+    - yarn --frozen-lockfile
+    - (
+    - RELEASE_CHANNEL='stable'
+    - yarn test-build-prod --maxWorkers=2
+    - )
+    depends_on:
+    - build
+    plugins:
+    - docker#v5.10.0:
+        image: circleci/openjdk:8-jdk-node-browsers
+    agents:
+      executor_type: docker
+    env: *1
+    key: test_build_prod
+  - commands:
+    - "# No need for checkout, the agent takes care of that"
+    - "# :circleci: attach_workspace "
+    - if [ ! -d 'build' ]; then mkdir 'build'; fi
+    - cd 'build'
+    - buildkite agent artifact download *
+    - "# `restore_cache` not implemented yet"
+    - echo '~~~ Install Packages'
+    - yarn --frozen-lockfile
+    - (
+    - RELEASE_CHANNEL='stable'
+    - yarn test-build --maxWorkers=2
+    - )
+    depends_on:
+    - build
+    plugins:
+    - docker#v5.10.0:
+        image: circleci/openjdk:8-jdk-node-browsers
+    agents:
+      executor_type: docker
+    env: *1
+    key: test_build_devtools
+  - commands:
+    - "# No need for checkout, the agent takes care of that"
+    - "# :circleci: attach_workspace "
+    - if [ ! -d 'build' ]; then mkdir 'build'; fi
+    - cd 'build'
+    - buildkite agent artifact download *
+    - "# `restore_cache` not implemented yet"
+    - echo '~~~ Run DOM fixture tests'
+    - (
+    - RELEASE_CHANNEL='stable'
+    - cd fixtures/dom
+    - yarn --frozen-lockfile
+    - yarn prestart
+    - yarn test --maxWorkers=2
+    - )
+    depends_on:
+    - build
+    plugins:
+    - docker#v5.10.0:
+        image: circleci/openjdk:8-jdk-node-browsers
+    agents:
+      executor_type: docker
+    env: *1
+    key: test_dom_fixtures
+- group: ":circleci: experimental"
+  key: experimental
+  steps:
+  - commands:
+    - "# No need for checkout, the agent takes care of that"
+    - echo '~~~ Nodejs Version'
+    - node --version
+    - "# `restore_cache` not implemented yet"
+    - echo '~~~ Install Packages'
+    - yarn --frozen-lockfile
+    - "# `save_cache` not implemented yet"
+    plugins:
+    - docker#v5.10.0: *2
+    agents: *3
+    env: *1
+    key: setup
+  - commands:
+    - "# No need for checkout, the agent takes care of that"
+    - "# `restore_cache` not implemented yet"
+    - echo '~~~ Install Packages'
+    - yarn --frozen-lockfile
+    - (
+    - RELEASE_CHANNEL='experimental'
+    - yarn test --maxWorkers=2
+    - )
+    depends_on:
+    - setup
+    plugins:
+    - docker#v5.10.0:
+        image: circleci/openjdk:8-jdk-node-browsers
+    agents:
+      executor_type: docker
+    env: *1
+    key: test_source_experimental
+  - commands:
+    - "# No need for checkout, the agent takes care of that"
+    - "# `restore_cache` not implemented yet"
+    - echo '~~~ Install Packages'
+    - yarn --frozen-lockfile
+    - (
+    - RELEASE_CHANNEL='experimental'
+    - "./scripts/circleci/add_build_info_json.sh"
+    - "./scripts/circleci/update_package_versions.sh"
+    - yarn build
+    - )
+    - echo "experimental" >> build/RELEASE_CHANNEL
+    - cd build
+    - buildkite-agent artifact upload 'RELEASE_CHANNEL;facebook-www;node_modules;react-native;dist;sizes/*.json'
+    - cd -
+    depends_on:
+    - setup
+    plugins:
+    - docker#v5.10.0:
+        image: circleci/openjdk:8-jdk-node-browsers
+    agents:
+      executor_type: docker
+    env: *1
+    key: build_experimental
+  - commands:
+    - "# No need for checkout, the agent takes care of that"
+    - "# :circleci: attach_workspace "
+    - if [ ! -d 'build' ]; then mkdir 'build'; fi
+    - cd 'build'
+    - buildkite agent artifact download *
+    - "# `restore_cache` not implemented yet"
+    - echo '~~~ Install Packages'
+    - yarn --frozen-lockfile
+    - node ./scripts/rollup/consolidateBundleSizes.js
+    - "./scripts/circleci/upload_build.sh"
+    - "./scripts/circleci/pack_and_store_artifact.sh"
+    - "# `store_artifacts` not implemented yet"
+    - "# `store_artifacts` not implemented yet"
+    - "# `store_artifacts` not implemented yet"
+    - "# `store_artifacts` not implemented yet"
+    - cd build
+    - buildkite-agent artifact upload 'bundle-sizes.json'
+    - cd -
+    depends_on:
+    - build_experimental
+    plugins:
+    - docker#v5.10.0:
+        image: circleci/openjdk:8-jdk-node-browsers
+    agents:
+      executor_type: docker
+    env: *1
+    key: process_artifacts_experimental
+  - commands:
+    - "# No need for checkout, the agent takes care of that"
+    - "# :circleci: attach_workspace "
+    - if [ ! -d 'build' ]; then mkdir 'build'; fi
+    - cd 'build'
+    - buildkite agent artifact download *
+    - "# `restore_cache` not implemented yet"
+    - echo '~~~ Install Packages'
+    - yarn --frozen-lockfile
+    - node ./scripts/rollup/consolidateBundleSizes.js
+    - (
+    - RELEASE_CHANNEL='experimental'
+    - node ./scripts/tasks/danger
+    - )
+    depends_on:
+    - build_experimental
+    plugins:
+    - docker#v5.10.0:
+        image: circleci/openjdk:8-jdk-node-browsers
+    agents:
+      executor_type: docker
+    env: *1
+    key: sizebot_experimental
+  - commands:
+    - "# No need for checkout, the agent takes care of that"
+    - "# :circleci: attach_workspace "
+    - if [ ! -d 'build' ]; then mkdir 'build'; fi
+    - cd 'build'
+    - buildkite agent artifact download *
+    - "# `restore_cache` not implemented yet"
+    - echo '~~~ Install Packages'
+    - yarn --frozen-lockfile
+    - (
+    - RELEASE_CHANNEL='experimental'
+    - yarn test-build --maxWorkers=2
+    - )
+    depends_on:
+    - build_experimental
+    plugins:
+    - docker#v5.10.0:
+        image: circleci/openjdk:8-jdk-node-browsers
+    agents:
+      executor_type: docker
+    env: *1
+    key: test_build_experimental
+  - commands:
+    - "# No need for checkout, the agent takes care of that"
+    - "# :circleci: attach_workspace "
+    - if [ ! -d 'build' ]; then mkdir 'build'; fi
+    - cd 'build'
+    - buildkite agent artifact download *
+    - "# `restore_cache` not implemented yet"
+    - echo '~~~ Install Packages'
+    - yarn --frozen-lockfile
+    - (
+    - RELEASE_CHANNEL='experimental'
+    - yarn test-build-prod --maxWorkers=2
+    - )
+    depends_on:
+    - build_experimental
+    plugins:
+    - docker#v5.10.0:
+        image: circleci/openjdk:8-jdk-node-browsers
+    agents:
+      executor_type: docker
+    env: *1
+    key: test_build_prod_experimental
+  - commands:
+    - "# No need for checkout, the agent takes care of that"
+    - "# :circleci: attach_workspace "
+    - if [ ! -d 'build' ]; then mkdir 'build'; fi
+    - cd 'build'
+    - buildkite agent artifact download *
+    - "# `restore_cache` not implemented yet"
+    - echo '~~~ Install Packages'
+    - yarn --frozen-lockfile
+    - yarn lint-build
+    - scripts/circleci/check_minified_errors.sh
+    depends_on:
+    - build_experimental
+    plugins:
+    - docker#v5.10.0: *4
+    agents: *5
+    env: *1
+    key: lint_build
+- group: ":circleci: fuzz_tests"
+  key: fuzz_tests
+  steps:
+  - commands:
+    - "# No need for checkout, the agent takes care of that"
+    - echo '~~~ Nodejs Version'
+    - node --version
+    - "# `restore_cache` not implemented yet"
+    - echo '~~~ Install Packages'
+    - yarn --frozen-lockfile
+    - "# `save_cache` not implemented yet"
+    plugins:
+    - docker#v5.10.0: *2
+    agents: *3
+    env: *1
+    key: setup
+  - commands:
+    - "# No need for checkout, the agent takes care of that"
+    - "# `restore_cache` not implemented yet"
+    - echo '~~~ Install Packages'
+    - yarn --frozen-lockfile
+    - echo '~~~ Run fuzz tests'
+    - FUZZ_TEST_SEED=$RANDOM yarn test fuzz --maxWorkers=2
+    - FUZZ_TEST_SEED=$RANDOM yarn test-prod fuzz --maxWorkers=2
+    depends_on:
+    - setup
+    plugins:
+    - docker#v5.10.0:
+        image: circleci/openjdk:8-jdk-node-browsers
+    agents:
+      executor_type: docker
+    env: *1
+    key: test_fuzz

@@ -1,0 +1,34 @@
+---
+steps:
+- group: stage1
+  key: stage1
+  steps:
+  - commands:
+    - ' # step [] {:type=>"Background", :name=>"postgres-dependency", :identifier=>"postgresdependency",
+      :spec=>{"connectorRef"=>"myDockerHubConnector", "image"=>"postgres:10.8", "shell"=>"Sh",
+      "envVariables"=>{"POSTGRES_USER"=>"postgres", "POSTGRES_PASSWORD"=>"<+secrets.getValue(\"DbPasswordSecret\")>",
+      "POSTGRES_DB"=>"postgres"}}} not implemented yet :('
+  - commands:
+    - echo "this runs on openjdk"
+    - "# shell is environment-dependent and should be configured in the agent'"
+    plugins:
+    - docker#v5.10.0:
+        image: openjdk:17.0-jdk
+    label: Run_1
+    key: Run_1
+- commands:
+  - |-
+    echo "pipeline var:" <+pipeline.variables.pipelinevar1>
+    echo "project level var:" <+variable.proj_var>
+    echo "secret example :" <+secrets.getValue("DbPasswordSecret")>
+  - "# shell is environment-dependent and should be configured in the agent'"
+  plugins:
+  - docker#v5.10.0:
+      image: node:13.0.0
+  label: Run_2
+  key: Run_2
+- commands:
+  - echo "Testing on  <+matrix.testparam>"
+  - "# shell is environment-dependent and should be configured in the agent'"
+  label: Run_3
+  key: Run_3

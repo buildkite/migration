@@ -1,0 +1,101 @@
+---
+steps:
+- commands:
+  - cd /go/src/github.com/segmentio/aws-okta
+  - "# No need for checkout, the agent takes care of that"
+  - echo '~~~ Install linux dependencies - libusb'
+  - sudo apt update -q
+  - sudo apt install -yq libusb-dev libusb-1.0.0-dev
+  - echo '~~~ Test'
+  - make test
+  - echo '~~~ Check modules are tidy and checked in'
+  - export GO111MODULE=on
+  - go mod tidy
+  - go mod vendor
+  - if [ "$(git status --porcelain)" != "" ]; then
+  - '  echo "git tree is dirty after tidying and vendoring modules"'
+  - '  echo "ensure go.mod and go.sum are tidy and vendor is checked in"'
+  - "  git status"
+  - "  exit 1"
+  - fi
+  plugins:
+  - docker#v5.10.0:
+      image: circleci/golang:1.13
+  agents:
+    executor_type: docker
+  key: test
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - echo '~~~ Install linux dependencies - libusb'
+  - sudo apt update -q
+  - sudo apt install -yq libusb-dev libusb-1.0.0-dev
+  - echo '~~~ Test'
+  - go build -mod=vendor
+  - "./aws-okta version"
+  plugins:
+  - docker#v5.10.0:
+      image: circleci/golang:1.12
+  agents:
+    executor_type: docker
+  key: test-build-golang-prev
+- commands:
+  - cd /go/src/github.com/segmentio/aws-okta
+  - "# No need for checkout, the agent takes care of that"
+  - echo '~~~ Install nfpm, rpmbuild'
+  - sudo make -f Makefile.tools nfpm-debian rpmbuild-debian
+  - echo '~~~ Install libusb'
+  - sudo apt update -q
+  - sudo apt install -yq libusb-dev libusb-1.0.0-dev
+  - echo '~~~ Make distributables'
+  - make -f Makefile.release dist-linux
+  - cd .
+  - buildkite-agent artifact upload 'dist/*'
+  - cd -
+  plugins:
+  - docker#v5.10.0:
+      image: circleci/golang:1.13
+  agents:
+    executor_type: docker
+  key: dist-linux
+- commands:
+  - cd /go/src/github.com/segmentio/aws-okta
+  - "# No need for checkout, the agent takes care of that"
+  - "# :circleci: attach_workspace "
+  - if [ ! -d '.' ]; then mkdir '.'; fi
+  - cd '.'
+  - buildkite agent artifact download *
+  - echo '~~~ Install tools'
+  - make -f Makefile.tools github-release
+  - "# this is all for package_cloud :/"
+  - sudo apt update -q
+  - sudo apt install -yq ruby ruby-dev build-essential
+  - "# fixes https://askubuntu.com/questions/872399/error-failed-to-build-gem-native-extension-when-trying-to-download-rubocop"
+  - sudo gem install rake
+  - sudo make -f Makefile.tools package_cloud
+  - make -f Makefile.release publish-packagecloud
+  depends_on:
+  - dist-linux
+  plugins:
+  - docker#v5.10.0:
+      image: circleci/golang:1.13
+  agents:
+    executor_type: docker
+  key: publish-packagecloud
+- commands:
+  - cd /go/src/github.com/segmentio/aws-okta
+  - "# No need for checkout, the agent takes care of that"
+  - "# :circleci: attach_workspace "
+  - if [ ! -d '.' ]; then mkdir '.'; fi
+  - cd '.'
+  - buildkite agent artifact download *
+  - echo '~~~ Install tools'
+  - make -f Makefile.tools github-release
+  - make -f Makefile.release publish-github-linux
+  depends_on:
+  - dist-linux
+  plugins:
+  - docker#v5.10.0:
+      image: circleci/golang:1.13
+  agents:
+    executor_type: docker
+  key: publish-github-linux

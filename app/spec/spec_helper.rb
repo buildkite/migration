@@ -17,6 +17,9 @@ require 'rspec/snapshot'
 # it.
 #
 # See https://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
+
+require 'rspec/snapshot'
+
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
@@ -99,5 +102,5 @@ RSpec.configure do |config|
   # Kernel.srand config.seed
 
   # Store snapshots made from rspec/snapshot into this directory
-  config.snapshot_dir = 'spec/lib/bk/compat/snapshots/'
+  config.snapshot_dir = 'spec/snapshots/'
 end

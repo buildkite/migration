@@ -1,0 +1,42 @@
+format_version: 11
+default_step_lib_source: https://github.com/example/example-bitrise.git
+project_type: ios
+
+workflows:
+  setup:
+    steps:
+    - brew-install@1.0.0:
+        inputs:
+        - upgrade: yes
+        - verbose_log: false
+  build:
+    steps:
+    - git-clone@2.2.1:
+        inputs:
+        - repository_url: git@github.com:example/example-repository.git
+    - brew-install@1.0.0:
+        inputs:
+        - packages: jq yq git
+        - upgrade: yes
+        - options: --force-bottle
+        - verbose_log: true
+  test:
+    steps:
+    - git-clone@2.2.1:
+        inputs:
+        - repository_url: git@github.com:example/example-repository.git
+    - brew-install@1.0.0:
+        inputs:
+        - packages: jq yq git selenium-server cucumber-ruby 
+        - upgrade: no
+        - verbose_log: false
+  deploy:
+    steps:
+    - git-clone@2.2.1:
+        inputs:
+        - repository_url: git@github.com:example/example-repository-deploy.git
+    - brew-install@1.0.0:
+        inputs:
+        - verbose_log: true
+        - use_brewfile: yes
+        - brewfile_path: brew/ex-repo-deploy/Brewfile
