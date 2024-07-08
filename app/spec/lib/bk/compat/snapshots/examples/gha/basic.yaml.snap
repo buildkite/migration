@@ -1,9 +1,0 @@
----
-steps:
-- commands:
-  - echo "The job was automatically triggered"
-  - echo "This job is now running on a server hosted by GitHub!"
-  agents:
-    runs-on: ubuntu-latest
-  label: ":github: explore"
-  key: explore

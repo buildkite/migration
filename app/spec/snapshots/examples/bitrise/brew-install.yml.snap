@@ -10,7 +10,7 @@ steps:
   steps:
   - commands:
     - "# No need for cloning, the agent takes care of that"
-    - brew reinstall --force-bottle -vd jq yq git
+    - brew reinstall -vd jq yq git
 - group: test
   key: test
   steps:

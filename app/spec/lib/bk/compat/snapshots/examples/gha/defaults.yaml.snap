@@ -1,9 +1,0 @@
----
-steps:
-- commands:
-  - echo "This is the first command"
-  - echo "This is the second command"
-  agents:
-    runs-on: ubuntu-latest
-  label: ":github: explore"
-  key: explore

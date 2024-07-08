@@ -6,14 +6,16 @@ steps:
   - commands:
     - "# No need for cloning, the agent takes care of that"
     - "./build-app.sh"
-    - git tag -fa $BITRISE_BUILD_NUMBER -m v1.0.0 && git push --tags
+    - git tag -fa $BITRISE_BUILD_NUMBER -m v1.0.0
+    - git push --tags
 - group: test
   key: test
   steps:
   - commands:
     - "# No need for cloning, the agent takes care of that"
     - "./test.sh"
-    - git tag -fa test-$BITRISE_BUILD_NUMBER && git push --tags
+    - git tag -fa test-$BITRISE_BUILD_NUMBER
+    - git push --tags
 - group: deploy
   key: deploy
   steps:

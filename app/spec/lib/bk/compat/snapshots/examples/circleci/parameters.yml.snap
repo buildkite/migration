@@ -1,5 +1,0 @@
----
-steps:
-- commands:
-  - echo Printing testworkflow
-  key: daily-message

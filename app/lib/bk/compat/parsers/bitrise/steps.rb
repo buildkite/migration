@@ -18,9 +18,7 @@ module BK
         end
 
         def translate_brew_install(inputs)
-          [
-            validate_brew_install_command(inputs)
-          ]
+          validate_brew_install_command(inputs)
         end
 
         def translate_bundler(inputs)
@@ -38,9 +36,7 @@ module BK
         end
 
         def translate_git_tag(inputs)
-          [
-            generate_git_tag_command(inputs)
-          ]
+          generate_git_tag_command(inputs)
         end
 
         def translate_script(inputs)
