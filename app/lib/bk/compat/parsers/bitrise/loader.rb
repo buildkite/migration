@@ -4,8 +4,6 @@ module BK
   module Compat
     # Bitrise workflow configuration loader
     class Bitrise
-      STEP_KEY_REGEX = /([a-zA-Z-]*)@(\d*|0)(\.((\d*)|0)){0,3}/
-
       def load_workflow(key, config)
         raise "Duplicate workflow name: #{key}" if @steps_by_key.include?(key)
 
@@ -18,7 +16,7 @@ module BK
           config['steps'].each do |step|
             step_key, step_config = step.first
             step_inputs = step_config['inputs'].reduce({}, :merge)
-            cmd_step.commands << load_workflow_step(step_key, step_inputs)
+            cmd_step << load_workflow_step(step_key, step_inputs)
           end
         end
       end
@@ -31,8 +29,7 @@ module BK
       end
 
       def normalize_step_key(step_key)
-        # Pull out the step key without its version to match translator's supported steps
-        step_key.match?(STEP_KEY_REGEX) ? step_key.match(STEP_KEY_REGEX)[1] : step_key
+        step_key.split('@').first
       end
     end
   end

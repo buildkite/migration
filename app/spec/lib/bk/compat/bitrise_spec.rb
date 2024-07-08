@@ -6,7 +6,7 @@ RSpec.describe BK::Compat::Bitrise do
   let(:bitrise) { BK::Compat::Bitrise }
 
   context 'it runs a snapshot test on each example' do
-    directory_path = 'examples/bitrise/'
+    directory_path = 'examples/bitrise'
 
     Dir.glob("#{directory_path}/*").each do |file|
       next if File.directory?(file)

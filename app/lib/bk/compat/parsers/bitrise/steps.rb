@@ -30,15 +30,11 @@ module BK
         end
 
         def translate_change_workdir(inputs)
-          [
-            generate_change_workdir_command(inputs['path'], inputs['is_create_path'])
-          ]
+          generate_change_workdir_command(inputs)
         end
 
         def translate_git_clone(_inputs)
-          [
-            ['# No need for cloning, the agent takes care of that']
-          ]
+          '# No need for cloning, the agent takes care of that'
         end
 
         def translate_git_tag(inputs)
@@ -48,9 +44,7 @@ module BK
         end
 
         def translate_script(inputs)
-          [
-            inputs['content']
-          ]
+          inputs['content']
         end
       end
     end
