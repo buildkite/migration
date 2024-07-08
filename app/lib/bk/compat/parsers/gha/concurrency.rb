@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'steps'
+require_relative '../../models/steps/gha'
 
 module BK
   module Compat
