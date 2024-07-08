@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../../../pipeline/step'
+require_relative '../../../models/steps/command'
 
 module BK
   module Compat
