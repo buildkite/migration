@@ -1,9 +1,6 @@
 ---
 steps:
-- group: test
+- commands:
+  - echo "Hello ${MY_NAME}!"
+  label: test
   key: test
-  steps:
-  - commands:
-    - echo "Hello ${MY_NAME}!"
-    label: test
-    key: test

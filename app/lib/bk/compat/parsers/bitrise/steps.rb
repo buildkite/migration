@@ -50,7 +50,7 @@ module BK
           return '# Invalid change-workdir step configuration!' unless inputs.include?('path')
 
           [
-            inputs.fetch('is_create_path', false) ? "mkdir #{inputs['path']}" : nil,
+            inputs.fetch('is_create_path') ? "mkdir #{inputs['path']}" : nil,
             "cd #{inputs['path']}"
           ].compact
         end
@@ -67,7 +67,7 @@ module BK
 
           [
             inputs.fetch('tag_message', false) ? cmd_all_params : cmd_no_message,
-            inputs.fetch('push', false) && inputs['push'] ? 'git push --tags' : nil
+            inputs['push'] ? 'git push --tags' : nil
           ].compact
         end
 
