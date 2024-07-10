@@ -6,7 +6,7 @@ steps:
   - commands:
     - "# No need for cloning, the agent takes care of that"
     - "./build-app.sh"
-    - git tag -fa $BITRISE_BUILD_NUMBER -m v1.0.0
+    - git tag -fa $BITRISE_BUILD_NUMBER -m "v1.0.0"
     - git push --tags
     label: build
     key: build

@@ -22,10 +22,10 @@ module BK
         end
 
         def generate_brew_install_command(inputs)
-          if !inputs['packages'].nil?
-            install_type = inputs['upgrade'] ? 'reinstall' : 'install'
+          if inputs.fetch('packages', false)
+            install_type = inputs.fetch('upgrade', false) ? 'reinstall' : 'install'
             "brew #{install_type}#{inputs['verbose_log'] ? ' -vd' : nil} #{inputs['packages']}"
-          elsif inputs['use_brewfile'] && !inputs['brewfile_path'].nil?
+          elsif inputs.fetch('use_brewfile', false) && inputs.fetch('brewfile_path', false)
             "brew bundle#{inputs['verbose_log'] ? ' -vd' : nil} --file=#{inputs['brewfile_path']}"
           else
             # verbose_log defined, packages and use_brewfile/brewfile_path not defined - invalid
@@ -50,7 +50,7 @@ module BK
           return '# Invalid change-workdir step configuration!' unless inputs.include?('path')
 
           [
-            inputs['is_create_path'] ? "mkdir #{inputs['path']}" : nil,
+            inputs.fetch('is_create_path', false) ? "mkdir #{inputs['path']}" : nil,
             "cd #{inputs['path']}"
           ].compact
         end
@@ -62,12 +62,12 @@ module BK
         def translate_git_tag(inputs)
           return '# Invalid git-tag step configuration!' unless inputs.include?('tag')
 
-          cmd_all_params = "git tag -fa #{inputs['tag']} -m #{inputs['tag_message']}"
+          cmd_all_params = "git tag -fa #{inputs['tag']} -m \"#{inputs['tag_message']}\""
           cmd_no_message = "git tag -fa #{inputs['tag']}"
 
           [
-            inputs['tag_message'].nil? ? cmd_no_message : cmd_all_params,
-            !inputs['push'].nil? && inputs['push'] ? 'git push --tags' : nil
+            inputs.fetch('tag_message', false) ? cmd_all_params : cmd_no_message,
+            inputs.fetch('push', false) && inputs['push'] ? 'git push --tags' : nil
           ].compact
         end
 
