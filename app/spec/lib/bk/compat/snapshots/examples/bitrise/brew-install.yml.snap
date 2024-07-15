@@ -1,0 +1,21 @@
+---
+steps:
+- commands:
+  - "# Invalid brew-install configuration!"
+  label: setup
+  key: setup
+- commands:
+  - "# No need for cloning, the agent takes care of that"
+  - brew reinstall -vd jq yq git
+  label: build
+  key: build
+- commands:
+  - "# No need for cloning, the agent takes care of that"
+  - brew install jq yq git selenium-server cucumber-ruby
+  label: test
+  key: test
+- commands:
+  - "# No need for cloning, the agent takes care of that"
+  - brew bundle -vd --file=brew/ex-repo-deploy/Brewfile
+  label: deploy
+  key: deploy
