@@ -61,12 +61,9 @@ module BK
 
         def translate_git_tag(inputs)
           return '# Invalid git-tag step configuration!' unless inputs.include?('tag')
-
-          cmd_all_params = "git tag -fa #{inputs['tag']} -m \"#{inputs['tag_message']}\""
-          cmd_no_message = "git tag -fa #{inputs['tag']}"
-
+          
           [
-            inputs.fetch('tag_message', false) ? cmd_all_params : cmd_no_message,
+            "git tag -fa #{inputs['tag']} -m \"#{inputs['tag_message']}\"",
             inputs['push'] ? 'git push --tags' : nil
           ].compact
         end

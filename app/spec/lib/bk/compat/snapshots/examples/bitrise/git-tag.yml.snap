@@ -10,7 +10,7 @@ steps:
 - commands:
   - "# No need for cloning, the agent takes care of that"
   - "./test.sh"
-  - git tag -fa test-$BITRISE_BUILD_NUMBER
+  - git tag -fa test-$BITRISE_BUILD_NUMBER -m ""
   - git push --tags
   label: test
   key: test
