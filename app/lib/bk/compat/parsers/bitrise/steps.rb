@@ -22,10 +22,10 @@ module BK
         end
 
         def generate_brew_install_command(inputs)
-          if inputs.fetch('packages', false)
+          if inputs['packages']
             install_type = inputs.fetch('upgrade', false) ? 'reinstall' : 'install'
             "brew #{install_type}#{inputs['verbose_log'] ? ' -vd' : nil} #{inputs['packages']}"
-          elsif inputs.fetch('use_brewfile', false) && inputs.fetch('brewfile_path', false)
+          elsif inputs['use_brewfile'] && inputs['brewfile_path']
             "brew bundle#{inputs['verbose_log'] ? ' -vd' : nil} --file=#{inputs['brewfile_path']}"
           else
             # verbose_log defined, packages and use_brewfile/brewfile_path not defined - invalid
@@ -50,7 +50,7 @@ module BK
           return '# Invalid change-workdir step configuration!' unless inputs.include?('path')
 
           [
-            inputs.fetch('is_create_path') ? "mkdir #{inputs['path']}" : nil,
+            inputs['is_create_path'] ? "mkdir #{inputs['path']}" : nil,
             "cd #{inputs['path']}"
           ].compact
         end
