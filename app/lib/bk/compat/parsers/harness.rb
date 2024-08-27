@@ -3,7 +3,8 @@
 require_relative '../translator'
 require_relative '../models/pipeline'
 require_relative '../models/steps/command'
-require_relative '../models/steps/group'
+
+require_relative 'harness/stage'
 require_relative 'harness/steps'
 
 module BK
@@ -58,29 +59,6 @@ module BK
       def register_translators!
         @translator = BK::Compat::StepTranslator.new(default: method(:default_step))
         @translator.register(BK::Compat::HarnessSteps::Translator.new)
-      end
-
-      def simplify_group(group)
-        # If there ended up being only 1 stage, skip the group and just
-        # pull the steps out.
-        if group.steps.length == 1
-          step = group.steps.first
-          step.conditional = group.conditional
-          group = step
-        end
-        group
-      end
-
-      def parse_stage(name:, identifier:, spec:, **_rest)
-        grp = BK::Compat::GroupStep.new(
-          label: name,
-          key: identifier,
-          steps: spec.dig('execution', 'steps').map do |step|
-            @translator.translate_step(**step['step'].transform_keys(&:to_sym))
-          end
-        )
-
-        simplify_group(grp)
       end
     end
   end
