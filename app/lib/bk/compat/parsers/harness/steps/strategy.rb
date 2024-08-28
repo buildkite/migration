@@ -27,7 +27,7 @@ module BK
 
         def translate_strategy_matrix(conf)
           concurrency = conf.delete('maxConcurrency')
-          adjustments = conf.delete('exclude')&.map { |e| e['skip'] = true }
+          adjustments = conf.delete('exclude')&.map { |e| { with: e, skip: true } }
           BK::Compat::CommandStep.new(
             matrix: {
               setup: conf,
@@ -38,14 +38,14 @@ module BK
         end
 
         def translate_strategy_repeat(conf)
-          times = conf.delete(times)
+          times = conf.delete('times')
 
           return translate_strategy_matrix(conf) if times.nil?
 
-          cmd = translate_strategy_parallelism(times)
-          cmd.concurrency = conf.delete('maxConcurrency')
-
-          cmd
+          concurrency = conf.delete('maxConcurrency')
+          translate_strategy_parallelism(times).tap do |cmd|
+            cmd.concurrency = concurrency
+          end
         end
       end
     end
