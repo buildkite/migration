@@ -1,0 +1,103 @@
+pipeline:
+  name: looping_strategy
+  identifier: looping_strategy
+  stages:
+    - stage:
+        name: sA
+        identifier: sA
+        type: Custom
+        spec:
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: ShellScript_1
+                  identifier: ShellScript_1
+                  spec:
+                    shell: Bash
+                    command: echo hey from matrix
+        strategy:
+          matrix:
+            jdk:
+              - "18"
+              - "17"
+              - "16"
+            maxConcurrency: 3
+    - stage:
+        name: sA2
+        identifier: sA2
+        type: Custom
+        spec:
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: ShellScript_1a
+                  identifier: ShellScript_1a
+                  spec:
+                    shell: Bash
+                    command: echo hey from matrix with exclusions
+        strategy:
+          matrix:
+            os:
+              - linux
+              - mac
+            broswer:
+              - chrome
+              - firefox
+            exclude:
+              - os: linux
+                browser: chrome
+            maxConcurrency: 2
+    - stage:
+        name: sB
+        identifier: sB
+        type: Custom
+        spec:
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: ShellScript_2
+                  identifier: ShellScript_2
+                  spec:
+                    shell: Bash
+                    command: echo hey from parallel
+        strategy:
+          parallelism: 5
+    - stage:
+        name: sC
+        identifier: sC
+        type: Custom
+        spec:
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: ShellScript_3
+                  identifier: ShellScript_3
+                  spec:
+                    shell: Bash
+                    command: echo hey from repeat times
+        strategy:
+          repeat:
+            times: 5
+            maxConcurrency: 4
+    - stage:
+        name: sD
+        identifier: sD
+        type: Custom
+        spec:
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: ShellScript_4
+                  identifier: ShellScript_4
+                  spec:
+                    shell: Bash
+                    command: echo hey from repeat matrix
+        strategy:
+          repeat:
+            items: ['a', 'b', 'c']
+  allowStageExecutions: true
