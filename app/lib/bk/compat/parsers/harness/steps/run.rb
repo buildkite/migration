@@ -18,16 +18,13 @@ module BK
             key: identifier,
             commands: [spec['command']]
           ).tap do |cmd|
-            post_keys(spec).each { |k| cmd << k }
+            post_keys.each { |k| cmd << send("translate_#{k}", spec[k]) }
             cmd << translate_strategy(strategy)
           end
         end
 
-        def post_keys(spec)
-          [
-            translate_image(spec['image']),
-            translate_shell(spec['shell'])
-          ]
+        def post_keys
+          %w[image shell].freeze
         end
 
         def translate_shell(shell)
