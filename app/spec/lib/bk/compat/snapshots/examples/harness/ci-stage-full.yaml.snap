@@ -30,5 +30,12 @@ steps:
 - commands:
   - echo "Testing on  <+matrix.testparam>"
   - "# shell is environment-dependent and should be configured in the agent'"
+  matrix:
+    setup:
+      testparam:
+      - node
+      - python
+      - ubuntu
   label: Run_3
   key: Run_3
+  concurrency: 3
