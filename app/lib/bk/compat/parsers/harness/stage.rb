@@ -6,16 +6,26 @@ module BK
   module Compat
     # Harness translation scaffolding
     class Harness
-      def parse_stage(name:, identifier:, spec:, **_rest)
+      def parse_stage(name:, identifier:, spec:, **rest)
+        defaults = get_multi_level_keys(**rest)
+
         grp = BK::Compat::GroupStep.new(
           label: name,
           key: identifier,
           steps: spec.dig('execution', 'steps').map do |step|
-            @translator.translate_step(**step['step'].transform_keys(&:to_sym))
+            @translator.translate_step(**defaults.merge(step['step']).transform_keys(&:to_sym))
           end
         )
 
         simplify_group(grp)
+      end
+
+      # some keys can be defined on the stage or the step level
+      # passing them through to just parse them at the step level
+      def get_multi_level_keys(**spec)
+        spec.slice(
+          :strategy
+        )
       end
 
       def simplify_group(group)
