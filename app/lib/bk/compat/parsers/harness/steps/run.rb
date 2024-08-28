@@ -1,23 +1,25 @@
 # frozen_string_literal: true
 
 require_relative '../../../models/steps/command'
+require_relative 'strategy'
 
 module BK
   module Compat
     module HarnessSteps
       # Implementation of native step translation
       class Translator
-        def translate_run(name:, identifier:, spec:, **_rest)
-          base_step(name, identifier, spec)
+        def translate_run(name:, identifier:, spec:, **rest)
+          base_step(name, identifier, spec, **rest)
         end
 
-        def base_step(name, identifier, spec)
+        def base_step(name, identifier, spec, strategy: {}, **)
           BK::Compat::CommandStep.new(
             label: name,
             key: identifier,
             commands: [spec['command']]
           ).tap do |cmd|
             post_keys(spec).each { |k| cmd << k }
+            cmd << translate_strategy(strategy)
           end
         end
 
