@@ -11,7 +11,7 @@ module BK
     class CommandStep < BaseStep
       attr_accessor :agents, :artifact_paths, :branches, :concurrency, :concurrency_group,
                     :conditional, :depends_on, :env, :key, :label, :matrix,
-                    :plugins, :soft_fail, :timeout_in_minutes
+                    :parallelism, :plugins, :soft_fail, :timeout_in_minutes
 
       attr_reader :commands # we define special writers
 
@@ -23,9 +23,14 @@ module BK
         %w[agents env matrix].freeze
       end
 
+      # attributes merged with the minimum value
+      def min_attributes
+        %w[concurrency parallelism].freeze
+      end
+
       # only for backwards compatibility
       def key_order
-        %i[artifact_paths commands depends_on plugins agents env matrix label key].freeze
+        %i[artifact_paths commands depends_on plugins agents env matrix label key concurrency].freeze
       end
 
       def commands=(value)
@@ -93,15 +98,19 @@ module BK
 
       def update_attributes!(other)
         @conditional = BK::Compat.xxand(conditional, other.conditional)
-        @concurrency = [@concurrency, other.concurrency].compact.min
         @concurrency_group ||= other.concurrency_group
         @branches = "#{@branches} #{other.branches}".strip
         @timeout_in_minutes = [@timeout_in_minutes, other.timeout_in_minutes].compact.max
+        min_attributes.each { |a| assign_minimum(a, other) }
 
         # TODO: these could be a hash with exit codes
         @soft_fail ||= other.soft_fail
 
         self
+      end
+
+      def assign_minimum(key, other)
+        send("#{key}=", [send(key), other.send(key)].compact.min)
       end
 
       def instantiate(*, **)

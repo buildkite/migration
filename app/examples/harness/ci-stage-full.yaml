@@ -102,7 +102,7 @@ pipeline:
               - node
               - python
               - ubuntu
-          maxConcurrency: 3
+            maxConcurrency: 3
   variables:
     - name: pipelinevar1
       type: String

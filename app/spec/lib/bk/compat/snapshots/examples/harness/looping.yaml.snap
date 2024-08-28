@@ -1,0 +1,57 @@
+---
+steps:
+- commands:
+  - echo hey from matrix
+  - "# shell is environment-dependent and should be configured in the agent'"
+  matrix:
+    setup:
+      jdk:
+      - '18'
+      - '17'
+      - '16'
+  label: ShellScript_1
+  key: ShellScript_1
+  concurrency: 3
+- commands:
+  - echo hey from matrix with exclusions
+  - "# shell is environment-dependent and should be configured in the agent'"
+  matrix:
+    setup:
+      os:
+      - linux
+      - mac
+      broswer:
+      - chrome
+      - firefox
+    adjustments:
+    - with:
+        os: linux
+        browser: chrome
+      skip: true
+  label: ShellScript_1a
+  key: ShellScript_1a
+  concurrency: 2
+- commands:
+  - echo hey from parallel
+  - "# shell is environment-dependent and should be configured in the agent'"
+  label: ShellScript_2
+  key: ShellScript_2
+  parallelism: 5
+- commands:
+  - echo hey from repeat times
+  - "# shell is environment-dependent and should be configured in the agent'"
+  label: ShellScript_3
+  key: ShellScript_3
+  concurrency: 4
+  parallelism: 5
+- commands:
+  - echo hey from repeat matrix
+  - "# shell is environment-dependent and should be configured in the agent'"
+  matrix:
+    setup:
+      items:
+      - a
+      - b
+      - c
+  label: ShellScript_4
+  key: ShellScript_4
