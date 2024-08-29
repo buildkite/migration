@@ -21,9 +21,7 @@ module BK
       def simplify_steps
         first = @steps.first
         # bubble up a pipeline with a single group that has no conditional
-        if @steps.one? && first.is_a?(GroupStep) && !first.conditional
-          @steps = first.steps
-        end
+        @steps = first.steps if @steps.one? && first.is_a?(GroupStep) && !first.conditional
 
         @steps.map { |s| s.simplify.to_h }
       end
