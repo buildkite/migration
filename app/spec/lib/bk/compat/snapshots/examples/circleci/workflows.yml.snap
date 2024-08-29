@@ -1,11 +1,9 @@
 ---
 steps:
-- group: ":circleci: workflow_1"
-  key: workflow_1
-  steps:
-  - commands:
-    - echo "Hello World, this is Circle"
-    key: hello
+- commands:
+  - echo "Hello World, this is Circle"
+  label: ":circleci: workflow_1"
+  key: workflow_1-hello
 - group: ":circleci: workflow_2"
   key: workflow_2
   steps:

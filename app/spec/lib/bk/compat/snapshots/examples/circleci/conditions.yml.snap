@@ -1,18 +1,16 @@
 ---
 steps:
-- group: ":circleci: my-workflow"
-  key: my-workflow
+- commands:
+  - echo 'Hello'
+  - "# when condition translation may not be compatible with your shell"
+  - if [ "<< pipeline.git.branch >>" == "main" ]; then
+  - echo 'Running in main'
+  - echo 'Running command'
+  - fi
+  label: ":circleci: my-workflow"
+  key: my-workflow-test
   if: '!(/^main$/ ~= << pipeline.git.branch >>) && "<< pipeline.git.tag >>" == "canary"
     || << pipeline.parameters.deploy-canary >>'
-  steps:
-  - commands:
-    - echo 'Hello'
-    - "# when condition translation may not be compatible with your shell"
-    - if [ "<< pipeline.git.branch >>" == "main" ]; then
-    - echo 'Running in main'
-    - echo 'Running command'
-    - fi
-    key: test
 - group: ":circleci: my-workflow-2"
   key: my-workflow-2
   if: '"<< pipeline.git.branch >>" == "main"'
