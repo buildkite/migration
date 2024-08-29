@@ -57,7 +57,10 @@ module BK
         # Turn each work flow into a step group
         bk_groups = workflows.map { |wf, config| parse_workflow(wf, config) }
 
-        Pipeline.new.tap { |p| p.steps.concat(simplify_group(bk_groups)) }
+        # If no workflow is defined, it's expected that there's a `build` job
+        bk_groups = [BK::Compat::GroupStep.new(steps: [@commands_by_key['build'].instantiate({})])] if bk_groups.empty?
+
+        Pipeline.new(steps: bk_groups)
       end
 
       private
@@ -75,17 +78,6 @@ module BK
         @config.fetch('executors', {}).map { |key, config| load_executor(key, config) }
         @config.fetch('commands', {}).map { |key, config| load_command(key, config) }
         @config.fetch('jobs', {}).map { |key, config| load_job(key, config) }
-      end
-
-      def simplify_group(groups)
-        # If no workflow is defined, it's expected that there's a `build` job
-        groups = [BK::Compat::GroupStep.new(steps: [@commands_by_key['build'].instantiate({})])] if groups.empty?
-
-        # If there ended up being only 1 workflow, skip the group and just
-        # pull the steps out.
-        groups = groups.first.steps.each { |step| step.conditional = groups.first.conditional } if groups.length == 1
-
-        groups
       end
 
       def translate_steps(step_list)
