@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative '../renderer'
+require_relative '../models/steps/group'
 
 module BK
   module Compat
@@ -17,10 +18,20 @@ module BK
         BK::Compat::Renderer.new(to_h).render(*, **)
       end
 
+      def simplify_steps
+        first = @steps.first
+        # bubble up a pipeline with a single group that has no conditional
+        if @steps.one? && first.is_a?(GroupStep) && !first.conditional
+          @steps = first.steps
+        end
+
+        @steps.map { |s| s.simplify.to_h }
+      end
+
       def to_h
         {}.tap do |h|
-          h[:env] = @env.to_h unless @env.empty?
-          h[:steps] = steps.map(&:to_h)
+          h[:env] = @env unless @env.empty?
+          h[:steps] = simplify_steps
         end
       end
     end
