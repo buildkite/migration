@@ -1,13 +1,11 @@
 ---
 steps:
-- group: default
-  steps:
-  - commands:
-    - echo 'testing pipe'
-    - "# Pipe test-pipe:v1.1 is not currently supported, maybe a plugin?"
-    label: simple pipe
-  - wait
-  - commands:
-    - echo 'testing vars pipe'
-    - "# Pipe test-pipe:v1.1 is not currently supported, maybe a plugin?"
-    label: pipe with vars
+- commands:
+  - echo 'testing pipe'
+  - "# Pipe test-pipe:v1.1 is not currently supported, maybe a plugin?"
+  label: simple pipe
+- wait
+- commands:
+  - echo 'testing vars pipe'
+  - "# Pipe test-pipe:v1.1 is not currently supported, maybe a plugin?"
+  label: pipe with vars
