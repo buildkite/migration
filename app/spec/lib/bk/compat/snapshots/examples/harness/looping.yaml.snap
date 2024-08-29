@@ -9,8 +9,8 @@ steps:
       - '18'
       - '17'
       - '16'
-  label: ShellScript_1
-  key: ShellScript_1
+  label: sA ShellScript_1
+  key: sA-ShellScript_1
   concurrency: 3
 - commands:
   - echo hey from matrix with exclusions
@@ -28,20 +28,20 @@ steps:
         os: linux
         browser: chrome
       skip: true
-  label: ShellScript_1a
-  key: ShellScript_1a
+  label: sA2 ShellScript_1a
+  key: sA2-ShellScript_1a
   concurrency: 2
 - commands:
   - echo hey from parallel
   - "# shell is environment-dependent and should be configured in the agent'"
-  label: ShellScript_2
-  key: ShellScript_2
+  label: sB ShellScript_2
+  key: sB-ShellScript_2
   parallelism: 5
 - commands:
   - echo hey from repeat times
   - "# shell is environment-dependent and should be configured in the agent'"
-  label: ShellScript_3
-  key: ShellScript_3
+  label: sC ShellScript_3
+  key: sC-ShellScript_3
   concurrency: 4
   parallelism: 5
 - commands:
@@ -53,5 +53,5 @@ steps:
       - a
       - b
       - c
-  label: ShellScript_4
-  key: ShellScript_4
+  label: sD ShellScript_4
+  key: sD-ShellScript_4

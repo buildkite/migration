@@ -25,8 +25,8 @@ steps:
   plugins:
   - docker#v5.10.0:
       image: node:13.0.0
-  label: Run_2
-  key: Run_2
+  label: stage2 Run_2
+  key: stage2-Run_2
 - commands:
   - echo "Testing on  <+matrix.testparam>"
   - "# shell is environment-dependent and should be configured in the agent'"
@@ -36,6 +36,6 @@ steps:
       - node
       - python
       - ubuntu
-  label: Run_3
-  key: Run_3
+  label: matrix stage Run_3
+  key: matrix_stage-Run_3
   concurrency: 3
