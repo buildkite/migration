@@ -82,30 +82,17 @@ module BK
         end
       end
 
-      def simplify_group(group)
-        # if ther last step is a wait, remove it
-        group.steps.pop if group.steps.last.is_a?(WaitStep)
-
-        # If there ended up being only 1 stage, skip the group and just
-        # pull the steps out.
-        if group.steps.length == 1
-          group.steps[0].conditional = group.conditional
-          return group.steps[0]
-        elsif group.steps.empty?
-          return []
-        end
-
-        group
-      end
-
       def parse_pipeline(name, conf, defaults)
+        return [] if Array(conf).empty?
+
         steps = Array(conf).map { |s| @translator.translate_step(s, defaults: defaults) }
-        simplify_group(
-          BK::Compat::GroupStep.new(
-            label: name,
-            steps: steps.flatten
-          )
-        )
+
+        BK::Compat::GroupStep.new(
+          label: name,
+          steps: steps.flatten
+        ).tap do |group|
+          group.steps.pop if group.steps.last.is_a?(WaitStep)
+        end
       end
 
       def post_process_nothing(_name, steps)
