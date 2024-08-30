@@ -1,22 +1,20 @@
 ---
 steps:
-- group: default
-  steps:
-  - commands:
-    - if git diff --exit-code --name-only HEAD "${BUILDKITE_PULL_REQUEST_BASE_BRANCH:HEAD^}"
-      -- 'singlefile'; then
-    - "  echo '+++ :warning: no changes found in 'singlefile', exiting step as OK"
-    - "  exit 0"
-    - fi
-    - echo 'should never run'
-    label: single file condition
-  - wait
-  - commands:
-    - if git diff --exit-code --name-only HEAD "${BUILDKITE_PULL_REQUEST_BASE_BRANCH:HEAD^}"
-      -- 'file1' 'path1/*' '**/glob.ext'; then
-    - "  echo '+++ :warning: no changes found in 'file1' 'path1/*' '**/glob.ext',
-      exiting step as OK"
-    - "  exit 0"
-    - fi
-    - echo 'should never run'
-    label: multiple files condition
+- commands:
+  - if git diff --exit-code --name-only HEAD "${BUILDKITE_PULL_REQUEST_BASE_BRANCH:HEAD^}"
+    -- 'singlefile'; then
+  - "  echo '+++ :warning: no changes found in 'singlefile', exiting step as OK"
+  - "  exit 0"
+  - fi
+  - echo 'should never run'
+  label: single file condition
+- wait
+- commands:
+  - if git diff --exit-code --name-only HEAD "${BUILDKITE_PULL_REQUEST_BASE_BRANCH:HEAD^}"
+    -- 'file1' 'path1/*' '**/glob.ext'; then
+  - "  echo '+++ :warning: no changes found in 'file1' 'path1/*' '**/glob.ext', exiting
+    step as OK"
+  - "  exit 0"
+  - fi
+  - echo 'should never run'
+  label: multiple files condition

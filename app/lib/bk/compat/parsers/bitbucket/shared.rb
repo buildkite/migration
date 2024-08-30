@@ -36,8 +36,7 @@ module BK
         case trigger
         when 'manual'
           # ensure key is unique but deterministic
-          k = step_id(steps[0])
-
+          k = step_id(steps[0].dup)
           input = BK::Compat::InputStep.new(
             key: "execute-#{k}",
             prompt: "Execute step #{k}?"

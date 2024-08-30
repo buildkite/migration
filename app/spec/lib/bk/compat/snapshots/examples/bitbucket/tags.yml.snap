@@ -2,13 +2,13 @@
 steps:
 - commands:
   - echo "Hello, Windows!"
-  label: Build for *-windows tags
+  label: "*-windows Build for *-windows tags"
   if: build.tag =~ /*-windows/
 - commands:
   - echo "Hello, macOS!"
-  label: Build for *-macos tags
+  label: "*-macos Build for *-macos tags"
   if: build.tag =~ /*-macos/
 - commands:
   - echo "Hello, Linux!"
-  label: Build for *-linux tags
+  label: "*-linux Build for *-linux tags"
   if: build.tag =~ /*-linux/

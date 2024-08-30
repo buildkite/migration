@@ -23,6 +23,10 @@ module BK
         end
       end
 
+      def simplify
+        self
+      end
+
       private
 
       def key_order

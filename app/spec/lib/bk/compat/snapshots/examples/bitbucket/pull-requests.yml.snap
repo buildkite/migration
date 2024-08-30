@@ -2,13 +2,13 @@
 steps:
 - commands:
   - echo "Hello, feature branch PR!"
-  label: Build for feature branch pull request
+  label: feature/* Build for feature branch pull request
   if: pull_request.id != null && build.branch =~ /feature\/*/
 - commands:
   - echo "Hello, hotfix PR!"
-  label: Build for hotfix branch pull request
+  label: hotfix/* Build for hotfix branch pull request
   if: pull_request.id != null && build.branch =~ /hotfix\/*/
 - commands:
   - echo "Hello, non-feature, non-hotfix pull request!"
-  label: Build for all other pull requests
+  label: "** Build for all other pull requests"
   if: pull_request.id != null && build.branch =~ /**/

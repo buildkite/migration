@@ -6,13 +6,13 @@ steps:
   plugins:
   - docker#v5.10.0:
       image: node:lts
-  label: Script step
+  label: default Script step
 - commands:
   - echo "This script runs only on commit to the main branch."
   plugins:
   - docker#v5.10.0:
       image: node:lts
-  label: Script step
+  label: main Script step
   if: build.branch =~ /main/
 - commands:
   - echo "This script runs only on commit to branches with names that match the feature/*
@@ -20,5 +20,5 @@ steps:
   plugins:
   - docker#v5.10.0:
       image: openjdk:8
-  label: Script step
+  label: feature/* Script step
   if: build.branch =~ /feature\/*/

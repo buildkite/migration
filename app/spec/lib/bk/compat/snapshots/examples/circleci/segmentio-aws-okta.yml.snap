@@ -57,6 +57,7 @@ steps:
   agents:
     executor_type: docker
   key: dist-linux
+  if: build.tag =~ /.*/
 - commands:
   - cd /go/src/github.com/segmentio/aws-okta
   - "# No need for checkout, the agent takes care of that"
@@ -81,6 +82,7 @@ steps:
   agents:
     executor_type: docker
   key: publish-packagecloud
+  if: "(build.branch !~ /.*/) && (build.tag =~ /v[0-9]+(\\.[0-9]+)*(-[a-zA-Z0-9-]+)?/)"
 - commands:
   - cd /go/src/github.com/segmentio/aws-okta
   - "# No need for checkout, the agent takes care of that"
@@ -99,3 +101,4 @@ steps:
   agents:
     executor_type: docker
   key: publish-github-linux
+  if: "(build.branch !~ /.*/) && (build.tag =~ /v[0-9]+(\\.[0-9]+)*(-[a-zA-Z0-9-]+)?/)"
