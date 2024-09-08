@@ -1,0 +1,26 @@
+---
+steps:
+- commands:
+  - "# to make background services work, add the following composefile to your repository"
+  - "# to force a particular shell in services, configure their command accordingly"
+  - |-
+    cat > compose.yaml << EOF
+    ---
+    services:
+      postgres_background:
+        image: postgres:10.8
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: <+secrets.getValue("DbPasswordSecret")>
+          POSTGRES_DB: postgres
+
+    EOF
+  plugins:
+  - docker-compose#v5.0.0:
+      run: app
+  key: background-Postgres Background
+- commands:
+  - psql -U postgres -d app
+  - "# shell is environment-dependent and should be configured in the agent'"
+  label: PSQL connect
+  key: psql_connect

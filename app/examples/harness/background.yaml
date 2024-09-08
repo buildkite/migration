@@ -1,0 +1,47 @@
+pipeline:
+  name: background-postgres
+  identifier: pgbg
+  projectIdentifier: pg_background
+  orgIdentifier: default
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: account.myscm
+        repoName: test
+        build: <+input>
+  stages:
+    - stage:
+        name: DB Start
+        identifier: db_start
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Background
+                  name: Postgres Background
+                  identifier: postgres_background
+                  spec:
+                    connectorRef: myDockerHubConnector
+                    image: postgres:10.8
+                    shell: Sh
+                    envVariables:
+                      POSTGRES_USER: postgres
+                      POSTGRES_PASSWORD: <+secrets.getValue("DbPasswordSecret")>
+                      POSTGRES_DB: postgres
+              - step:
+                  type: Run
+                  name: PSQL connect
+                  identifier: psql_connect
+                  spec:
+                    shell: Bash
+                    command: psql -U postgres -d app
