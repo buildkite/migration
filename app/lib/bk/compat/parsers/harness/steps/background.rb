@@ -19,7 +19,7 @@ module BK
 
           cmds = [
             '# to make background services work, add the following composefile to your repository',
-            spec.include?('shell') ? '# to force a particular shell in services, configure their command accordingly' : nil,
+            spec.include?('shell') ? '# configure their command to force a particular shell in services' : nil,
             "cat > compose.yaml << EOF\n#{compose_conf.to_yaml}\nEOF"
           ]
 
