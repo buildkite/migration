@@ -2,7 +2,7 @@
 steps:
 - commands:
   - "# to make background services work, add the following composefile to your repository"
-  - "# to force a particular shell in services, configure their command accordingly"
+  - "# configure their command to force a particular shell in services"
   - |-
     cat > compose.yaml << EOF
     ---
