@@ -4,10 +4,24 @@ steps:
   key: stage1
   steps:
   - commands:
-    - ' # step [] {:type=>"Background", :name=>"postgres-dependency", :identifier=>"postgresdependency",
-      :spec=>{"connectorRef"=>"myDockerHubConnector", "image"=>"postgres:10.8", "shell"=>"Sh",
-      "envVariables"=>{"POSTGRES_USER"=>"postgres", "POSTGRES_PASSWORD"=>"<+secrets.getValue(\"DbPasswordSecret\")>",
-      "POSTGRES_DB"=>"postgres"}}} not implemented yet :('
+    - "# to make background services work, add the following composefile to your repository"
+    - "# configure their command to force a particular shell in services"
+    - |-
+      cat > compose.yaml << EOF
+      ---
+      services:
+        postgresdependency:
+          image: postgres:10.8
+          environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: <+secrets.getValue("DbPasswordSecret")>
+            POSTGRES_DB: postgres
+
+      EOF
+    plugins:
+    - docker-compose#v5.0.0:
+        run: app
+    key: background-postgres-dependency
   - commands:
     - echo "this runs on openjdk"
     - "# shell is environment-dependent and should be configured in the agent'"
