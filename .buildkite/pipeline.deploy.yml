@@ -24,6 +24,12 @@ steps:
       - docker build . -t buildkite/migration-tool
       - docker push buildkite/migration-tool
     plugins:
+      - aws-assume-role-with-web-identity:
+          role-arn: arn:aws:iam::445615400570:role/pipeline-buildkite-migration-tool-deploy
+      - aws-ssm#v1.0.0:
+          parameters:
+            BUILDKITE_PLUGIN_DOCKER_LOGIN_USERNAME: /pipelines/buildkite/migration-tool-deploy/docker-login-username
+            DOCKER_LOGIN_PASSWORD: /pipelines/buildkite/migration-tool-deploy/docker-login-password
       - docker-login#v3.0.0: ~
     if: |
       build.branch == 'main'
