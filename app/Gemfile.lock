@@ -12,7 +12,7 @@ GEM
       racc
     parslet (2.0.0)
     racc (1.8.1)
-    rack (3.1.7)
+    rack (3.1.8)
     rackup (2.1.0)
       rack (>= 3)
       webrick (~> 1.8)
