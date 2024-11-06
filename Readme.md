@@ -36,7 +36,7 @@ steps:
 
 ## Web Service/API
 
-Buildkite Compat can also be used via a HTTP API using `rackup` from the `app` folder of this repository.
+Buildkite Compat can also be used via a HTTP API using `puma` from the `app` folder of this repository.
 
 You start the web UI with either of the following docker commands:
 
@@ -47,7 +47,7 @@ docker compose up webui
 Note: If you are using `docker run` you will have to override the entrypoint:
 
 ```shell
-$ docker run --rm -ti -p 9292:9292 --entrypoint '' --workdir /app $IMAGE:$TAG rackup --port 9292
+$ docker run --rm -ti -p 9292:9292 --entrypoint '' --workdir /app $IMAGE:$TAG puma --port 9292
 ```
 
 After that, you can access a simple web interface at http://localhost:9292
@@ -75,7 +75,7 @@ steps:
 
 Buildkite has its own suggested best practices, these may differ to those from other providers, check out the [Buildkite Docs](https://buildkite.com/docs) for more information. Review and use the results of this tool as the basis towards Buildkite adoption, the output of the migration tool is a guide and manual editing is likely to be required.
 
-## Further Details 
+## Further Details
 
 Further information on the currently supported attributes of CI provider pipeline translation to Buildkite pipelines can be found below (within the `/docs` directory):
 
