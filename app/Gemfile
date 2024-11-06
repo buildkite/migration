@@ -5,8 +5,8 @@ source 'https://rubygems.org'
 git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
 
 gem 'parslet'
-gem 'rack'
 gem 'puma' # necessary for starting the HTTP interface
+gem 'rack'
 gem 'rouge'
 
 group :development, :test do
