@@ -2,7 +2,7 @@ version: "3"
 services:
   webui:
     build: .
-    command: rackup --port 9292
+    command: puma --port 9292
     entrypoint: ""
     ports:
       - "9292:9292"
