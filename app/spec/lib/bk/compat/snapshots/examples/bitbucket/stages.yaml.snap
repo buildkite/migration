@@ -27,17 +27,17 @@ steps:
     label: Run unit tests
 - group: manual stage
   steps:
-  - key: execute-5f4b7c80dda894d4254d2c5547b1c7dc5dc16891
-    prompt: Execute step 5f4b7c80dda894d4254d2c5547b1c7dc5dc16891?
-    input: execute-5f4b7c80dda894d4254d2c5547b1c7dc5dc16891
+  - key: execute-27f5be813d45b642f493c4b7e2239da2924175fe
+    prompt: Execute step 27f5be813d45b642f493c4b7e2239da2924175fe?
+    input: execute-27f5be813d45b642f493c4b7e2239da2924175fe
   - commands:
     - sh ./build-app.sh
     depends_on:
-    - execute-5f4b7c80dda894d4254d2c5547b1c7dc5dc16891
+    - execute-27f5be813d45b642f493c4b7e2239da2924175fe
     label: Build app
   - wait
   - commands:
     - sh ./run-tests.sh
     depends_on:
-    - execute-5f4b7c80dda894d4254d2c5547b1c7dc5dc16891
+    - execute-27f5be813d45b642f493c4b7e2239da2924175fe
     label: Run unit tests

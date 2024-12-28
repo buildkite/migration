@@ -2,8 +2,8 @@
 steps:
 - commands:
   - "./build.sh"
-  label: parallel-7745d6f42f7f67b5b911003efa6bdd7a809f392c Build
-- group: parallel-d0d6955d5365cdcbbd5215f583dbea2be5cbff7e
+  label: parallel-dc4a1a175ef1caae3f6e0ac055381fb44d1f187e Build
+- group: parallel-7f796b98b1a2e1e54e2e452dd31ed13835e384dc
   steps:
   - commands:
     - "./integration-tests.sh --batch 1"
