@@ -1,8 +1,8 @@
 ---
 steps:
-- key: execute-3c6693d9c5739b3f1e3ce7a4a8e495f68f0428a9
-  prompt: Execute step 3c6693d9c5739b3f1e3ce7a4a8e495f68f0428a9?
-  input: execute-3c6693d9c5739b3f1e3ce7a4a8e495f68f0428a9
+- key: execute-5af567048c196d644962c4772d3aafb6029184c3
+  prompt: Execute step 5af567048c196d644962c4772d3aafb6029184c3?
+  input: execute-5af567048c196d644962c4772d3aafb6029184c3
 - commands:
   - echo "Manual triggers for Sonar are awesome!"
   label: sonar Script step

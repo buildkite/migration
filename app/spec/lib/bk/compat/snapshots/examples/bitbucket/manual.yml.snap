@@ -4,11 +4,11 @@ steps:
   - echo 'running'
   label: simple
 - wait
-- key: execute-cad93b8b7bf63eb33ffe9002d9b6932eb155ec3c
-  prompt: Execute step cad93b8b7bf63eb33ffe9002d9b6932eb155ec3c?
-  input: execute-cad93b8b7bf63eb33ffe9002d9b6932eb155ec3c
+- key: execute-bdbce8d743ed804e10bcfb5ecb85ac5bafcb219d
+  prompt: Execute step bdbce8d743ed804e10bcfb5ecb85ac5bafcb219d?
+  input: execute-bdbce8d743ed804e10bcfb5ecb85ac5bafcb219d
 - commands:
   - echo 'running'
   depends_on:
-  - execute-cad93b8b7bf63eb33ffe9002d9b6932eb155ec3c
+  - execute-bdbce8d743ed804e10bcfb5ecb85ac5bafcb219d
   label: complex

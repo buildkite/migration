@@ -1,7 +1,7 @@
 ---
 steps:
 - commands:
-  - '# executor {"name"=>"win/default", "size"=>"medium"} not supported yet'
+  - '# executor {"name" => "win/default", "size" => "medium"} not supported yet'
   - Hello, Orb Executor
   key: orb-executor
 - commands:
