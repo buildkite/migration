@@ -1,30 +1,35 @@
-# frozen_string_literal: true
-
 module BK
   module Compat
-    # CircleCI orb handling
-    class CircleCI
-      private
-
-      def load_orb(key, _conf)
-        @translator.register(CircleCISteps::GenericOrb.new(key))
-      end
-    end
-
     module CircleCISteps
-      # Generic orb steps/jobs (that states it is not supported)
-      class GenericOrb
-        def initialize(key)
-          @prefix = key
-        end
-
+      class DockerOrb
         def matcher(orb, _conf)
-          orb.start_with?("#{@prefix}/")
+          orb.start_with?('docker/')
         end
 
-        def translator(action, _config)
+        def translator(action, config)
+          case action
+          when 'docker/build'
+            translate_docker_build(config)
+          when 'docker/install'
+            translate_docker_install(config)
+          else
+            ["# Unsupported docker orb action: #{action}"]
+          end
+        end
+
+        private
+
+        def translate_docker_build(config)
           [
-            "# #{action} is part of orb #{@prefix} which is not supported and should be translated by hand"
+            "docker build -t #{config['image']}:#{config['tag']} ."
+          ]
+        end
+
+        def translate_docker_install(config)
+          [
+            "echo '~~~ Installing Docker'",
+            "curl -fsSL https://get.docker.com -o get-docker.sh",
+            "sh get-docker.sh"
           ]
         end
       end

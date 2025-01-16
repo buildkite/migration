@@ -22,10 +22,22 @@ module BK
       def self.option
         'circleci'
       end
+      def load_orb(key, config)
+        case key
+        when 'docker'
+          @translator.register(CircleCISteps::DockerOrb.new)
+        else
+          @translator.register(CircleCISteps::GenericOrb.new(key))
+        end
+      end
 
       def self.matches?(text)
         # sorting is important
         config = YAML.safe_load(text, aliases: true)
+        ## Print config in pretty format
+        puts config.to_yaml
+        puts config.keys
+
         mandatory_keys = %w[jobs version workflows].freeze
 
         if config.is_a?(String)
