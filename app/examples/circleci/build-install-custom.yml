@@ -14,28 +14,18 @@ commands:
             apt-get install -y curl jq git
 
 jobs:
-  install:
+  install-docker:
     docker:
       - image: cimg/base:stable
     steps:
       - checkout
       - install_deps
-      - docker/install
-
-  build:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - checkout
-      - docker/build:
-          image: $IMAGE_NAME
-          tag: latest
+      - docker/install-docker:
+          version: 20.10.7
+          install-dir: /usr/bin
 
 workflows:
   version: 2
-  install-and-build:
+  docker-install:
     jobs:
-      - install
-      - build:
-          requires:
-            - install
+      - install-docker

@@ -1,0 +1,28 @@
+---
+steps:
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - echo '~~~ Install Dependencies'
+  - apt-get update
+  - apt-get install -y curl jq git
+  - echo '~~~ Installing Docker'
+  - curl -fsSL https://get.docker.com -o get-docker.sh
+  - sh get-docker.sh
+  plugins:
+  - docker#v5.10.0:
+      image: cimg/base:stable
+  agents:
+    executor_type: docker
+  key: install
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - "# No need to setup remote docker, use the host docker"
+  - docker build -t $IMAGE_NAME:latest .
+  depends_on:
+  - install
+  plugins:
+  - docker#v5.10.0:
+      image: cimg/base:stable
+  agents:
+    executor_type: docker
+  key: build
