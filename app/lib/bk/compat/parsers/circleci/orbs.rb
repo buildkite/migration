@@ -44,18 +44,21 @@ module BK
         def validate_and_translate_install_docker(_config)
           install_dir = @config['install-dir'] || '/usr/local/bin'
           version = @config['version'] || 'latest'
+          commands = ['"# No need for install docker, the agent takes care of that"']
+          commands << "echo '~~~ Installing Docker'"
+          commands << "mkdir -p #{install_dir}" if install_dir != '/usr/local/bin'
+          commands += install_commands(version, install_dir)
+          commands
+        end
 
-          commands =["mkdir -p #{install_dir}"]if install_dir != '/usr/local/bin'
-
+        def install_commands(version, install_dir)
           if version == 'latest'
-            commands = ["echo '~~~ INFO: Docker be installed and ready on the agent'"]
-            commands += [
+            [
               'curl -fsSL https://get.docker.com -o get-docker.sh',
               'sh get-docker.sh'
             ]
           else
-            commands = ["echo '~~~ Installing Docker'"]
-            commands += [
+            [
               "VERSION=#{version}",
               'curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-${VERSION}.tgz -o docker.tgz',
               'tar xzvf docker.tgz',
@@ -63,8 +66,6 @@ module BK
               'rm -rf docker docker.tgz'
             ]
           end
-
-          commands
         end
       end
     end
