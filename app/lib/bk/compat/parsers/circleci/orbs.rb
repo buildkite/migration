@@ -22,16 +22,11 @@ module BK
 
       # Docker orb specific implementation
       class DockerOrb
-        def initialize
-          @config = {}
-        end
-
         def matcher(orb, _conf)
           orb.start_with?('docker/')
         end
 
         def translator(action, config)
-          @config = config
           method_map = {
             'docker/build' => -> { translate_docker_build(config) },
             'docker/install-docker' => -> { validate_and_translate_install_docker(config) }
@@ -41,17 +36,20 @@ module BK
 
         private
 
-        def validate_and_translate_install_docker(_config)
-          install_dir = @config['install-dir'] || '/usr/local/bin'
-          version = @config['version'] || 'latest'
-          commands = ['"# No need for install docker, the agent takes care of that"']
-          commands << "echo '~~~ Installing Docker'"
-          commands << "mkdir -p #{install_dir}" if install_dir != '/usr/local/bin'
-          commands += install_commands(version, install_dir)
-          commands
+        def validate_and_translate_install_docker(config)
+          install_dir = config.fetch('install-dir', '/usr/local/bin')
+          version = config.fetch('version', 'latest')
+
+          [
+            '# No need for install docker, the agent takes care of that',
+            "echo '~~~ Installing Docker'",
+            install_dir == '/usr/local/bin' ? nil : "mkdir -p #{install_dir}",
+            install_commands(version, install_dir)
+          ].flatten.compact
         end
 
         def install_commands(version, install_dir)
+          (install_dir == '/usr/local/bin' ? [] : ["mkdir -p #{install_dir}"])
           if version == 'latest'
             [
               'curl -fsSL https://get.docker.com -o get-docker.sh',

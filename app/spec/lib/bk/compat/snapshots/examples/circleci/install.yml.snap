@@ -5,7 +5,7 @@ steps:
   - echo '~~~ Install Dependencies'
   - apt-get update
   - apt-get install -y curl jq git
-  - '"# No need for install docker, the agent takes care of that"'
+  - "# No need for install docker, the agent takes care of that"
   - echo '~~~ Installing Docker'
   - curl -fsSL https://get.docker.com -o get-docker.sh
   - sh get-docker.sh
@@ -20,7 +20,7 @@ steps:
   - echo '~~~ Install Dependencies'
   - apt-get update
   - apt-get install -y curl jq git
-  - '"# No need for install docker, the agent takes care of that"'
+  - "# No need for install docker, the agent takes care of that"
   - echo '~~~ Installing Docker'
   - mkdir -p /var/lib/docker
   - VERSION=20.10.7
