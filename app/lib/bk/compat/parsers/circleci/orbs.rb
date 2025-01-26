@@ -27,29 +27,26 @@ module BK
         end
 
         def translator(action, config)
-          method_map = {
-            'docker/build' => -> { translate_docker_build(config) },
-            'docker/install-docker' => -> { validate_and_translate_install_docker(config) }
-          }
-          method_map.fetch(action, -> { ["# Unsupported docker orb action: #{action}"] }).call
+          method_name = "translate_#{action.gsub('/', '_')}"
+          return send(method_name, config) if respond_to?(method_name, true)
+
+          unsupported_action(action)
         end
 
         private
 
-        def validate_and_translate_install_docker(config)
+        def translate_docker_install_docker(config)
           install_dir = config.fetch('install-dir', '/usr/local/bin')
           version = config.fetch('version', 'latest')
 
           [
-            '# No need for install docker, the agent takes care of that',
+            '# Instead of installing docker in a step, we recommend your agent environment to have it pre-installed',
             "echo '~~~ Installing Docker'",
-            install_dir == '/usr/local/bin' ? nil : "mkdir -p #{install_dir}",
             install_commands(version, install_dir)
           ].flatten.compact
         end
 
         def install_commands(version, install_dir)
-          (install_dir == '/usr/local/bin' ? [] : ["mkdir -p #{install_dir}"])
           if version == 'latest'
             [
               'curl -fsSL https://get.docker.com -o get-docker.sh',
@@ -57,6 +54,7 @@ module BK
             ]
           else
             [
+              (install_dir == '/usr/local/bin' ? [] : ["mkdir -p #{install_dir}"]),
               "VERSION=#{version}",
               'curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-${VERSION}.tgz -o docker.tgz',
               'tar xzvf docker.tgz',
@@ -64,6 +62,12 @@ module BK
               'rm -rf docker docker.tgz'
             ]
           end
+        end
+
+        def unsupported_action(action)
+          [
+            "# Unsupported docker orb action: #{action}"
+          ]
         end
       end
     end
