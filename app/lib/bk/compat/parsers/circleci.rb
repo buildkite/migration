@@ -23,6 +23,15 @@ module BK
         'circleci'
       end
 
+      def load_orb(key, _config)
+        case key
+        when 'docker'
+          @translator.register(CircleCISteps::DockerOrb.new)
+        else
+          @translator.register(CircleCISteps::GenericOrb.new(key))
+        end
+      end
+
       def self.matches?(text)
         # sorting is important
         config = YAML.safe_load(text, aliases: true)
