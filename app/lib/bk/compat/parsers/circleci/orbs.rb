@@ -27,7 +27,7 @@ module BK
         end
 
         def translator(action, config)
-          method_name = "translate_#{action.gsub('/', '_')}"
+          method_name = "translate_#{action.tr('/-', '_')}"
           return send(method_name, config) if respond_to?(method_name, true)
 
           unsupported_action(action)

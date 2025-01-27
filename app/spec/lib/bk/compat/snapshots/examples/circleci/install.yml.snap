@@ -5,7 +5,11 @@ steps:
   - echo '~~~ Install Dependencies'
   - apt-get update
   - apt-get install -y curl jq git
-  - "# Unsupported docker orb action: docker/install-docker"
+  - "# Instead of installing docker in a step, we recommend your agent environment
+    to have it pre-installed"
+  - echo '~~~ Installing Docker'
+  - curl -fsSL https://get.docker.com -o get-docker.sh
+  - sh get-docker.sh
   plugins:
   - docker#v5.10.0:
       image: cimg/base:stable
@@ -17,7 +21,16 @@ steps:
   - echo '~~~ Install Dependencies'
   - apt-get update
   - apt-get install -y curl jq git
-  - "# Unsupported docker orb action: docker/install-docker"
+  - "# Instead of installing docker in a step, we recommend your agent environment
+    to have it pre-installed"
+  - echo '~~~ Installing Docker'
+  - mkdir -p /var/lib/docker
+  - VERSION=20.10.7
+  - curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-${VERSION}.tgz
+    -o docker.tgz
+  - tar xzvf docker.tgz
+  - cp docker/* /var/lib/docker/
+  - rm -rf docker docker.tgz
   plugins:
   - docker#v5.10.0:
       image: cimg/base:stable
