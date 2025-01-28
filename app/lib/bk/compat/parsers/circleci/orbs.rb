@@ -63,35 +63,31 @@ module BK
 
         def translate_docker_build(config)
           [
-            ("# Attaching workspace at #{config['attach-at']}" if config['attach-at']),
             ('export DOCKER_BUILDKIT=1' if config['use-buildkit']),
-            lint_dockerfile(config),
+            ("# Using BuildKit context at #{config['attach-at']}" if config['attach-at']),
+            "# Linting Dockerfile#{' (treating warnings as errors)' if config['treat-warnings-as-errors']}",
             *pull_cache_images(config),
             generate_build_command(config)
           ].compact
         end
 
-        def lint_dockerfile(config)
-          return unless config['lint-dockerfile']
-
-          "# Linting Dockerfile#{' (treating warnings as errors)' if config['treat-warnings-as-errors']}"
-        end
-
         def pull_cache_images(config)
-          config['cache_from']&.split(',')&.map { |image| "docker pull #{image.strip} || true" } || []
+          config.fetch('cache-from', '').split.map do |image|
+            "docker pull #{image.strip} || true"
+          end
         end
 
         def generate_build_command(config)
-          parts = [
+          [
             'docker',
             ('buildx' if config['cache_to']),
             'build',
-            '-f', File.join(config['path'] || '.', config['dockerfile'] || 'Dockerfile'),
+            '-f', File.join(config.fetch('path', '.'), config.fetch('dockerfile', 'Dockerfile')),
             '-t', generate_tag(config),
+            ("--build-context source=#{config['attach-at']}" if config['attach-at']),
             *generate_optional_args(config),
             config['docker-context'] || '.'
-          ]
-          parts.compact.join(' ')
+          ].compact
         end
 
         def generate_optional_args(config)
@@ -99,13 +95,13 @@ module BK
             ("--cache-from=#{config['cache_from']}" if config['cache_from']),
             ("--cache-to=#{config['cache_to']}" if config['cache_to']),
             ('--load' if config['cache_to']),
-            *config['extra_build_args']&.split&.map(&:strip)
+            *config.fetch('extra_build_args', '').split.map(&:strip)
           ].compact
         end
 
         def generate_tag(config)
           registry = config['registry'] || 'docker.io'
-          tag = config['tag'] || ENV['CIRCLE_SHA1'] || 'latest'
+          tag = config['tag'] || 'latest'
           tag.split(',').map { |t| "#{registry}/#{config['image']}:#{t.strip}" }.join(' -t ')
         end
 
