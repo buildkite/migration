@@ -65,14 +65,16 @@ module BK
           [
             ('export DOCKER_BUILDKIT=1' if config['use-buildkit']),
             ("# Using BuildKit context at #{config['attach-at']}" if config['attach-at']),
-            "# Linting Dockerfile#{' (treating warnings as errors)' if config['treat-warnings-as-errors']}",
+            (if config['lint-dockerfile']
+               '# Dockerlint is not supported at this time and should be translated by hand'
+             end),
             *pull_cache_images(config),
             generate_build_command(config)
           ].compact
         end
 
         def pull_cache_images(config)
-          config.fetch('cache-from', '').split.map do |image|
+          config.fetch('cache_from', '').split(',').map do |image|
             "docker pull #{image.strip} || true"
           end
         end
@@ -86,8 +88,8 @@ module BK
             '-t', generate_tag(config),
             ("--build-context source=#{config['attach-at']}" if config['attach-at']),
             *generate_optional_args(config),
-            config['docker-context'] || '.'
-          ].compact
+            config.fetch('docker-context', '.')
+          ].compact.join(' ')
         end
 
         def generate_optional_args(config)
@@ -100,8 +102,8 @@ module BK
         end
 
         def generate_tag(config)
-          registry = config['registry'] || 'docker.io'
-          tag = config['tag'] || 'latest'
+          registry = config.fetch('registry', 'docker.io')
+          tag = config.fetch('tag', 'latest')
           tag.split(',').map { |t| "#{registry}/#{config['image']}:#{t.strip}" }.join(' -t ')
         end
 

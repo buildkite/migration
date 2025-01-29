@@ -14,7 +14,7 @@ jobs:
           dockerfile: Dockerfile.prod
           path: ./docker
           docker-context: .
-          tag: 'v1.0,$CIRCLE_SHA1,latest'
+          tag: 'v1.0,latest'
           registry: my.registry.io
           cache_from: 'user/app:cache,user/app2:cache2'
           cache_to: 'user/app:cache'
