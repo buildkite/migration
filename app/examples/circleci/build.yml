@@ -1,0 +1,44 @@
+version: 2.1
+
+orbs:
+  docker: circleci/docker@2.4.0
+
+jobs:
+  build:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - docker/build:
+          image: myapp
+          dockerfile: Dockerfile.prod
+          path: ./docker
+          docker-context: .
+          tag: 'v1.0,latest'
+          registry: my.registry.io
+          cache_from: 'user/app:cache,user/app2:cache2'
+          cache_to: 'user/app:cache'
+          attach-at: ./workspace
+          extra_build_args: '--build-arg VERSION=1.0 --build-arg ENV=prod'
+          lint-dockerfile: true
+          treat-warnings-as-errors: true
+          use-buildkit: true
+          no_output_timeout: 20m
+          step-name: "Build Production Docker Image"
+          debug: true
+
+  build-simple:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - docker/build:
+          image: myapp
+          tag: latest
+
+workflows:
+  version: 2
+  build-workflow:
+    jobs:
+      - build
+      - build-simple
