@@ -8,9 +8,9 @@ steps:
   - docker pull user/app:cache || true
   - docker pull user/app2:cache2 || true
   - docker buildx build -f ./docker/Dockerfile.prod -t my.registry.io/myapp:v1.0 -t
-    my.registry.io/myapp:latest --build-context source=./workspace --cache-from=user/app:cache,user/app2:cache2
-    --cache-to=user/app:cache --load --build-arg VERSION=1.0 --build-arg ENV=prod
-    .
+    my.registry.io/myapp:$CIRCLE_SHA1 -t my.registry.io/myapp:latest --build-context
+    source=./workspace --cache-from=user/app:cache,user/app2:cache2 --cache-to=user/app:cache
+    --load --build-arg VERSION=1.0 --build-arg ENV=prod .
   plugins:
   - docker#v5.10.0:
       image: cimg/base:stable

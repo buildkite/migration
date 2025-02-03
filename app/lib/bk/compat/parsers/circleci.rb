@@ -6,6 +6,7 @@ require_relative '../models/steps/group'
 require_relative 'circleci/executors'
 require_relative 'circleci/jobs'
 require_relative 'circleci/orbs'
+require_relative 'circleci/orbs/docker'
 require_relative 'circleci/steps'
 require_relative 'circleci/workflows'
 

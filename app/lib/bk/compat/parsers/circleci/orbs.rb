@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'orbs/docker_orb'
+require_relative 'orbs/docker'
 
 module BK
   module Compat
