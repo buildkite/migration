@@ -1,0 +1,18 @@
+version: '2.1'
+
+orbs:
+  docker: circleci/docker@2.4.0
+
+jobs:
+  pull:
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - checkout
+      - docker/pull:
+          images: ubuntu:16.04,ubuntu:18.04
+
+workflows:
+  pull-images:
+    jobs:
+      - pull
