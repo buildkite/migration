@@ -14,15 +14,16 @@ module BK
         end
 
         def translate_docker_push(config)
-          full_image = config.fetch('image') { raise 'Image name must be provided' }
-          full_image = "#{config['registry']}/#{full_image}" if config['registry']
+          raise 'Image name must be provided' unless config.include?('image')
+
+          full_image = config.values_at('registry', 'image').compact.join('/')
           tags = config.fetch('tag', '').split(',').map(&:strip)
+          digest_path = config['digest-path']
           [
             *tags.map { |tag| "docker push #{full_image}:#{tag}" },
-            ("mkdir -p #{File.dirname(config['digest-path'])}" if config['digest-path']),
-            (if config['digest-path']
-               "docker image inspect --format '{{index .RepoDigests 0}}' " \
-                 "#{full_image}:#{tags.first} > #{config['digest-path']}"
+            ("mkdir -p #{File.dirname(digest_path)}" if digest_path),
+            (if digest_path
+               "docker image inspect --format '{{index .RepoDigests 0}}' #{full_image}:#{tags.first} > #{digest_path}"
              end)
           ].compact
         end

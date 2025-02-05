@@ -32,19 +32,9 @@ module BK
             'build',
             '-f', File.join(config.fetch('path', '.'), config.fetch('dockerfile', 'Dockerfile')),
             '-t', generate_tag(config),
-            ("--build-context source=#{config['attach-at']}" if config['attach-at']),
-            *generate_optional_args(config),
+            *config.fetch('extra_build_args', '').split.map(&:strip),
             config.fetch('docker-context', '.')
           ].compact.join(' ')
-        end
-
-        def generate_optional_args(config)
-          [
-            ("--cache-from=#{config['cache_from']}" if config['cache_from']),
-            ("--cache-to=#{config['cache_to']}" if config['cache_to']),
-            ('--load' if config['cache_to']),
-            *config.fetch('extra_build_args', '').split.map(&:strip)
-          ].compact
         end
 
         def generate_tag(config)
