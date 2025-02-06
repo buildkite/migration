@@ -11,13 +11,37 @@ module BK
           [
             '# Instead of installing docker in a step, we recommend your agent environment to have it pre-installed',
             "echo '~~~ Installing Docker'",
-            install_commands(version, install_dir)
+            install_docker_commands(version, install_dir)
+          ].flatten.compact
+        end
+
+        def translate_docker_install_docker_compose(config)
+          install_dir = config.fetch('install-dir', '/usr/local/bin')
+          version = config.fetch('version', 'latest')
+          [
+            '# Instead of installing docker-compose in a step, ' \
+            'we recommend your agent environment to have it pre-installed',
+            "echo '~~~ Installing docker-compose'",
+            (install_dir == '/usr/local/bin' ? [] : ["mkdir -p #{install_dir}"]),
+            install_docker_compose_commands(version, install_dir)
+          ].flatten.compact
+        end
+
+        def translate_docker_install_dockerize(config)
+          install_dir = config.fetch('install-dir', '/usr/local/bin')
+          version = config.fetch('version', 'latest')
+          [
+            '# Instead of installing dockerize in a step, ' \
+            'we recommend your agent environment to have it pre-installed',
+            "echo '~~~ Installing Dockerize'",
+            (install_dir == '/usr/local/bin' ? [] : ["mkdir -p #{install_dir}"]),
+            install_dockerize_commands(version, install_dir)
           ].flatten.compact
         end
 
         private
 
-        def install_commands(version, install_dir)
+        def install_docker_commands(version, install_dir)
           if version == 'latest'
             [
               'curl -fsSL https://get.docker.com -o get-docker.sh',
@@ -33,6 +57,30 @@ module BK
               'rm -rf docker docker.tgz'
             ]
           end
+        end
+
+        def install_docker_compose_commands(version, install_dir)
+          binary_url = 'https://github.com/docker/compose/releases/' \
+                       "#{version == 'latest' ? 'latest/' : "download/#{version}/"}docker-compose-linux-x86_64"
+          [
+            "curl -L #{binary_url} -o #{install_dir}/docker-compose",
+            "chmod +x #{install_dir}/docker-compose"
+          ]
+        end
+
+        def install_dockerize_commands(version, install_dir)
+          binary_url = if version == 'latest'
+                         'https://github.com/jwilder/dockerize/releases/latest/download/dockerize-linux-amd64.tar.gz'
+                       else
+                         "https://github.com/jwilder/dockerize/releases/download/#{version}/dockerize-linux-amd64-#{version}.tar.gz"
+                       end
+          [
+            "curl -L #{binary_url} -o 'dockerize-linux-amd64.tar.gz'",
+            'tar xf dockerize-linux-amd64*.tar.gz',
+            'rm -f dockerize-linux-amd64*.tar.gz',
+            "mv dockerize #{install_dir}",
+            "chmod +x #{install_dir}/dockerize"
+          ]
         end
       end
     end

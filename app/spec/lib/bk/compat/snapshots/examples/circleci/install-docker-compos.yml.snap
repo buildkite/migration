@@ -1,0 +1,37 @@
+---
+steps:
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - echo '~~~ Install Dependencies'
+  - apt-get update
+  - apt-get install -y curl jq git
+  - "# Instead of installing docker-compose in a step, we recommend your agent environment
+    to have it pre-installed"
+  - echo '~~~ Installing docker-compose'
+  - curl -L https://github.com/docker/compose/releases/latest/docker-compose-linux-x86_64
+    -o /usr/local/bin/docker-compose
+  - chmod +x /usr/local/bin/docker-compose
+  plugins:
+  - docker#v5.10.0:
+      image: cimg/base:stable
+  agents:
+    executor_type: docker
+  key: install-docker-compose
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - echo '~~~ Install Dependencies'
+  - apt-get update
+  - apt-get install -y curl jq git
+  - "# Instead of installing docker-compose in a step, we recommend your agent environment
+    to have it pre-installed"
+  - echo '~~~ Installing docker-compose'
+  - mkdir -p /var/lib/docker
+  - curl -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-linux-x86_64
+    -o /var/lib/docker/docker-compose
+  - chmod +x /var/lib/docker/docker-compose
+  plugins:
+  - docker#v5.10.0:
+      image: cimg/base:stable
+  agents:
+    executor_type: docker
+  key: install-docker-compose-custom
