@@ -9,9 +9,9 @@ steps:
     to have it pre-installed"
   - echo '~~~ Installing Dockerize'
   - curl -L https://github.com/jwilder/dockerize/releases/latest/download/dockerize-linux-amd64.tar.gz
-    -o 'dockerize-linux-amd64.tar.gz'
-  - tar xf dockerize-linux-amd64*.tar.gz
-  - rm -f dockerize-linux-amd64*.tar.gz
+    -o 'dockerize.tar.gz'
+  - tar xf dockerize.tar.gz
+  - rm -f dockerize.tar.gz
   - mv dockerize /usr/local/bin
   - chmod +x /usr/local/bin/dockerize
   plugins:
@@ -30,9 +30,9 @@ steps:
   - echo '~~~ Installing Dockerize'
   - mkdir -p /var/lib/docker
   - curl -L https://github.com/jwilder/dockerize/releases/download/0.6.1/dockerize-linux-amd64-0.6.1.tar.gz
-    -o 'dockerize-linux-amd64.tar.gz'
-  - tar xf dockerize-linux-amd64*.tar.gz
-  - rm -f dockerize-linux-amd64*.tar.gz
+    -o 'dockerize.tar.gz'
+  - tar xf dockerize.tar.gz
+  - rm -f dockerize.tar.gz
   - mv dockerize /var/lib/docker
   - chmod +x /var/lib/docker/dockerize
   plugins:

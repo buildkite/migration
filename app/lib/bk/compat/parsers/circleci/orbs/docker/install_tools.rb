@@ -60,8 +60,12 @@ module BK
         end
 
         def install_docker_compose_commands(version, install_dir)
+          platform = `uname -s`.strip.downcase
+          sys_arch = `uname -m`.strip.downcase
+          sys_arch = 'aarch64' if sys_arch == 'arm64'
           binary_url = 'https://github.com/docker/compose/releases/' \
-                       "#{version == 'latest' ? 'latest/' : "download/#{version}/"}docker-compose-linux-x86_64"
+                       "#{version == 'latest' ? 'latest/' : "download/#{version}/"}" \
+                       "docker-compose-#{platform}-#{sys_arch}"
           [
             "curl -L #{binary_url} -o #{install_dir}/docker-compose",
             "chmod +x #{install_dir}/docker-compose"
@@ -69,18 +73,30 @@ module BK
         end
 
         def install_dockerize_commands(version, install_dir)
+          platform = determine_dockerize_platform
           binary_url = if version == 'latest'
-                         'https://github.com/jwilder/dockerize/releases/latest/download/dockerize-linux-amd64.tar.gz'
+                         "https://github.com/jwilder/dockerize/releases/latest/download/dockerize-#{platform}.tar.gz"
                        else
-                         "https://github.com/jwilder/dockerize/releases/download/#{version}/dockerize-linux-amd64-#{version}.tar.gz"
+                         "https://github.com/jwilder/dockerize/releases/download/#{version}/dockerize-#{platform}-#{version}.tar.gz"
                        end
           [
-            "curl -L #{binary_url} -o 'dockerize-linux-amd64.tar.gz'",
-            'tar xf dockerize-linux-amd64*.tar.gz',
-            'rm -f dockerize-linux-amd64*.tar.gz',
+            "curl -L #{binary_url} -o 'dockerize.tar.gz'",
+            'tar xf dockerize.tar.gz',
+            'rm -f dockerize.tar.gz',
             "mv dockerize #{install_dir}",
             "chmod +x #{install_dir}/dockerize"
           ]
+        end
+
+        def determine_dockerize_platform
+          return 'darwin-amd64' if `uname -s`.strip == 'Darwin'
+
+          sys_arch = { 'x86_64' => 'amd64', 'aarch64' => 'arm64' }.fetch(`uname -m`.strip, `uname -m`.strip)
+          alpine? ? 'alpine-linux-amd64' : "linux-#{sys_arch}"
+        end
+
+        def alpine?
+          File.exist?('/etc/issue') && File.read('/etc/issue').include?('Alpine')
         end
       end
     end
