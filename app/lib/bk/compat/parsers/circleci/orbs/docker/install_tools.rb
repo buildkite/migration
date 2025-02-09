@@ -31,8 +31,7 @@ module BK
           install_dir = config.fetch('install-dir', '/usr/local/bin')
           version = config.fetch('version', 'latest')
           [
-            '# Instead of installing dockerize in a step, ' \
-            'we recommend your agent environment to have it pre-installed',
+            '# Instead of installing dockerize in a step, we recommend your agent environment to have it pre-installed',
             "echo '~~~ Installing Dockerize'",
             (install_dir == '/usr/local/bin' ? [] : ["mkdir -p #{install_dir}"]),
             install_dockerize_commands(version, install_dir)
@@ -43,49 +42,54 @@ module BK
 
         def install_docker_commands(version, install_dir)
           if version == 'latest'
-            [
-              'curl -fsSL https://get.docker.com -o get-docker.sh',
-              'sh get-docker.sh'
-            ]
+            ['curl -fsSL https://get.docker.com -o get-docker.sh', 'sh get-docker.sh']
           else
-            [
-              (install_dir == '/usr/local/bin' ? [] : ["mkdir -p #{install_dir}"]),
-              "VERSION=#{version}",
-              'curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-${VERSION}.tgz -o docker.tgz',
-              'tar xzvf docker.tgz',
-              "cp docker/* #{install_dir}/",
-              'rm -rf docker docker.tgz'
-            ]
+            [(install_dir == '/usr/local/bin' ? [] : ["mkdir -p #{install_dir}"]),
+             "VERSION=#{version}",
+             'curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-${VERSION}.tgz -o docker.tgz',
+             'tar xzvf docker.tgz',
+             "cp docker/* #{install_dir}/",
+             'rm -rf docker docker.tgz']
           end
         end
 
-        def install_docker_compose_commands(version, install_dir)
-          platform = `uname -s`.strip.downcase
-          sys_arch = `uname -m`.strip.downcase
-          sys_arch = 'aarch64' if sys_arch == 'arm64'
-          binary_url = 'https://github.com/docker/compose/releases/' \
-                       "#{version == 'latest' ? 'latest/' : "download/#{version}/"}" \
-                       "docker-compose-#{platform}-#{sys_arch}"
+        def install_docker_compose_commands(_version, install_dir)
           [
-            "curl -L #{binary_url} -o #{install_dir}/docker-compose",
+            "PLATFORM=$(uname -s | tr '[:upper:]' '[:lower:]')",
+            "SYS_ARCH=$(uname -m | tr '[:upper:]' '[:lower:]')",
+            'if [ "$SYS_ARCH" = "arm64" ]; then SYS_ARCH="aarch64"; fi',
+            'RELEASE_PATH="latest/"',
+            'if [ "$version" != "latest" ]; then', '  RELEASE_PATH="download/${version}/"', 'fi',
+            'BINARY_URL="https://github.com/docker/compose/releases/${RELEASE_PATH}docker-compose-${PLATFORM}-${SYS_ARCH}"',
+            "curl -L \"${BINARY_URL}\" -o #{install_dir}/docker-compose",
             "chmod +x #{install_dir}/docker-compose"
           ]
         end
 
-        def install_dockerize_commands(version, install_dir)
-          platform = determine_dockerize_platform
-          binary_url = if version == 'latest'
-                         "https://github.com/jwilder/dockerize/releases/latest/download/dockerize-#{platform}.tar.gz"
-                       else
-                         "https://github.com/jwilder/dockerize/releases/download/#{version}/dockerize-#{platform}-#{version}.tar.gz"
-                       end
-          [
-            "curl -L #{binary_url} -o 'dockerize.tar.gz'",
-            'tar xf dockerize.tar.gz',
-            'rm -f dockerize.tar.gz',
-            "mv dockerize #{install_dir}",
-            "chmod +x #{install_dir}/dockerize"
-          ]
+        def install_dockerize_commands(_version, install_dir)
+          ['PLATFORM=""',
+           'if [ "$(uname -s)" = "Darwin" ]; then', '  PLATFORM="darwin-amd64"',
+           'else',
+           '  SYS_ARCH=$(uname -m)',
+           '  case "$SYS_ARCH" in',
+           '    "x86_64") SYS_ARCH="amd64" ;;',
+           '    "aarch64") SYS_ARCH="arm64" ;;',
+           '  esac',
+           '  if [ -f /etc/issue ] && grep -q "Alpine" /etc/issue; then',
+           '    PLATFORM="alpine-linux-amd64"',
+           '  else', '    PLATFORM="linux-${SYS_ARCH}"', '  fi',
+           'fi',
+           'BINARY_URL=""',
+           'if [ "$version" = "latest" ]; then',
+           '  BINARY_URL="https://github.com/jwilder/dockerize/releases/latest/download/dockerize-${PLATFORM}.tar.gz"',
+           'else',
+           '  BINARY_URL="https://github.com/jwilder/dockerize/releases/download/${version}/dockerize-${PLATFORM}-${version}.tar.gz"',
+           'fi',
+           "curl -L \"${BINARY_URL}\" -o 'dockerize.tar.gz'",
+           'tar xf dockerize.tar.gz',
+           'rm -f dockerize.tar.gz',
+           "mv dockerize #{install_dir}",
+           "chmod +x #{install_dir}/dockerize"]
         end
 
         def determine_dockerize_platform
