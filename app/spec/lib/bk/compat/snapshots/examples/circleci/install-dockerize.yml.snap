@@ -17,12 +17,14 @@ steps:
   - '    "x86_64") SYS_ARCH="amd64" ;;'
   - '    "aarch64") SYS_ARCH="arm64" ;;'
   - "  esac"
+  - ''
   - '  if [ -f /etc/issue ] && grep -q "Alpine" /etc/issue; then'
   - '    PLATFORM="alpine-linux-amd64"'
   - "  else"
   - '    PLATFORM="linux-${SYS_ARCH}"'
   - "  fi"
   - fi
+  - ''
   - BINARY_URL=""
   - if [ "$version" = "latest" ]; then
   - '  BINARY_URL="https://github.com/jwilder/dockerize/releases/latest/download/dockerize-${PLATFORM}.tar.gz"'
@@ -58,12 +60,14 @@ steps:
   - '    "x86_64") SYS_ARCH="amd64" ;;'
   - '    "aarch64") SYS_ARCH="arm64" ;;'
   - "  esac"
+  - ''
   - '  if [ -f /etc/issue ] && grep -q "Alpine" /etc/issue; then'
   - '    PLATFORM="alpine-linux-amd64"'
   - "  else"
   - '    PLATFORM="linux-${SYS_ARCH}"'
   - "  fi"
   - fi
+  - ''
   - BINARY_URL=""
   - if [ "$version" = "latest" ]; then
   - '  BINARY_URL="https://github.com/jwilder/dockerize/releases/latest/download/dockerize-${PLATFORM}.tar.gz"'

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-require_relative 'docker/install_tools'
+require_relative 'docker/install_docker'
+require_relative 'docker/install_docker_compose'
+require_relative 'docker/install_dockerize'
 require_relative 'docker/build'
 require_relative 'docker/pull_push'
 
