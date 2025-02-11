@@ -5,19 +5,20 @@ steps:
   - echo '~~~ Install Dependencies'
   - apt-get update
   - apt-get install -y curl jq git
-  - "# Instead of installing docker-compose in a step, we recommend your agent environment
-    to have it pre-installed"
+  - "# Instead of installing docker-compose in a step, "
+  - "# we recommend your agent environment to have it pre-installed"
   - echo '~~~ Installing docker-compose'
   - PLATFORM=$(uname -s | tr '[:upper:]' '[:lower:]')
   - SYS_ARCH=$(uname -m | tr '[:upper:]' '[:lower:]')
-  - SYS_ARCH="${SYS_ARCH/arm64/aarch64}"
+  - SYS_ARCH=${SYS_ARCH/arm64/aarch64}
+  - version="latest"
   - if [ "$version" = "latest" ]; then
-  - '  RELEASE_PATH="latest/"'
+  - "  RELEASE_PATH=latest/"
   - else
-  - '  RELEASE_PATH="download/${version}/"'
+  - "  RELEASE_PATH=download/${version}/"
   - fi
-  - BINARY_URL="https://github.com/docker/compose/releases/${RELEASE_PATH}docker-compose-${PLATFORM}-${SYS_ARCH}"
-  - curl -L "${BINARY_URL}" -o /usr/local/bin/docker-compose
+  - BINARY_URL=https://github.com/docker/compose/releases/${RELEASE_PATH}docker-compose-${PLATFORM}-${SYS_ARCH}
+  - curl -L ${BINARY_URL} -o /usr/local/bin/docker-compose
   - chmod +x /usr/local/bin/docker-compose
   plugins:
   - docker#v5.10.0:
@@ -30,20 +31,21 @@ steps:
   - echo '~~~ Install Dependencies'
   - apt-get update
   - apt-get install -y curl jq git
-  - "# Instead of installing docker-compose in a step, we recommend your agent environment
-    to have it pre-installed"
+  - "# Instead of installing docker-compose in a step, "
+  - "# we recommend your agent environment to have it pre-installed"
   - echo '~~~ Installing docker-compose'
   - mkdir -p /var/lib/docker
   - PLATFORM=$(uname -s | tr '[:upper:]' '[:lower:]')
   - SYS_ARCH=$(uname -m | tr '[:upper:]' '[:lower:]')
-  - SYS_ARCH="${SYS_ARCH/arm64/aarch64}"
+  - SYS_ARCH=${SYS_ARCH/arm64/aarch64}
+  - version="1.29.2"
   - if [ "$version" = "latest" ]; then
-  - '  RELEASE_PATH="latest/"'
+  - "  RELEASE_PATH=latest/"
   - else
-  - '  RELEASE_PATH="download/${version}/"'
+  - "  RELEASE_PATH=download/${version}/"
   - fi
-  - BINARY_URL="https://github.com/docker/compose/releases/${RELEASE_PATH}docker-compose-${PLATFORM}-${SYS_ARCH}"
-  - curl -L "${BINARY_URL}" -o /var/lib/docker/docker-compose
+  - BINARY_URL=https://github.com/docker/compose/releases/${RELEASE_PATH}docker-compose-${PLATFORM}-${SYS_ARCH}
+  - curl -L ${BINARY_URL} -o /var/lib/docker/docker-compose
   - chmod +x /var/lib/docker/docker-compose
   plugins:
   - docker#v5.10.0:

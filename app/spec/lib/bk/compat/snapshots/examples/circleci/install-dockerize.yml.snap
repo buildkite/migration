@@ -5,14 +5,14 @@ steps:
   - echo '~~~ Install Dependencies'
   - apt-get update
   - apt-get install -y curl jq git
-  - "# Instead of installing dockerize in a step, we recommend your agent environment
-    to have it pre-installed"
+  - "# Instead of installing dockerize in a step, "
+  - "# we recommend your agent environment to have it pre-installed"
   - echo '~~~ Installing Dockerize'
   - PLATFORM=""
   - if [ "$(uname -s)" = "Darwin" ]; then
-  - '  PLATFORM="darwin-amd64"'
+  - "  PLATFORM=$(uname -s | tr '[:upper:]' '[:lower:]')"
   - else
-  - "  SYS_ARCH=$(uname -m)"
+  - SYS_ARCH=$(uname -m | tr '[:upper:]' '[:lower:]')
   - '  case "$SYS_ARCH" in'
   - '    "x86_64") SYS_ARCH="amd64" ;;'
   - '    "aarch64") SYS_ARCH="arm64" ;;'
@@ -26,6 +26,7 @@ steps:
   - fi
   - ''
   - BINARY_URL=""
+  - version="latest"
   - if [ "$version" = "latest" ]; then
   - '  BINARY_URL="https://github.com/jwilder/dockerize/releases/latest/download/dockerize-${PLATFORM}.tar.gz"'
   - else
@@ -47,15 +48,15 @@ steps:
   - echo '~~~ Install Dependencies'
   - apt-get update
   - apt-get install -y curl jq git
-  - "# Instead of installing dockerize in a step, we recommend your agent environment
-    to have it pre-installed"
+  - "# Instead of installing dockerize in a step, "
+  - "# we recommend your agent environment to have it pre-installed"
   - echo '~~~ Installing Dockerize'
   - mkdir -p /var/lib/docker
   - PLATFORM=""
   - if [ "$(uname -s)" = "Darwin" ]; then
-  - '  PLATFORM="darwin-amd64"'
+  - "  PLATFORM=$(uname -s | tr '[:upper:]' '[:lower:]')"
   - else
-  - "  SYS_ARCH=$(uname -m)"
+  - SYS_ARCH=$(uname -m | tr '[:upper:]' '[:lower:]')
   - '  case "$SYS_ARCH" in'
   - '    "x86_64") SYS_ARCH="amd64" ;;'
   - '    "aarch64") SYS_ARCH="arm64" ;;'
@@ -69,6 +70,7 @@ steps:
   - fi
   - ''
   - BINARY_URL=""
+  - version="0.6.1"
   - if [ "$version" = "latest" ]; then
   - '  BINARY_URL="https://github.com/jwilder/dockerize/releases/latest/download/dockerize-${PLATFORM}.tar.gz"'
   - else

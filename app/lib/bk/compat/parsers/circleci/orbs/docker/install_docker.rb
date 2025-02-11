@@ -9,7 +9,8 @@ module BK
           install_dir = config.fetch('install-dir', '/usr/local/bin')
           version = config.fetch('version', 'latest')
           [
-            '# Instead of installing docker in a step, we recommend your agent environment to have it pre-installed',
+            '# Instead of installing docker in a step, ',
+            '# we recommend your agent environment to have it pre-installed',
             "echo '~~~ Installing Docker'",
             install_docker_commands(version, install_dir)
           ].flatten.compact

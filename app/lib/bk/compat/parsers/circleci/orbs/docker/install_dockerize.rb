@@ -9,7 +9,8 @@ module BK
           install_dir = config.fetch('install-dir', '/usr/local/bin')
           version = config.fetch('version', 'latest')
           [
-            '# Instead of installing dockerize in a step, we recommend your agent environment to have it pre-installed',
+            '# Instead of installing dockerize in a step, ',
+            '# we recommend your agent environment to have it pre-installed',
             "echo '~~~ Installing Dockerize'",
             (install_dir == '/usr/local/bin' ? [] : ["mkdir -p #{install_dir}"]),
             install_dockerize_commands(version, install_dir)
@@ -18,12 +19,12 @@ module BK
 
         private
 
-        def install_dockerize_commands(_version, install_dir)
+        def install_dockerize_commands(version, install_dir)
           ['PLATFORM=""',
            'if [ "$(uname -s)" = "Darwin" ]; then',
-           '  PLATFORM="darwin-amd64"',
+           "  PLATFORM=$(uname -s | tr '[:upper:]' '[:lower:]')",
            'else',
-           '  SYS_ARCH=$(uname -m)',
+           "SYS_ARCH=$(uname -m | tr '[:upper:]' '[:lower:]')",
            '  case "$SYS_ARCH" in',
            '    "x86_64") SYS_ARCH="amd64" ;;',
            '    "aarch64") SYS_ARCH="arm64" ;;',
@@ -37,6 +38,7 @@ module BK
            'fi',
            '',
            'BINARY_URL=""',
+           "version=\"#{version}\"",
            'if [ "$version" = "latest" ]; then',
            '  BINARY_URL="https://github.com/jwilder/dockerize/releases/latest/download/dockerize-${PLATFORM}.tar.gz"',
            'else',
