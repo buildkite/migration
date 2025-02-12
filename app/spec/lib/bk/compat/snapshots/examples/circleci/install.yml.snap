@@ -5,8 +5,8 @@ steps:
   - echo '~~~ Install Dependencies'
   - apt-get update
   - apt-get install -y curl jq git
-  - "# Instead of installing docker in a step, we recommend your agent environment
-    to have it pre-installed"
+  - "# Instead of installing docker in a step, "
+  - "# we recommend your agent environment to have it pre-installed"
   - echo '~~~ Installing Docker'
   - curl -fsSL https://get.docker.com -o get-docker.sh
   - sh get-docker.sh
@@ -21,8 +21,8 @@ steps:
   - echo '~~~ Install Dependencies'
   - apt-get update
   - apt-get install -y curl jq git
-  - "# Instead of installing docker in a step, we recommend your agent environment
-    to have it pre-installed"
+  - "# Instead of installing docker in a step, "
+  - "# we recommend your agent environment to have it pre-installed"
   - echo '~~~ Installing Docker'
   - mkdir -p /var/lib/docker
   - VERSION=20.10.7

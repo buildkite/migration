@@ -1,0 +1,40 @@
+version: 2.1
+
+orbs:
+  docker: circleci/docker@2.4.0
+
+commands:
+  install_deps:
+    description: "Install required dependencies"
+    steps:
+      - run:
+          name: Install Dependencies
+          command: |
+            apt-get update
+            apt-get install -y curl jq git
+
+jobs:
+  install-docker-compose:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_deps
+      - docker/install-docker-compose
+
+  install-docker-compose-custom:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_deps
+      - docker/install-docker-compose:
+          install-dir: /var/lib/docker
+          version: "1.29.2"
+
+workflows:
+  version: 2
+  install-and-build:
+    jobs:
+      - install-docker-compose
+      - install-docker-compose-custom

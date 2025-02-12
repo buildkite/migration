@@ -1,0 +1,89 @@
+---
+steps:
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - echo '~~~ Install Dependencies'
+  - apt-get update
+  - apt-get install -y curl jq git
+  - "# Instead of installing dockerize in a step, "
+  - "# we recommend your agent environment to have it pre-installed"
+  - echo '~~~ Installing Dockerize'
+  - PLATFORM=""
+  - if [ "$(uname -s)" = "Darwin" ]; then
+  - "  PLATFORM=$(uname -s | tr '[:upper:]' '[:lower:]')"
+  - else
+  - SYS_ARCH=$(uname -m | tr '[:upper:]' '[:lower:]')
+  - '  case "$SYS_ARCH" in'
+  - '    "x86_64") SYS_ARCH="amd64" ;;'
+  - '    "aarch64") SYS_ARCH="arm64" ;;'
+  - "  esac"
+  - ''
+  - '  if [ -f /etc/issue ] && grep -q "Alpine" /etc/issue; then'
+  - '    PLATFORM="alpine-linux-amd64"'
+  - "  else"
+  - '    PLATFORM="linux-${SYS_ARCH}"'
+  - "  fi"
+  - fi
+  - ''
+  - BINARY_URL=""
+  - version="latest"
+  - if [ "$version" = "latest" ]; then
+  - '  BINARY_URL="https://github.com/jwilder/dockerize/releases/latest/download/dockerize-${PLATFORM}.tar.gz"'
+  - else
+  - '  BINARY_URL="https://github.com/jwilder/dockerize/releases/download/${version}/dockerize-${PLATFORM}-${version}.tar.gz"'
+  - fi
+  - curl -L "${BINARY_URL}" -o 'dockerize.tar.gz'
+  - tar xf dockerize.tar.gz
+  - rm -f dockerize.tar.gz
+  - mv dockerize /usr/local/bin
+  - chmod +x /usr/local/bin/dockerize
+  plugins:
+  - docker#v5.10.0:
+      image: cimg/base:stable
+  agents:
+    executor_type: docker
+  key: install
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - echo '~~~ Install Dependencies'
+  - apt-get update
+  - apt-get install -y curl jq git
+  - "# Instead of installing dockerize in a step, "
+  - "# we recommend your agent environment to have it pre-installed"
+  - echo '~~~ Installing Dockerize'
+  - mkdir -p /var/lib/docker
+  - PLATFORM=""
+  - if [ "$(uname -s)" = "Darwin" ]; then
+  - "  PLATFORM=$(uname -s | tr '[:upper:]' '[:lower:]')"
+  - else
+  - SYS_ARCH=$(uname -m | tr '[:upper:]' '[:lower:]')
+  - '  case "$SYS_ARCH" in'
+  - '    "x86_64") SYS_ARCH="amd64" ;;'
+  - '    "aarch64") SYS_ARCH="arm64" ;;'
+  - "  esac"
+  - ''
+  - '  if [ -f /etc/issue ] && grep -q "Alpine" /etc/issue; then'
+  - '    PLATFORM="alpine-linux-amd64"'
+  - "  else"
+  - '    PLATFORM="linux-${SYS_ARCH}"'
+  - "  fi"
+  - fi
+  - ''
+  - BINARY_URL=""
+  - version="0.6.1"
+  - if [ "$version" = "latest" ]; then
+  - '  BINARY_URL="https://github.com/jwilder/dockerize/releases/latest/download/dockerize-${PLATFORM}.tar.gz"'
+  - else
+  - '  BINARY_URL="https://github.com/jwilder/dockerize/releases/download/${version}/dockerize-${PLATFORM}-${version}.tar.gz"'
+  - fi
+  - curl -L "${BINARY_URL}" -o 'dockerize.tar.gz'
+  - tar xf dockerize.tar.gz
+  - rm -f dockerize.tar.gz
+  - mv dockerize /var/lib/docker
+  - chmod +x /var/lib/docker/dockerize
+  plugins:
+  - docker#v5.10.0:
+      image: cimg/base:stable
+  agents:
+    executor_type: docker
+  key: install-custom
