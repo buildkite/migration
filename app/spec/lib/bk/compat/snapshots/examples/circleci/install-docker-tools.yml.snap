@@ -1,0 +1,81 @@
+---
+steps:
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - "# Instead of installing docker in a step, "
+  - "# we recommend your agent environment to have it pre-installed"
+  - echo '~~~ Installing Docker'
+  - curl -fsSL https://get.docker.com -o get-docker.sh
+  - sh get-docker.sh
+  - "# Instead of installing docker-compose in a step, "
+  - "# we recommend your agent environment to have it pre-installed"
+  - echo '~~~ Installing docker-compose'
+  - PLATFORM=$(uname -s | tr '[:upper:]' '[:lower:]')
+  - SYS_ARCH=$(uname -m | tr '[:upper:]' '[:lower:]')
+  - SYS_ARCH=${SYS_ARCH/arm64/aarch64}
+  - version="latest"
+  - if [ "$version" = "latest" ]; then
+  - "  RELEASE_PATH=latest/"
+  - else
+  - "  RELEASE_PATH=download/${version}/"
+  - fi
+  - BINARY_URL=https://github.com/docker/compose/releases/${RELEASE_PATH}docker-compose-${PLATFORM}-${SYS_ARCH}
+  - curl -L ${BINARY_URL} -o /usr/local/bin/docker-compose
+  - chmod +x /usr/local/bin/docker-compose
+  - "# Instead of installing dockerize in a step, "
+  - "# we recommend your agent environment to have it pre-installed"
+  - echo '~~~ Installing Dockerize'
+  - PLATFORM=""
+  - if [ "$(uname -s)" = "Darwin" ]; then
+  - "  PLATFORM=$(uname -s | tr '[:upper:]' '[:lower:]')"
+  - else
+  - SYS_ARCH=$(uname -m | tr '[:upper:]' '[:lower:]')
+  - '  case "$SYS_ARCH" in'
+  - '    "x86_64") SYS_ARCH="amd64" ;;'
+  - '    "aarch64") SYS_ARCH="arm64" ;;'
+  - "  esac"
+  - ''
+  - '  if [ -f /etc/issue ] && grep -q "Alpine" /etc/issue; then'
+  - '    PLATFORM="alpine-linux-amd64"'
+  - "  else"
+  - '    PLATFORM="linux-${SYS_ARCH}"'
+  - "  fi"
+  - fi
+  - ''
+  - BINARY_URL=""
+  - version="latest"
+  - if [ "$version" = "latest" ]; then
+  - '  BINARY_URL="https://github.com/jwilder/dockerize/releases/latest/download/dockerize-${PLATFORM}.tar.gz"'
+  - else
+  - '  BINARY_URL="https://github.com/jwilder/dockerize/releases/download/${version}/dockerize-${PLATFORM}-${version}.tar.gz"'
+  - fi
+  - curl -L "${BINARY_URL}" -o 'dockerize.tar.gz'
+  - tar xf dockerize.tar.gz
+  - rm -f dockerize.tar.gz
+  - mv dockerize /usr/local/bin
+  - chmod +x /usr/local/bin/dockerize
+  - echo '~~~ Installing Goss and dgoss'
+  - arch="amd64"
+  - version="latest"
+  - install_dir="/usr/local/bin"
+  - if [ "${version}" = "latest" ]; then
+  - '  VERSION=$(curl -Ls --fail --retry 3 -o /dev/null -w "%<url_effective>s" https://github.com/aelsabbahy/goss/releases/latest
+    | sed "s:.*/::")'
+  - '  echo "Latest version of Goss is ${VERSION}"'
+  - else
+  - ' VERSION="${version}"'
+  - '  echo "Selected version of Goss is ${VERSION}"'
+  - fi
+  - curl -sSLo "${install_dir}/goss" "https://github.com/aelsabbahy/goss/releases/download/$VERSION/goss-linux-${arch}"
+  - mv goss-linux-${arch} "${install_dir}/goss"
+  - chmod +rx "${install_dir}/goss"
+  - DGOSS_URL="https://raw.githubusercontent.com/aelsabbahy/goss/$VERSION/extras/dgoss/dgoss"
+  - curl -fsSL "${DGOSS_URL}" -o "${install_dir}/dgoss" || echo "No dgoss wrapper
+    found for the selected version of Goss ($VERSION)."
+  - chmod +rx "${install_dir}/dgoss"
+  plugins:
+  - docker#v5.10.0:
+      image: cimg/base:stable
+  agents:
+    executor_type: docker
+  key: install-docker-tools
