@@ -29,7 +29,7 @@ module BK
             'DGOSS_URL="https://raw.githubusercontent.com/aelsabbahy/goss/$VERSION/extras/dgoss/dgoss"',
             'curl -fsSL "${DGOSS_URL}" -o "${install_dir}/dgoss" || ' \
             'echo "No dgoss wrapper found for the selected version of Goss ($VERSION)."',
-            %(chmod +rx "${install_dir}/dgoss")
+            'chmod +rx "${install_dir}/dgoss"'
           ]
         end
       end

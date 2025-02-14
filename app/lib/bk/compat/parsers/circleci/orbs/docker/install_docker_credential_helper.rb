@@ -11,7 +11,7 @@ module BK
           release_tag = config.fetch('release-tag', '')
 
           [
-            '# Instead of installing docker credential helper in a step, ', \
+            '# Instead of installing docker credential helper in a step, ',
             '# we recommend your agent environment to have it pre-installed',
             "echo '~~~ Installing Docker Credential Helper'",
             'platform=""',
@@ -31,9 +31,9 @@ module BK
             '  else',
             '    helper_name="pass"',
             '  fi',
+            'fi',
             'helper_filename="docker-credential-${helper_name}"',
             'BIN_PATH="/usr/local/bin"',
-            'mkdir -p ${BIN_PATH}',
             '  RELEASE_TAG=$(curl -Ls --fail --retry 3 -o /dev/null -w "%<url_effective>s" ' \
             'https://github.com/docker/docker-credential-helpers/releases/latest | sed "s:.*/::")',
             "if [ -n \"${release_tag}\" ]; then",

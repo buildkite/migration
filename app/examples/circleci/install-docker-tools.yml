@@ -11,17 +11,17 @@ jobs:
       - checkout
       - docker/install-docker-tools:
           install-docker: true
-          docker-install-dir: /usr/local/bin
+          docker-install-dir: /var/lib/docker
           docker-version: latest
           install-docker-compose: true
-          docker-compose-install-dir: /usr/local/bin
+          docker-compose-install-dir: /var/lib/docker
           docker-compose-version: latest
           install-dockerize: true
-          dockerize-install-dir: /usr/local/bin
+          dockerize-install-dir: /var/lib/docker
           dockerize-version: latest
           install-goss-dgoss: true
           goss-architecture: amd64
-          goss-install-dir: /usr/local/bin
+          goss-install-dir: /var/lib/docker
           goss-version: latest
 
 workflows:
