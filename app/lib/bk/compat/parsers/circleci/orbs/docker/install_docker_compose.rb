@@ -6,7 +6,7 @@ module BK
       # Handles the translation of docker installation commands
       class DockerOrb
         def translate_docker_install_docker_compose(config)
-          install_dir = config.fetch('install-dir', '/usr/local/bin')
+          install_dir = config.fetch('install-dir', config.fetch('docker-compose-install-dir', '/usr/local/bin'))
           version = config.fetch('version', 'latest')
           [
             '# Instead of installing docker-compose in a step, ',
