@@ -7,7 +7,7 @@ module BK
       'docker-compose' => 'v5.0.0',
       'docker-login' => 'v3.0.0',
       'ecr' => 'v2.7.0'
-    }.to_h do |p, v|
+    }.each do |p, v|
       env_friendly = p.upcase.tr('^A-Z0-9', '_')
       [p, ENV.fetch("BUILDKITE_PLUGIN_#{env_friendly}_VERSION", v)]
     end.freeze

@@ -21,9 +21,9 @@ module BK
         end
       end
 
-      private
-
       INDEX_HTML_PATH = File.expand_path(File.join(__FILE__, '..', '..', '..', '..', 'public', 'index.html'))
+
+      private
 
       def handle_index(_req)
         # Read once in production mode, otherwise - read each time.
