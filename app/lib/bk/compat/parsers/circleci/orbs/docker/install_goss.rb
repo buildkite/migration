@@ -7,7 +7,7 @@ module BK
       class DockerOrb
         def translate_docker_install_goss(config)
           arch = config.fetch('architecture', 'amd64')
-          install_dir = config.fetch('install-dir', '/usr/local/bin')
+          install_dir = config.fetch('install-dir', config.fetch('goss-install-dir', '/usr/local/bin'))
           version = config.fetch('version', 'latest')
 
           [
