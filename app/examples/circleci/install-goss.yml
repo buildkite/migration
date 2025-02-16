@@ -1,0 +1,40 @@
+version: 2.1
+
+orbs:
+  docker: circleci/docker@2.4.0
+
+commands:
+  install_deps:
+    description: "Install required dependencies"
+    steps:
+      - run:
+          name: Install Dependencies
+          command: |
+            apt-get update
+            apt-get install -y curl jq git
+
+jobs:
+  install:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_deps
+      - docker/install-goss
+
+  install-custom:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_deps
+      - docker/install-goss:
+            install-dir: /var/lib/docker
+            version: "v0.3.20"
+
+workflows:
+  version: 2
+  install-and-test:
+    jobs:
+      - install
+      - install-custom

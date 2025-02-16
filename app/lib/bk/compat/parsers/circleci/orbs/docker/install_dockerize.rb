@@ -6,7 +6,7 @@ module BK
       # Handles the translation of docker installation commands
       class DockerOrb
         def translate_docker_install_dockerize(config)
-          install_dir = config.fetch('install-dir', '/usr/local/bin')
+          install_dir = config.fetch('install-dir', config.fetch('dockerize-install-dir', '/usr/local/bin'))
           version = config.fetch('version', 'latest')
           [
             '# Instead of installing dockerize in a step, ',

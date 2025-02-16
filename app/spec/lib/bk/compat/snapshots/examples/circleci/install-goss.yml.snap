@@ -1,0 +1,62 @@
+---
+steps:
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - echo '~~~ Install Dependencies'
+  - apt-get update
+  - apt-get install -y curl jq git
+  - echo '~~~ Installing Goss and dgoss'
+  - arch="amd64"
+  - version="latest"
+  - install_dir="/usr/local/bin"
+  - if [ "${version}" = "latest" ]; then
+  - '  VERSION=$(curl -Ls --fail --retry 3 -o /dev/null -w "%<url_effective>s" https://github.com/aelsabbahy/goss/releases/latest
+    | sed "s:.*/::")'
+  - '  echo "Latest version of Goss is ${VERSION}"'
+  - else
+  - ' VERSION="${version}"'
+  - '  echo "Selected version of Goss is ${VERSION}"'
+  - fi
+  - curl -sSLo "${install_dir}/goss" "https://github.com/aelsabbahy/goss/releases/download/$VERSION/goss-linux-${arch}"
+  - mv goss-linux-${arch} "${install_dir}/goss"
+  - chmod +rx "${install_dir}/goss"
+  - DGOSS_URL="https://raw.githubusercontent.com/aelsabbahy/goss/$VERSION/extras/dgoss/dgoss"
+  - curl -fsSL "${DGOSS_URL}" -o "${install_dir}/dgoss" || echo "No dgoss wrapper
+    found for the selected version of Goss ($VERSION)."
+  - chmod +rx "${install_dir}/dgoss"
+  plugins:
+  - docker#v5.10.0:
+      image: cimg/base:stable
+  agents:
+    executor_type: docker
+  key: install
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - echo '~~~ Install Dependencies'
+  - apt-get update
+  - apt-get install -y curl jq git
+  - echo '~~~ Installing Goss and dgoss'
+  - arch="amd64"
+  - version="v0.3.20"
+  - install_dir="/var/lib/docker"
+  - if [ "${version}" = "latest" ]; then
+  - '  VERSION=$(curl -Ls --fail --retry 3 -o /dev/null -w "%<url_effective>s" https://github.com/aelsabbahy/goss/releases/latest
+    | sed "s:.*/::")'
+  - '  echo "Latest version of Goss is ${VERSION}"'
+  - else
+  - ' VERSION="${version}"'
+  - '  echo "Selected version of Goss is ${VERSION}"'
+  - fi
+  - curl -sSLo "${install_dir}/goss" "https://github.com/aelsabbahy/goss/releases/download/$VERSION/goss-linux-${arch}"
+  - mv goss-linux-${arch} "${install_dir}/goss"
+  - chmod +rx "${install_dir}/goss"
+  - DGOSS_URL="https://raw.githubusercontent.com/aelsabbahy/goss/$VERSION/extras/dgoss/dgoss"
+  - curl -fsSL "${DGOSS_URL}" -o "${install_dir}/dgoss" || echo "No dgoss wrapper
+    found for the selected version of Goss ($VERSION)."
+  - chmod +rx "${install_dir}/dgoss"
+  plugins:
+  - docker#v5.10.0:
+      image: cimg/base:stable
+  agents:
+    executor_type: docker
+  key: install-custom
