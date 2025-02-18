@@ -1,0 +1,31 @@
+version: 2.1
+
+orbs:
+  docker: circleci/docker@2.4.0
+
+jobs:
+  install-docker-tools:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - docker/install-docker-tools:
+          install-docker: true
+          docker-install-dir: /var/lib/docker
+          docker-version: latest
+          install-docker-compose: true
+          docker-compose-install-dir: /var/lib/docker
+          docker-compose-version: latest
+          install-dockerize: true
+          dockerize-install-dir: /var/lib/docker
+          dockerize-version: latest
+          install-goss-dgoss: true
+          goss-architecture: amd64
+          goss-install-dir: /var/lib/docker
+          goss-version: latest
+
+workflows:
+  version: 2
+  install-and-test:
+    jobs:
+      - install-docker-tools
