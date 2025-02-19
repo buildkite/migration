@@ -1,0 +1,68 @@
+version: 2.1
+
+orbs:
+  docker: circleci/docker@2.4.0
+
+commands:
+  install_deps:
+    description: "Install required dependencies"
+    steps:
+      - run:
+          name: Install Dependencies
+          command: |
+            apt-get update
+            apt-get install -y curl jq git
+
+jobs:
+  check:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_deps
+      - docker/check
+
+  check-custom:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_deps
+      - docker/check:
+          registry: "custom-registry.io"
+          docker-username: "custom-username"
+          docker-password: "custom-password"
+          use-docker-credentials-store: true
+          
+  check-custom-arch:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_deps
+      - docker/check:
+          registry: "gcr.io"
+          use-docker-credentials-store: true
+          arch: "arm64"
+          
+  check-multiple-registries:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_deps
+      - docker/check:
+          registry: "registry1.example.com"
+      - docker/check:
+          registry: "registry2.example.com"
+          docker-username: "REGISTRY2_USERNAME"
+          docker-password: "REGISTRY2_PASSWORD"
+
+workflows:
+  version: 2
+  check-login:
+    jobs:
+      - check
+      - check-custom
+      - check-custom-arch
+      - check-multiple-registries
