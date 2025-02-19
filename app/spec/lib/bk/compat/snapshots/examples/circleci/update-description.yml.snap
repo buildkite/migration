@@ -1,0 +1,78 @@
+---
+steps:
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - echo '~~~ Install Dependencies'
+  - apt-get update
+  - apt-get install -y curl jq
+  - echo '~~~ Updating Docker Hub Description'
+  - if [ "docker.io" != "docker.io" ]; then
+  - '  echo "Registry is not set to Docker Hub. Exiting."'
+  - "  exit 1"
+  - fi
+  - ''
+  - USERNAME=${DOCKER_LOGIN}
+  - PASSWORD=${DOCKER_PASSWORD}
+  - IMAGE=""
+  - DESCRIPTION="./README.md"
+  - ''
+  - echo "Authenticating with Docker Hub..."
+  - PAYLOAD="username=$USERNAME&password=$PASSWORD"
+  - JWT=$(curl -s -d "$PAYLOAD" https://hub.docker.com/v2/users/login/ | jq -r .token)
+  - ''
+  - 'HEADER="Authorization: JWT $JWT"'
+  - URL="https://hub.docker.com/v2/repositories/$IMAGE/"
+  - ''
+  - 'STATUS=$(curl -s -o /dev/null -w "%<http_code>s" -X PATCH -H "$HEADER"  -H "Content-type:
+    application/json" --data "{\"full_description\": $(jq -Rs . $DESCRIPTION)}" $URL)'
+  - ''
+  - if [ "$STATUS" -ne 200 ]; then
+  - '  echo "Could not update image description"'
+  - '  echo "Error code: $STATUS"'
+  - "  exit 1"
+  - fi
+  - echo "Docker image description updated successfully."
+  plugins:
+  - docker#v5.10.0:
+      image: cimg/base:stable
+  agents:
+    executor_type: docker
+  key: update-description
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - echo '~~~ Install Dependencies'
+  - apt-get update
+  - apt-get install -y curl jq
+  - echo '~~~ Updating Docker Hub Description'
+  - if [ "custom.registry.io" != "docker.io" ]; then
+  - '  echo "Registry is not set to Docker Hub. Exiting."'
+  - "  exit 1"
+  - fi
+  - ''
+  - USERNAME=${CUSTOM_DOCKER_LOGIN}
+  - PASSWORD=${CUSTOM_DOCKER_PASSWORD}
+  - IMAGE="custom-image"
+  - DESCRIPTION="/custom/path/custom-readme.md"
+  - ''
+  - echo "Authenticating with Docker Hub..."
+  - PAYLOAD="username=$USERNAME&password=$PASSWORD"
+  - JWT=$(curl -s -d "$PAYLOAD" https://hub.docker.com/v2/users/login/ | jq -r .token)
+  - ''
+  - 'HEADER="Authorization: JWT $JWT"'
+  - URL="https://hub.docker.com/v2/repositories/$IMAGE/"
+  - ''
+  - 'STATUS=$(curl -s -o /dev/null -w "%<http_code>s" -X PATCH -H "$HEADER"  -H "Content-type:
+    application/json" --data "{\"full_description\": $(jq -Rs . $DESCRIPTION)}" $URL)'
+  - ''
+  - if [ "$STATUS" -ne 200 ]; then
+  - '  echo "Could not update image description"'
+  - '  echo "Error code: $STATUS"'
+  - "  exit 1"
+  - fi
+  - echo "Docker image description updated successfully."
+  plugins:
+  - docker#v5.10.0:
+      image: cimg/base:stable
+  agents:
+    executor_type: docker
+  key: update-description-custom

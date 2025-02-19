@@ -1,0 +1,44 @@
+version: 2.1
+
+orbs:
+  docker: circleci/docker@2.4.0
+
+commands:
+  install_deps:
+    description: "Install required dependencies"
+    steps:
+      - run:
+          name: Install Dependencies
+          command: |
+            apt-get update
+            apt-get install -y curl jq
+
+jobs:
+  update-description:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_deps
+      - docker/update-description
+
+  update-description-custom:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_deps
+      - docker/update-description:
+          docker-username: CUSTOM_DOCKER_LOGIN
+          docker-password: CUSTOM_DOCKER_PASSWORD
+          image: custom-image
+          path: /custom/path
+          readme: custom-readme.md
+          registry: custom.registry.io
+          
+workflows:
+  version: 2
+  update-docker-description:
+    jobs:
+      - update-description
+      - update-description-custom

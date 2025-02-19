@@ -23,7 +23,6 @@ module BK
             '  arch="arm64"',
             'else',
             '  platform="linux"',
-            '  arch=${arch}',
             'fi',
             'if [ -z "${helper_name}" ]; then',
             '  if [ "${platform}" = "darwin" ]; then',
