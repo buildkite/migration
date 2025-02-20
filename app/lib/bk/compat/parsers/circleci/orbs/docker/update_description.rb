@@ -8,7 +8,7 @@ module BK
         def translate_docker_update_description(config)
           docker_username = config.fetch('docker-username', 'DOCKER_LOGIN')
           docker_password = config.fetch('docker-password', 'DOCKER_PASSWORD')
-          image = config.fetch('image', '')
+          image = config['image']
           path = config.fetch('path', '.')
           readme = config.fetch('readme', 'README.md')
           registry = config.fetch('registry', 'docker.io')
@@ -41,7 +41,7 @@ module BK
             '  exit 1',
             'fi',
             'echo "Docker image description updated successfully."'
-          ].compact
+          ]
         end
       end
     end

@@ -3,13 +3,12 @@
 require_relative 'docker/install_docker'
 require_relative 'docker/install_docker_compose'
 require_relative 'docker/install_dockerize'
-require_relative 'docker/install_docker_credential_helper'
+require_relative 'docker/credentials'
 require_relative 'docker/install_goss'
 require_relative 'docker/install_docker_tools'
 require_relative 'docker/build'
 require_relative 'docker/pull_push'
 require_relative 'docker/update_description'
-require_relative 'docker/configure_docker_credentials_store'
 require_relative 'docker/check'
 
 module BK
