@@ -4,7 +4,20 @@ steps:
   - "# No need for checkout, the agent takes care of that"
   - echo '~~~ Install Dependencies'
   - apt-get update
-  - apt-get install -y curl jq git gnupg2 pass
+  - apt-get install -y curl jq git
+  - echo "~~~ Checking Docker Login"
+  - echo "${DOCKER_PASSWORD}"|docker login -u "${DOCKER_LOGIN}" --password-stdin "docker.io"
+  plugins:
+  - docker#v5.10.0:
+      image: cimg/base:stable
+  agents:
+    executor_type: docker
+  key: check
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - echo '~~~ Install Dependencies'
+  - apt-get update
+  - apt-get install -y curl jq git
   - "# Instead of installing docker credential helper in a step, "
   - "# we recommend your agent environment to have it pre-installed"
   - echo '~~~ Installing Docker Credential Helper'
@@ -17,7 +30,6 @@ steps:
   - '  arch="arm64"'
   - else
   - '  platform="linux"'
-  - "  arch=${arch}"
   - fi
   - if [ -z "${helper_name}" ]; then
   - '  if [ "${platform}" = "darwin" ]; then'
@@ -51,30 +63,52 @@ steps:
   - fi
   - chmod +x "${helper_filename}"
   - mv "${helper_filename}" "${BIN_PATH}/${helper_filename}"
+  - echo '~~~ Configuring Docker Credentials Store'
+  - DOCKER_CONFIG_PATH="$HOME/.docker/config.json"
+  - HELPER_NAME=""
+  - if [ -z "${HELPER_NAME}" ]; then
+  - '  if [ "$(uname -s)" = "Darwin" ]; then'
+  - '    HELPER_NAME="osxkeychain"'
+  - "  else"
+  - '    HELPER_NAME="pass"'
+  - "  fi"
+  - fi
+  - if [ ! -e "${DOCKER_CONFIG_PATH}" ]; then
+  - '  mkdir -p "$(dirname "${DOCKER_CONFIG_PATH}")"'
+  - fi
+  - if ! command -v jq >/dev/null 2>&1; then
+  - '  echo "jq is required for this command"'
+  - "  exit 1"
+  - fi
+  - 'jq --arg credsStore "${HELPER_NAME}" ''. + {credsStore: ${credsStore}}'' "${DOCKER_CONFIG_PATH}"
+    > /tmp/docker-config-credsstore-update.json'
+  - mv /tmp/docker-config-credsstore-update.json "${DOCKER_CONFIG_PATH}"
+  - echo "~~~ Checking Docker Login"
+  - echo "${custom-password}"|docker login -u "${custom-username}" --password-stdin
+    "custom-registry.io"
   plugins:
   - docker#v5.10.0:
       image: cimg/base:stable
   agents:
     executor_type: docker
-  key: install
+  key: check-custom
 - commands:
   - "# No need for checkout, the agent takes care of that"
   - echo '~~~ Install Dependencies'
   - apt-get update
-  - apt-get install -y curl jq git gnupg2 pass
+  - apt-get install -y curl jq git
   - "# Instead of installing docker credential helper in a step, "
   - "# we recommend your agent environment to have it pre-installed"
   - echo '~~~ Installing Docker Credential Helper'
   - platform=""
   - arch="arm64"
-  - helper_name="pass"
-  - release_tag="v0.6.3"
+  - helper_name=""
+  - release_tag=""
   - if [ "$(uname -s)" = "Darwin" ]; then
   - '  platform="darwin"'
   - '  arch="arm64"'
   - else
   - '  platform="linux"'
-  - "  arch=${arch}"
   - fi
   - if [ -z "${helper_name}" ]; then
   - '  if [ "${platform}" = "darwin" ]; then'
@@ -108,9 +142,47 @@ steps:
   - fi
   - chmod +x "${helper_filename}"
   - mv "${helper_filename}" "${BIN_PATH}/${helper_filename}"
+  - echo '~~~ Configuring Docker Credentials Store'
+  - DOCKER_CONFIG_PATH="$HOME/.docker/config.json"
+  - HELPER_NAME=""
+  - if [ -z "${HELPER_NAME}" ]; then
+  - '  if [ "$(uname -s)" = "Darwin" ]; then'
+  - '    HELPER_NAME="osxkeychain"'
+  - "  else"
+  - '    HELPER_NAME="pass"'
+  - "  fi"
+  - fi
+  - if [ ! -e "${DOCKER_CONFIG_PATH}" ]; then
+  - '  mkdir -p "$(dirname "${DOCKER_CONFIG_PATH}")"'
+  - fi
+  - if ! command -v jq >/dev/null 2>&1; then
+  - '  echo "jq is required for this command"'
+  - "  exit 1"
+  - fi
+  - 'jq --arg credsStore "${HELPER_NAME}" ''. + {credsStore: ${credsStore}}'' "${DOCKER_CONFIG_PATH}"
+    > /tmp/docker-config-credsstore-update.json'
+  - mv /tmp/docker-config-credsstore-update.json "${DOCKER_CONFIG_PATH}"
+  - echo "~~~ Checking Docker Login"
+  - echo "${DOCKER_PASSWORD}"|docker login -u "${DOCKER_LOGIN}" --password-stdin "gcr.io"
   plugins:
   - docker#v5.10.0:
       image: cimg/base:stable
   agents:
     executor_type: docker
-  key: install-custom
+  key: check-custom-arch
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - echo '~~~ Install Dependencies'
+  - apt-get update
+  - apt-get install -y curl jq git
+  - echo "~~~ Checking Docker Login"
+  - echo "${DOCKER_PASSWORD}"|docker login -u "${DOCKER_LOGIN}" --password-stdin "registry1.example.com"
+  - echo "~~~ Checking Docker Login"
+  - echo "${REGISTRY2_PASSWORD}"|docker login -u "${REGISTRY2_USERNAME}" --password-stdin
+    "registry2.example.com"
+  plugins:
+  - docker#v5.10.0:
+      image: cimg/base:stable
+  agents:
+    executor_type: docker
+  key: check-multiple-registries
