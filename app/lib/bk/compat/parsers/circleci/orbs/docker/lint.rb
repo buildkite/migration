@@ -31,7 +31,7 @@ module BK
                 "hadolint --failure-threshold #{failure_threshold} #{ignore_rules} #{trusted_registries} #{dockerfile}"
               ]
             end
-          ].flatten.compact
+          ].flatten
         end
 
         def translate_docker_dockerlint(config)
