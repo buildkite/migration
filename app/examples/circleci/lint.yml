@@ -1,0 +1,109 @@
+version: 2.1
+
+orbs:
+  docker: circleci/docker@2.4.0
+
+commands:
+  install_deps:
+    description: "Install required dependencies"
+    steps:
+      - run:
+          name: Install Dependencies
+          command: |
+            apt-get update
+            apt-get install -y curl jq git npm
+
+jobs:
+  # Original hadolint jobs
+  lint-hadolint:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_deps
+      - docker/hadolint
+
+  lint-hadolint-custom:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_deps
+      - docker/hadolint:
+          failure-threshold: error
+          ignore-rules: DL3008,DL3013
+          trusted-registries: myregistry.com
+
+  # Additional hadolint test cases
+  lint-hadolint-multiple-files:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_deps
+      - docker/hadolint:
+          dockerfiles: Dockerfile:Dockerfile.prod:Dockerfile.dev
+          failure-threshold: warning
+          
+  lint-hadolint-multiple-rules:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_deps
+      - docker/hadolint:
+          ignore-rules: DL3008,DL3013,DL3016,DL3018,DL3019
+          failure-threshold: error
+
+  lint-dockerlint:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_deps
+      - docker/dockerlint
+
+  lint-dockerlint-custom:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_deps
+      - docker/dockerlint:
+          dockerfile: ./custom.Dockerfile
+          treat-warnings-as-errors: true
+          debug: true
+
+
+  lint-dockerlint-strict:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_deps
+      - docker/dockerlint:
+          dockerfile: ./prod.Dockerfile
+          treat-warnings-as-errors: true
+
+  lint-dockerlint-debug-only:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_deps
+      - docker/dockerlint:
+          debug: true
+
+workflows:
+  version: 2
+  linting:
+    jobs:
+      # Original jobs
+      - lint-hadolint
+      - lint-hadolint-custom
+      - lint-dockerlint
+      - lint-dockerlint-custom
+      - lint-hadolint-multiple-files
+      - lint-hadolint-multiple-rules
+      - lint-dockerlint-strict
+      - lint-dockerlint-debug-only

@@ -1,0 +1,212 @@
+---
+steps:
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - echo '~~~ Install Dependencies'
+  - apt-get update
+  - apt-get install -y curl jq git npm
+  - if ! command -v hadolint &> /dev/null; then
+  - "# Instead of installing hadolint in a step, "
+  - "# we recommend your agent environment to have it pre-installed"
+  - echo "~~~ Installing Hadolint"
+  - '  if [ "$(uname -s)" = "Darwin" ]; then'
+  - "    brew install hadolint"
+  - "  else"
+  - '    SYS_ARCH=$(uname -m | tr "[:upper:]" "[:lower:]")'
+  - "    SYS_ARCH=${SYS_ARCH/aarch64/arm64}"
+  - '    wget -O /usr/local/bin/hadolint "https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-${SYS_ARCH}"'
+  - "    chmod +x /usr/local/bin/hadolint"
+  - "  fi"
+  - fi
+  - echo '~~~ Linting Dockerfile with hadolint'
+  - hadolint --failure-threshold info   Dockerfile
+  plugins:
+  - docker#v5.10.0:
+      image: cimg/base:stable
+  agents:
+    executor_type: docker
+  key: lint-hadolint
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - echo '~~~ Install Dependencies'
+  - apt-get update
+  - apt-get install -y curl jq git npm
+  - if ! command -v hadolint &> /dev/null; then
+  - "# Instead of installing hadolint in a step, "
+  - "# we recommend your agent environment to have it pre-installed"
+  - echo "~~~ Installing Hadolint"
+  - '  if [ "$(uname -s)" = "Darwin" ]; then'
+  - "    brew install hadolint"
+  - "  else"
+  - '    SYS_ARCH=$(uname -m | tr "[:upper:]" "[:lower:]")'
+  - "    SYS_ARCH=${SYS_ARCH/aarch64/arm64}"
+  - '    wget -O /usr/local/bin/hadolint "https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-${SYS_ARCH}"'
+  - "    chmod +x /usr/local/bin/hadolint"
+  - "  fi"
+  - fi
+  - echo '~~~ Linting Dockerfile with hadolint'
+  - hadolint --failure-threshold error --ignore DL3008 --ignore DL3013 --trusted-registry
+    myregistry.com Dockerfile
+  plugins:
+  - docker#v5.10.0:
+      image: cimg/base:stable
+  agents:
+    executor_type: docker
+  key: lint-hadolint-custom
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - echo '~~~ Install Dependencies'
+  - apt-get update
+  - apt-get install -y curl jq git npm
+  - if ! command -v dockerlint &> /dev/null; then
+  - "# Instead of installing dockerlint in a step, "
+  - "# we recommend your agent environment to have it pre-installed"
+  - echo "~~~ Installing dockerlint"
+  - "  if ! command -v npm &> /dev/null; then"
+  - '    echo "npm is required to install dockerlint."'
+  - '    echo "Consider running this command with an image that has node available:
+    https://circleci.com/developer/images/image/cimg/node"'
+  - '    echo "Alternatively, use dockerlint''s docker image: https://github.com/RedCoolBeans/dockerlint#docker-image."'
+  - "    exit 1"
+  - "  fi"
+  - "  npm install -g dockerlint &> /dev/null"
+  - fi
+  - 'dockerlint -f Dockerfile '
+  plugins:
+  - docker#v5.10.0:
+      image: cimg/base:stable
+  agents:
+    executor_type: docker
+  key: lint-dockerlint
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - echo '~~~ Install Dependencies'
+  - apt-get update
+  - apt-get install -y curl jq git npm
+  - if ! command -v dockerlint &> /dev/null; then
+  - "# Instead of installing dockerlint in a step, "
+  - "# we recommend your agent environment to have it pre-installed"
+  - echo "~~~ Installing dockerlint"
+  - "  if ! command -v npm &> /dev/null; then"
+  - '    echo "npm is required to install dockerlint."'
+  - '    echo "Consider running this command with an image that has node available:
+    https://circleci.com/developer/images/image/cimg/node"'
+  - '    echo "Alternatively, use dockerlint''s docker image: https://github.com/RedCoolBeans/dockerlint#docker-image."'
+  - "    exit 1"
+  - "  fi"
+  - "  npm install -g dockerlint"
+  - fi
+  - dockerlint -f ./custom.Dockerfile -p
+  plugins:
+  - docker#v5.10.0:
+      image: cimg/base:stable
+  agents:
+    executor_type: docker
+  key: lint-dockerlint-custom
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - echo '~~~ Install Dependencies'
+  - apt-get update
+  - apt-get install -y curl jq git npm
+  - if ! command -v hadolint &> /dev/null; then
+  - "# Instead of installing hadolint in a step, "
+  - "# we recommend your agent environment to have it pre-installed"
+  - echo "~~~ Installing Hadolint"
+  - '  if [ "$(uname -s)" = "Darwin" ]; then'
+  - "    brew install hadolint"
+  - "  else"
+  - '    SYS_ARCH=$(uname -m | tr "[:upper:]" "[:lower:]")'
+  - "    SYS_ARCH=${SYS_ARCH/aarch64/arm64}"
+  - '    wget -O /usr/local/bin/hadolint "https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-${SYS_ARCH}"'
+  - "    chmod +x /usr/local/bin/hadolint"
+  - "  fi"
+  - fi
+  - echo '~~~ Linting Dockerfile with hadolint'
+  - hadolint --failure-threshold warning   Dockerfile
+  - echo '~~~ Linting Dockerfile.prod with hadolint'
+  - hadolint --failure-threshold warning   Dockerfile.prod
+  - echo '~~~ Linting Dockerfile.dev with hadolint'
+  - hadolint --failure-threshold warning   Dockerfile.dev
+  plugins:
+  - docker#v5.10.0:
+      image: cimg/base:stable
+  agents:
+    executor_type: docker
+  key: lint-hadolint-multiple-files
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - echo '~~~ Install Dependencies'
+  - apt-get update
+  - apt-get install -y curl jq git npm
+  - if ! command -v hadolint &> /dev/null; then
+  - "# Instead of installing hadolint in a step, "
+  - "# we recommend your agent environment to have it pre-installed"
+  - echo "~~~ Installing Hadolint"
+  - '  if [ "$(uname -s)" = "Darwin" ]; then'
+  - "    brew install hadolint"
+  - "  else"
+  - '    SYS_ARCH=$(uname -m | tr "[:upper:]" "[:lower:]")'
+  - "    SYS_ARCH=${SYS_ARCH/aarch64/arm64}"
+  - '    wget -O /usr/local/bin/hadolint "https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-${SYS_ARCH}"'
+  - "    chmod +x /usr/local/bin/hadolint"
+  - "  fi"
+  - fi
+  - echo '~~~ Linting Dockerfile with hadolint'
+  - hadolint --failure-threshold error --ignore DL3008 --ignore DL3013 --ignore DL3016
+    --ignore DL3018 --ignore DL3019  Dockerfile
+  plugins:
+  - docker#v5.10.0:
+      image: cimg/base:stable
+  agents:
+    executor_type: docker
+  key: lint-hadolint-multiple-rules
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - echo '~~~ Install Dependencies'
+  - apt-get update
+  - apt-get install -y curl jq git npm
+  - if ! command -v dockerlint &> /dev/null; then
+  - "# Instead of installing dockerlint in a step, "
+  - "# we recommend your agent environment to have it pre-installed"
+  - echo "~~~ Installing dockerlint"
+  - "  if ! command -v npm &> /dev/null; then"
+  - '    echo "npm is required to install dockerlint."'
+  - '    echo "Consider running this command with an image that has node available:
+    https://circleci.com/developer/images/image/cimg/node"'
+  - '    echo "Alternatively, use dockerlint''s docker image: https://github.com/RedCoolBeans/dockerlint#docker-image."'
+  - "    exit 1"
+  - "  fi"
+  - "  npm install -g dockerlint &> /dev/null"
+  - fi
+  - dockerlint -f ./prod.Dockerfile -p
+  plugins:
+  - docker#v5.10.0:
+      image: cimg/base:stable
+  agents:
+    executor_type: docker
+  key: lint-dockerlint-strict
+- commands:
+  - "# No need for checkout, the agent takes care of that"
+  - echo '~~~ Install Dependencies'
+  - apt-get update
+  - apt-get install -y curl jq git npm
+  - if ! command -v dockerlint &> /dev/null; then
+  - "# Instead of installing dockerlint in a step, "
+  - "# we recommend your agent environment to have it pre-installed"
+  - echo "~~~ Installing dockerlint"
+  - "  if ! command -v npm &> /dev/null; then"
+  - '    echo "npm is required to install dockerlint."'
+  - '    echo "Consider running this command with an image that has node available:
+    https://circleci.com/developer/images/image/cimg/node"'
+  - '    echo "Alternatively, use dockerlint''s docker image: https://github.com/RedCoolBeans/dockerlint#docker-image."'
+  - "    exit 1"
+  - "  fi"
+  - "  npm install -g dockerlint"
+  - fi
+  - 'dockerlint -f Dockerfile '
+  plugins:
+  - docker#v5.10.0:
+      image: cimg/base:stable
+  agents:
+    executor_type: docker
+  key: lint-dockerlint-debug-only

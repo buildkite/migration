@@ -10,6 +10,7 @@ require_relative 'docker/build'
 require_relative 'docker/pull_push'
 require_relative 'docker/update_description'
 require_relative 'docker/check'
+require_relative 'docker/lint'
 
 module BK
   module Compat
