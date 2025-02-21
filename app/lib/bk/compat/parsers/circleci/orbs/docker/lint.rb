@@ -28,7 +28,7 @@ module BK
             *dockerfiles.map do |dockerfile|
               [
                 "echo '~~~ Linting #{dockerfile} with hadolint'",
-                "hadolint --failure-threshold #{failure_threshold} #{ignore_rules} #{trusted_registries} #{dockerfile}",
+                "hadolint --failure-threshold #{failure_threshold} #{ignore_rules} #{trusted_registries} #{dockerfile}"
               ]
             end
           ].flatten.compact
@@ -60,7 +60,7 @@ module BK
         private
 
         def format_rules(values, flag_type)
-          flags = values.split(',').map { |value| "--#{flag_type} #{value.strip}" }.join(' ')
+          values.split(',').map { |value| "--#{flag_type} #{value.strip}" }.join(' ')
         end
       end
     end
