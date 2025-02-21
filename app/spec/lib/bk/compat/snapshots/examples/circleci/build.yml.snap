@@ -4,7 +4,20 @@ steps:
   - "# No need for checkout, the agent takes care of that"
   - export DOCKER_BUILDKIT=1
   - "# Using BuildKit context at ./workspace"
-  - "# Dockerlint is not supported at this time and should be translated by hand"
+  - if ! command -v dockerlint &> /dev/null; then
+  - "# Instead of installing dockerlint in a step, "
+  - "# we recommend your agent environment to have it pre-installed"
+  - echo "~~~ Installing dockerlint"
+  - "  if ! command -v npm &> /dev/null; then"
+  - '    echo "npm is required to install dockerlint."'
+  - '    echo "Consider running this command with an image that has node available:
+    https://circleci.com/developer/images/image/cimg/node"'
+  - '    echo "Alternatively, use dockerlint''s docker image: https://github.com/RedCoolBeans/dockerlint#docker-image."'
+  - "    exit 1"
+  - "  fi"
+  - "  npm install -g dockerlint"
+  - fi
+  - dockerlint -f Dockerfile.prod -p
   - docker pull user/app:cache || true
   - docker pull user/app2:cache2 || true
   - docker buildx build -f ./docker/Dockerfile.prod -t my.registry.io/myapp:v1.0 -t
