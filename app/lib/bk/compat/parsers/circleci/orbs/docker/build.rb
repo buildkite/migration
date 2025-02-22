@@ -9,9 +9,7 @@ module BK
           [
             ('export DOCKER_BUILDKIT=1' if config['use-buildkit']),
             ("# Using BuildKit context at #{config['attach-at']}" if config['attach-at']),
-            (if config['lint-dockerfile']
-               '# Dockerlint is not supported at this time and should be translated by hand'
-             end),
+            (translate_docker_dockerlint(config) if config['lint-dockerfile']),
             *pull_cache_images(config),
             generate_build_command(config)
           ].compact
