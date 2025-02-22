@@ -13,9 +13,9 @@ module BK
 
           [
             'if ! command -v hadolint &> /dev/null; then',
-            '# Instead of installing hadolint in a step, ',
-            '# we recommend your agent environment to have it pre-installed',
-            'echo "~~~ Installing Hadolint"',
+            '  # Instead of installing dockerlint in a step, ',
+            '  # we recommend your agent environment to have it pre-installed',
+            '  echo "~~~ Installing dockerlint"',
             '  if [ "$(uname -s)" = "Darwin" ]; then',
             '    brew install hadolint',
             '  else',
@@ -41,20 +41,19 @@ module BK
 
           [
             'if ! command -v dockerlint &> /dev/null; then',
-            '# Instead of installing dockerlint in a step, ',
-            '# we recommend your agent environment to have it pre-installed',
-            'echo "~~~ Installing dockerlint"',
+            '  # Instead of installing dockerlint in a step, ',
+            '  # we recommend your agent environment to have it pre-installed',
+            '  echo "~~~ Installing dockerlint"',
             '  if ! command -v npm &> /dev/null; then',
             '    echo "npm is required to install dockerlint."',
             '    echo "Consider running this command with an image that has node available: https://circleci.com/developer/images/image/cimg/node"',
             '    echo "Alternatively, use dockerlint\'s docker image: https://github.com/RedCoolBeans/dockerlint#docker-image."',
             '    exit 1',
             '  fi',
-            ('  npm install -g dockerlint' if debug),
-            ('  npm install -g dockerlint &> /dev/null' unless debug),
+            "  npm install -g dockerlint #{'&> /dev/null' if debug}",
             'fi',
             "dockerlint -f #{dockerfile} #{'-p' if treat_warnings_as_errors}"
-          ].compact
+          ]
         end
 
         private

@@ -5,9 +5,9 @@ steps:
   - export DOCKER_BUILDKIT=1
   - "# Using BuildKit context at ./workspace"
   - if ! command -v dockerlint &> /dev/null; then
-  - "# Instead of installing dockerlint in a step, "
-  - "# we recommend your agent environment to have it pre-installed"
-  - echo "~~~ Installing dockerlint"
+  - "  # Instead of installing dockerlint in a step, "
+  - "  # we recommend your agent environment to have it pre-installed"
+  - '  echo "~~~ Installing dockerlint"'
   - "  if ! command -v npm &> /dev/null; then"
   - '    echo "npm is required to install dockerlint."'
   - '    echo "Consider running this command with an image that has node available:
@@ -15,7 +15,7 @@ steps:
   - '    echo "Alternatively, use dockerlint''s docker image: https://github.com/RedCoolBeans/dockerlint#docker-image."'
   - "    exit 1"
   - "  fi"
-  - "  npm install -g dockerlint"
+  - "  npm install -g dockerlint &> /dev/null"
   - fi
   - dockerlint -f Dockerfile.prod -p
   - docker pull user/app:cache || true

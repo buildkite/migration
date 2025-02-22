@@ -6,9 +6,9 @@ steps:
   - apt-get update
   - apt-get install -y curl jq git npm
   - if ! command -v hadolint &> /dev/null; then
-  - "# Instead of installing hadolint in a step, "
-  - "# we recommend your agent environment to have it pre-installed"
-  - echo "~~~ Installing Hadolint"
+  - "  # Instead of installing dockerlint in a step, "
+  - "  # we recommend your agent environment to have it pre-installed"
+  - '  echo "~~~ Installing dockerlint"'
   - '  if [ "$(uname -s)" = "Darwin" ]; then'
   - "    brew install hadolint"
   - "  else"
@@ -32,9 +32,9 @@ steps:
   - apt-get update
   - apt-get install -y curl jq git npm
   - if ! command -v hadolint &> /dev/null; then
-  - "# Instead of installing hadolint in a step, "
-  - "# we recommend your agent environment to have it pre-installed"
-  - echo "~~~ Installing Hadolint"
+  - "  # Instead of installing dockerlint in a step, "
+  - "  # we recommend your agent environment to have it pre-installed"
+  - '  echo "~~~ Installing dockerlint"'
   - '  if [ "$(uname -s)" = "Darwin" ]; then'
   - "    brew install hadolint"
   - "  else"
@@ -59,9 +59,9 @@ steps:
   - apt-get update
   - apt-get install -y curl jq git npm
   - if ! command -v dockerlint &> /dev/null; then
-  - "# Instead of installing dockerlint in a step, "
-  - "# we recommend your agent environment to have it pre-installed"
-  - echo "~~~ Installing dockerlint"
+  - "  # Instead of installing dockerlint in a step, "
+  - "  # we recommend your agent environment to have it pre-installed"
+  - '  echo "~~~ Installing dockerlint"'
   - "  if ! command -v npm &> /dev/null; then"
   - '    echo "npm is required to install dockerlint."'
   - '    echo "Consider running this command with an image that has node available:
@@ -69,7 +69,7 @@ steps:
   - '    echo "Alternatively, use dockerlint''s docker image: https://github.com/RedCoolBeans/dockerlint#docker-image."'
   - "    exit 1"
   - "  fi"
-  - "  npm install -g dockerlint &> /dev/null"
+  - "  npm install -g dockerlint "
   - fi
   - 'dockerlint -f Dockerfile '
   plugins:
@@ -84,9 +84,9 @@ steps:
   - apt-get update
   - apt-get install -y curl jq git npm
   - if ! command -v dockerlint &> /dev/null; then
-  - "# Instead of installing dockerlint in a step, "
-  - "# we recommend your agent environment to have it pre-installed"
-  - echo "~~~ Installing dockerlint"
+  - "  # Instead of installing dockerlint in a step, "
+  - "  # we recommend your agent environment to have it pre-installed"
+  - '  echo "~~~ Installing dockerlint"'
   - "  if ! command -v npm &> /dev/null; then"
   - '    echo "npm is required to install dockerlint."'
   - '    echo "Consider running this command with an image that has node available:
@@ -94,7 +94,7 @@ steps:
   - '    echo "Alternatively, use dockerlint''s docker image: https://github.com/RedCoolBeans/dockerlint#docker-image."'
   - "    exit 1"
   - "  fi"
-  - "  npm install -g dockerlint"
+  - "  npm install -g dockerlint &> /dev/null"
   - fi
   - dockerlint -f ./custom.Dockerfile -p
   plugins:
@@ -109,9 +109,9 @@ steps:
   - apt-get update
   - apt-get install -y curl jq git npm
   - if ! command -v hadolint &> /dev/null; then
-  - "# Instead of installing hadolint in a step, "
-  - "# we recommend your agent environment to have it pre-installed"
-  - echo "~~~ Installing Hadolint"
+  - "  # Instead of installing dockerlint in a step, "
+  - "  # we recommend your agent environment to have it pre-installed"
+  - '  echo "~~~ Installing dockerlint"'
   - '  if [ "$(uname -s)" = "Darwin" ]; then'
   - "    brew install hadolint"
   - "  else"
@@ -139,9 +139,9 @@ steps:
   - apt-get update
   - apt-get install -y curl jq git npm
   - if ! command -v hadolint &> /dev/null; then
-  - "# Instead of installing hadolint in a step, "
-  - "# we recommend your agent environment to have it pre-installed"
-  - echo "~~~ Installing Hadolint"
+  - "  # Instead of installing dockerlint in a step, "
+  - "  # we recommend your agent environment to have it pre-installed"
+  - '  echo "~~~ Installing dockerlint"'
   - '  if [ "$(uname -s)" = "Darwin" ]; then'
   - "    brew install hadolint"
   - "  else"
@@ -166,9 +166,9 @@ steps:
   - apt-get update
   - apt-get install -y curl jq git npm
   - if ! command -v dockerlint &> /dev/null; then
-  - "# Instead of installing dockerlint in a step, "
-  - "# we recommend your agent environment to have it pre-installed"
-  - echo "~~~ Installing dockerlint"
+  - "  # Instead of installing dockerlint in a step, "
+  - "  # we recommend your agent environment to have it pre-installed"
+  - '  echo "~~~ Installing dockerlint"'
   - "  if ! command -v npm &> /dev/null; then"
   - '    echo "npm is required to install dockerlint."'
   - '    echo "Consider running this command with an image that has node available:
@@ -176,7 +176,7 @@ steps:
   - '    echo "Alternatively, use dockerlint''s docker image: https://github.com/RedCoolBeans/dockerlint#docker-image."'
   - "    exit 1"
   - "  fi"
-  - "  npm install -g dockerlint &> /dev/null"
+  - "  npm install -g dockerlint "
   - fi
   - dockerlint -f ./prod.Dockerfile -p
   plugins:
@@ -191,9 +191,9 @@ steps:
   - apt-get update
   - apt-get install -y curl jq git npm
   - if ! command -v dockerlint &> /dev/null; then
-  - "# Instead of installing dockerlint in a step, "
-  - "# we recommend your agent environment to have it pre-installed"
-  - echo "~~~ Installing dockerlint"
+  - "  # Instead of installing dockerlint in a step, "
+  - "  # we recommend your agent environment to have it pre-installed"
+  - '  echo "~~~ Installing dockerlint"'
   - "  if ! command -v npm &> /dev/null; then"
   - '    echo "npm is required to install dockerlint."'
   - '    echo "Consider running this command with an image that has node available:
@@ -201,7 +201,7 @@ steps:
   - '    echo "Alternatively, use dockerlint''s docker image: https://github.com/RedCoolBeans/dockerlint#docker-image."'
   - "    exit 1"
   - "  fi"
-  - "  npm install -g dockerlint"
+  - "  npm install -g dockerlint &> /dev/null"
   - fi
   - 'dockerlint -f Dockerfile '
   plugins:
