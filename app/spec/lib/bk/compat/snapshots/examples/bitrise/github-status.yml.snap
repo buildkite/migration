@@ -1,0 +1,127 @@
+---
+steps:
+- commands:
+  - "# No need for cloning, the agent takes care of that"
+  - "./build-app.sh"
+  - |
+    # GitHub Status API call
+    # Extract owner/repo from repository URL
+    REPO_PATH=$(echo "$GIT_REPOSITORY_URL" | sed -E 's|.*[:/]([^/]+/[^/.]+)(\.git)?$|\1|')
+    STATUS_API_URL="https://api.github.com/repos/${REPO_PATH}/statuses/$BITRISE_GIT_COMMIT"
+    echo "Sending status to: $STATUS_API_URL"
+    curl -s -X POST \
+      -H "Authorization: token $GITHUB_TOKEN" \
+      -H "Content-Type: application/json" \
+      --data '{
+        "state": "success",
+        "target_url": "$BITRISE_BUILD_URL",
+        "description": "Build completed successfully",
+        "context": "ci/bitrise/build"
+      }' \
+      "$STATUS_API_URL"
+    CURL_RESULT=$?
+    [ $CURL_RESULT -eq 0 ] || echo "Error sending status update to GitHub"
+  label: build
+  key: build
+- commands:
+  - "# No need for cloning, the agent takes care of that"
+  - |
+    # GitHub Status API call
+    # Extract owner/repo from repository URL
+    REPO_PATH=$(echo "$GIT_REPOSITORY_URL" | sed -E 's|.*[:/]([^/]+/[^/.]+)(\.git)?$|\1|')
+    STATUS_API_URL="https://api.github.com/repos/${REPO_PATH}/statuses/$BITRISE_GIT_COMMIT"
+    echo "Sending status to: $STATUS_API_URL"
+    curl -s -X POST \
+      -H "Authorization: token $GITHUB_TOKEN" \
+      -H "Content-Type: application/json" \
+      --data '{
+        "state": "pending",
+        "target_url": "$BITRISE_BUILD_URL",
+        "description": "Tests are running",
+        "context": "ci/bitrise/test"
+      }' \
+      "$STATUS_API_URL"
+    CURL_RESULT=$?
+    [ $CURL_RESULT -eq 0 ] || echo "Error sending status update to GitHub"
+  - "./test.sh"
+  - |
+    # GitHub Status API call
+    # Extract owner/repo from repository URL
+    REPO_PATH=$(echo "$GIT_REPOSITORY_URL" | sed -E 's|.*[:/]([^/]+/[^/.]+)(\.git)?$|\1|')
+    STATUS_API_URL="https://api.github.com/repos/${REPO_PATH}/statuses/$BITRISE_GIT_COMMIT"
+    echo "Sending status to: $STATUS_API_URL"
+    curl -s -X POST \
+      -H "Authorization: token $GITHUB_TOKEN" \
+      -H "Content-Type: application/json" \
+      --data '{
+        "state": "'$([ "$BUILDKITE_COMMAND_EXIT_STATUS" = "0" ] && echo "success" || echo "failure")'",
+        "target_url": "$BITRISE_BUILD_URL",
+        "description": "Test run completed",
+        "context": "ci/bitrise/test"
+      }' \
+      "$STATUS_API_URL"
+    CURL_RESULT=$?
+    [ $CURL_RESULT -eq 0 ] || echo "Error sending status update to GitHub"
+  label: test
+  key: test
+- commands:
+  - |
+    # GitHub Status API call
+    # Extract owner/repo from repository URL
+    REPO_PATH=$(echo "$GIT_REPOSITORY_URL" | sed -E 's|.*[:/]([^/]+/[^/.]+)(\.git)?$|\1|')
+    STATUS_API_URL="https://api.github.com/repos/${REPO_PATH}/statuses/$BITRISE_GIT_COMMIT"
+    echo "Sending status to: $STATUS_API_URL"
+    curl -s -X POST \
+      -H "Authorization: token $GITHUB_TOKEN" \
+      -H "Content-Type: application/json" \
+      --data '{
+        "state": "pending",
+        "target_url": "",
+        "description": "Deployment in progress",
+        "context": "ci/bitrise/deployment"
+      }' \
+      "$STATUS_API_URL"
+    CURL_RESULT=$?
+    [ $CURL_RESULT -eq 0 ] || echo "Error sending status update to GitHub"
+  - "./deploy-app.sh"
+  - |
+    # GitHub Status API call
+    # Extract owner/repo from repository URL
+    REPO_PATH=$(echo "$GIT_REPOSITORY_URL" | sed -E 's|.*[:/]([^/]+/[^/.]+)(\.git)?$|\1|')
+    STATUS_API_URL="https://api.github.com/repos/${REPO_PATH}/statuses/$BITRISE_GIT_COMMIT"
+    echo "Sending status to: $STATUS_API_URL"
+    curl -s -X POST \
+      -H "Authorization: token $GITHUB_TOKEN" \
+      -H "Content-Type: application/json" \
+      --data '{
+        "state": "'$([ "$BUILDKITE_COMMAND_EXIT_STATUS" = "0" ] && echo "success" || echo "failure")'",
+        "target_url": "https://example.com/release/$BITRISE_BUILD_NUMBER",
+        "description": "Deployment finished",
+        "context": "ci/bitrise/deployment"
+      }' \
+      "$STATUS_API_URL"
+    CURL_RESULT=$?
+    [ $CURL_RESULT -eq 0 ] || echo "Error sending status update to GitHub"
+  label: deploy
+  key: deploy
+- commands:
+  - |
+    # GitHub Status API call
+    # Extract owner/repo from repository URL
+    REPO_PATH=$(echo "git@github.company.com:example/internal-repo.git" | sed -E 's|.*[:/]([^/]+/[^/.]+)(\.git)?$|\1|')
+    STATUS_API_URL="https://github.company.com/api/v3/repos/${REPO_PATH}/statuses/$BITRISE_GIT_COMMIT"
+    echo "Sending status to: $STATUS_API_URL"
+    curl -s -X POST \
+      -H "Authorization: token $GITHUB_TOKEN" \
+      -H "Content-Type: application/json" \
+      --data '{
+        "state": "error",
+        "target_url": "",
+        "description": "Internal validation failed",
+        "context": "ci/custom/validation"
+      }' \
+      "$STATUS_API_URL"
+    CURL_RESULT=$?
+    [ $CURL_RESULT -eq 0 ] || echo "Error sending status update to GitHub"
+  label: custom-endpoint
+  key: custom-endpoint

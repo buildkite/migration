@@ -5,7 +5,7 @@ module BK
     module BitriseSteps
       # Implementation of Bitrise step translations
       class Translator
-        VALID_STEP_TYPES = %w[bundler brew-install change-workdir git-clone git-tag script].freeze
+        VALID_STEP_TYPES = %w[bundler brew-install change-workdir git-clone git-tag script github-status].freeze
 
         def matcher(type, _inputs)
           VALID_STEP_TYPES.include?(type.downcase)
@@ -70,6 +70,62 @@ module BK
 
         def translate_script(inputs)
           inputs['content']
+        end
+
+        def translate_github_status(inputs)
+          return '# Invalid github-status step configuration!' unless required_github_status_inputs(inputs)
+
+          params = extract_github_status_params(inputs)
+          generate_github_status_script(params)
+        end
+
+        def extract_github_status_params(inputs)
+          {
+            auth_token: inputs['auth_token'],
+            api_base_url: inputs['api_base_url'].to_s.chomp('/'),
+            repo_path_command: extract_repo_path(inputs['repository_url']),
+            commit_hash: inputs['commit_hash'],
+            state_command: determine_status(inputs['set_specific_status']),
+            target_url: inputs['pipeline_build_url'] || inputs['build_url'] || '',
+            description: inputs['description'] || '',
+            context: inputs['context'] || 'default'
+          }
+        end
+
+        def generate_github_status_script(params)
+          <<~SCRIPT
+            # GitHub Status API call
+            # Extract owner/repo from repository URL
+            #{params[:repo_path_command]}
+            STATUS_API_URL="#{params[:api_base_url]}/repos/${REPO_PATH}/statuses/#{params[:commit_hash]}"
+            echo "Sending status to: $STATUS_API_URL"
+            curl -s -X POST \\
+              -H "Authorization: token #{params[:auth_token]}" \\
+              -H "Content-Type: application/json" \\
+              --data '{
+                "state": "#{params[:state_command]}",
+                "target_url": "#{params[:target_url]}",
+                "description": "#{params[:description]}",
+                "context": "#{params[:context]}"
+              }' \\
+              "$STATUS_API_URL"
+            CURL_RESULT=$?
+            [ $CURL_RESULT -eq 0 ] || echo "Error sending status update to GitHub"
+          SCRIPT
+        end
+
+        def determine_status(set_specific_status)
+          return set_specific_status unless set_specific_status == 'auto'
+
+          "'$([ \"$BUILDKITE_COMMAND_EXIT_STATUS\" = \"0\" ] && echo \"success\" || echo \"failure\")'"
+        end
+
+        def extract_repo_path(repository_url)
+          "REPO_PATH=$(echo \"#{repository_url}\" | sed -E 's|.*[:/]([^/]+/[^/.]+)(\\.git)?$|\\1|')"
+        end
+
+        def required_github_status_inputs(inputs)
+          %w[auth_token api_base_url repository_url commit_hash].all? { |key| inputs.include?(key) }
         end
       end
     end
