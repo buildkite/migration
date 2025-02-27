@@ -3,59 +3,50 @@ steps:
 - commands:
   - "# No need for cloning, the agent takes care of that"
   - "./build-app.sh"
-  - |
-    notify:
-      - github_commit_status:
-          context: "ci/bitrise/build"
-          description: "Build completed successfully"
-          status: "success"
-          target_url: "$BITRISE_BUILD_URL"
   label: build
   key: build
+  notify:
+  - github_commit_status:
+      context: ci/bitrise/build
+      description: Build completed successfully
+      status: success
+      target_url: "$BITRISE_BUILD_URL"
 - commands:
   - "# No need for cloning, the agent takes care of that"
-  - |
-    notify:
-      - github_commit_status:
-          context: "ci/bitrise/test"
-          description: "Tests are running"
-          status: "pending"
-          target_url: "$BITRISE_BUILD_URL"
   - "./test.sh"
-  - |
-    notify:
-      - github_commit_status:
-          context: "ci/bitrise/test"
-          description: "Test run completed"
-          status: "failure"
-          target_url: "$BITRISE_BUILD_URL"
   label: test
   key: test
+  notify:
+  - github_commit_status:
+      context: ci/bitrise/test
+      description: Tests are running
+      status: pending
+      target_url: "$BITRISE_BUILD_URL"
+  - github_commit_status:
+      context: ci/bitrise/test
+      description: Test run completed
+      status: failure
+      target_url: "$BITRISE_BUILD_URL"
 - commands:
-  - |
-    notify:
-      - github_commit_status:
-          context: "ci/bitrise/deployment"
-          description: "Deployment in progress"
-          status: "pending"
-          target_url: "${BUILDKITE_BUILD_URL}"
   - "./deploy-app.sh"
-  - |
-    notify:
-      - github_commit_status:
-          context: "ci/bitrise/deployment"
-          description: "Deployment finished"
-          status: "failure"
-          target_url: "https://example.com/release/$BITRISE_BUILD_NUMBER"
   label: deploy
   key: deploy
-- commands:
-  - |
-    notify:
-      - github_commit_status:
-          context: "ci/custom/validation"
-          description: "Internal validation failed"
-          status: "error"
-          target_url: "${BUILDKITE_BUILD_URL}"
-  label: custom-endpoint
+  notify:
+  - github_commit_status:
+      context: ci/bitrise/deployment
+      description: Deployment in progress
+      status: pending
+      target_url: "${BUILDKITE_BUILD_URL}"
+  - github_commit_status:
+      context: ci/bitrise/deployment
+      description: Deployment finished
+      status: failure
+      target_url: https://example.com/release/$BITRISE_BUILD_NUMBER
+- label: custom-endpoint
   key: custom-endpoint
+  notify:
+  - github_commit_status:
+      context: ci/custom/validation
+      description: Internal validation failed
+      status: error
+      target_url: "${BUILDKITE_BUILD_URL}"

@@ -9,7 +9,7 @@ module BK
           raise '# Invalid github-status step configuration!' unless required_github_status_inputs(inputs)
 
           params = extract_github_status_params(inputs)
-          generate_github_status_notify(params)
+          BK::Compat::CommandStep.new(notify: generate_github_status_notify(params))
         end
 
         private
@@ -28,14 +28,16 @@ module BK
         end
 
         def generate_github_status_notify(params)
-          <<~YAML
-            notify:
-              - github_commit_status:
-                  context: "#{params[:context]}"
-                  description: "#{params[:description]}"
-                  status: "#{params[:status]}"
-                  target_url: "#{params[:target_url]}"
-          YAML
+          [
+            {
+              'github_commit_status' => {
+                'context' => params[:context],
+                'description' => params[:description],
+                'status' => params[:status],
+                'target_url' => params[:target_url]
+              }
+            }
+          ]
         end
 
         def determine_status(set_specific_status, build_status = nil, pipeline_build_status = nil)
