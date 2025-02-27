@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
+require_relative 'github_status'
+
 module BK
   module Compat
     module BitriseSteps
       # Implementation of Bitrise step translations
       class Translator
-        VALID_STEP_TYPES = %w[bundler brew-install change-workdir git-clone git-tag script].freeze
+        VALID_STEP_TYPES = %w[bundler brew-install change-workdir git-clone github-status git-tag script].freeze
 
         def matcher(type, _inputs)
           VALID_STEP_TYPES.include?(type.downcase)
