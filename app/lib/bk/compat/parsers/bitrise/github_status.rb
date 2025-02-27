@@ -6,10 +6,13 @@ module BK
       # Handles the translation of github-status
       class Translator
         def translate_github_status(inputs)
-          raise '# Invalid github-status step configuration!' unless required_github_status_inputs(inputs)
+          raise 'Invalid github-status step configuration!' unless required_github_status_inputs(inputs)
 
           params = extract_github_status_params(inputs)
-          BK::Compat::CommandStep.new(notify: generate_github_status_notify(params))
+          {
+            'notify' => generate_github_status_notify(params),
+            'commands' => generate_github_status_command(params)
+          }
         end
 
         private
@@ -31,12 +34,18 @@ module BK
           [
             {
               'github_commit_status' => {
-                'context' => params[:context],
-                'description' => params[:description],
-                'status' => params[:status],
-                'target_url' => params[:target_url]
+                'context' => params[:context]
               }
             }
+          ]
+        end
+
+        # Command step to update commit status correctly
+        def generate_github_status_command(params)
+          [
+            "buildkite-agent meta-data set github_commit_status_description '#{params[:description]}'",
+            "buildkite-agent meta-data set github_commit_status_status '#{params[:status]}'",
+            "buildkite-agent meta-data set github_commit_status_target_url '#{params[:target_url]}'"
           ]
         end
 
