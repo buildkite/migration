@@ -3,6 +3,7 @@ steps:
 - commands:
   - "# No need for cloning, the agent takes care of that"
   - "./build-app.sh"
+  - "# Only the status_identifier option is supported for github status translation"
   label: build
   key: build
   notify:
@@ -10,10 +11,7 @@ steps:
       context: custom-status
 - commands:
   - "# No need for cloning, the agent takes care of that"
-  - "# Warning: The 'auth_token' option is not supported in Buildkite and will be
-    ignored."
-  - "# Warning: The 'api_base_url' option is not supported in Buildkite and will be
-    ignored."
+  - "# Only the status_identifier option is supported for github status translation"
   label: test
   key: test
   notify:
