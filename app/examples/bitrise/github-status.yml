@@ -1,0 +1,29 @@
+format_version: 11
+default_step_lib_source: https://github.com/example/example-bitrise.git
+project_type: ios
+
+workflows:
+  build:
+    steps:
+    - git-clone@8.2.2:
+        inputs:
+        - clone_into_dir: /tmp/bitrise-ex/
+        - repository_url: git@github.com:example/example-repository.git
+    - script@1.1.5:
+        inputs:
+        - content: ./build-app.sh
+    - github-status@3.0.1:
+        inputs:
+        - status_identifier: custom-status
+  
+  test:
+    steps:
+    - git-clone@8.2.2:
+        inputs:
+        - clone_into_dir: /tmp/bitrise-ex/
+        - repository_url: git@github.com:example/example-repository.git
+    - github-status@3.0.1:
+        inputs:
+        - auth_token: $GITHUB_TOKEN
+        - api_base_url: https://api.github.com
+

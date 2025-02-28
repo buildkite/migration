@@ -10,13 +10,13 @@ module BK
     # basic command step
     class CommandStep < BaseStep
       attr_accessor :agents, :artifact_paths, :branches, :concurrency, :concurrency_group,
-                    :conditional, :depends_on, :env, :key, :label, :matrix,
+                    :conditional, :depends_on, :env, :key, :label, :matrix, :notify,
                     :parallelism, :plugins, :soft_fail, :timeout_in_minutes
 
       attr_reader :commands # we define special writers
 
       def list_attributes
-        %w[artifact_paths commands depends_on plugins].freeze
+        %w[artifact_paths commands depends_on notify plugins].freeze
       end
 
       def hash_attributes

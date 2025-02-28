@@ -1,0 +1,19 @@
+---
+steps:
+- commands:
+  - "# No need for cloning, the agent takes care of that"
+  - "./build-app.sh"
+  - "# Only the status_identifier option is supported for github status translation"
+  label: build
+  key: build
+  notify:
+  - github_commit_status:
+      context: custom-status
+- commands:
+  - "# No need for cloning, the agent takes care of that"
+  - "# Only the status_identifier option is supported for github status translation"
+  label: test
+  key: test
+  notify:
+  - github_commit_status:
+      context: continuous-integration/buildkite
