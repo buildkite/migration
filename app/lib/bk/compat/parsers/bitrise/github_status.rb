@@ -6,63 +6,32 @@ module BK
       # Handles the translation of github-status
       class Translator
         def translate_github_status(inputs)
-          raise 'Invalid github-status step configuration!' unless required_github_status_inputs(inputs)
+          context = inputs['context'] || inputs['status_identifier'] || 'continuous-integration/buildkite'
+          warnings = generate_warnings_for_unsupported_options(inputs.keys)
 
-          params = extract_github_status_params(inputs)
-          {
-            'notify' => generate_github_status_notify(params),
-            'commands' => generate_github_status_command(params)
+          github_status = {
+            'context' => context
           }
+
+          step = BK::Compat::CommandStep.new
+
+          step.notify = [{ 'github_commit_status' => github_status }]
+          step.add_commands(warnings) unless warnings.empty?
+
+          step
         end
 
         private
 
-        def extract_github_status_params(inputs)
-          {
-            context: inputs['context'] || 'default',
-            description: inputs['description'] || '',
-            status: determine_status(
-              inputs['set_specific_status'],
-              inputs['build_status'],
-              inputs['pipeline_build_status']
-            ),
-            target_url: inputs['pipeline_build_url'] || inputs['build_url'] || '${BUILDKITE_BUILD_URL}'
-          }
-        end
+        def generate_warnings_for_unsupported_options(input_keys)
+          supported_options = ['status_identifier']
+          warnings = []
+          input_keys.each do |key|
+            next if supported_options.include?(key)
 
-        def generate_github_status_notify(params)
-          [
-            {
-              'github_commit_status' => {
-                'context' => params[:context]
-              }
-            }
-          ]
-        end
-
-        # Command step to update commit status correctly
-        def generate_github_status_command(params)
-          [
-            "buildkite-agent meta-data set github_commit_status_description '#{params[:description]}'",
-            "buildkite-agent meta-data set github_commit_status_status '#{params[:status]}'",
-            "buildkite-agent meta-data set github_commit_status_target_url '#{params[:target_url]}'"
-          ]
-        end
-
-        def determine_status(set_specific_status, build_status = nil, pipeline_build_status = nil)
-          return set_specific_status unless set_specific_status == 'auto'
-
-          pipeline_success = pipeline_build_status.nil? || pipeline_build_status == 'passed'
-
-          if pipeline_success && build_status == '0'
-            'success'
-          else
-            'failure'
+            warnings << "# Warning: The '#{key}' option is not supported in Buildkite and will be ignored."
           end
-        end
-
-        def required_github_status_inputs(inputs)
-          %w[context description set_specific_status].all? { |key| inputs.include?(key) }
+          warnings
         end
       end
     end

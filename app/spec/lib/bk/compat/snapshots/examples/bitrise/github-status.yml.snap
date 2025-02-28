@@ -3,62 +3,19 @@ steps:
 - commands:
   - "# No need for cloning, the agent takes care of that"
   - "./build-app.sh"
-  - notify
-  - github_commit_status:
-      context: ci/bitrise/build
-  - commands
-  - buildkite-agent meta-data set github_commit_status_description 'Build completed
-    successfully'
-  - buildkite-agent meta-data set github_commit_status_status 'success'
-  - buildkite-agent meta-data set github_commit_status_target_url '$BITRISE_BUILD_URL'
   label: build
   key: build
+  notify:
+  - github_commit_status:
+      context: custom-status
 - commands:
   - "# No need for cloning, the agent takes care of that"
-  - notify
-  - github_commit_status:
-      context: ci/bitrise/test
-  - commands
-  - buildkite-agent meta-data set github_commit_status_description 'Tests are running'
-  - buildkite-agent meta-data set github_commit_status_status 'pending'
-  - buildkite-agent meta-data set github_commit_status_target_url '$BITRISE_BUILD_URL'
-  - "./test.sh"
-  - notify
-  - github_commit_status:
-      context: ci/bitrise/test
-  - commands
-  - buildkite-agent meta-data set github_commit_status_description 'Test run completed'
-  - buildkite-agent meta-data set github_commit_status_status 'failure'
-  - buildkite-agent meta-data set github_commit_status_target_url '$BITRISE_BUILD_URL'
+  - "# Warning: The 'auth_token' option is not supported in Buildkite and will be
+    ignored."
+  - "# Warning: The 'api_base_url' option is not supported in Buildkite and will be
+    ignored."
   label: test
   key: test
-- commands:
-  - notify
+  notify:
   - github_commit_status:
-      context: ci/bitrise/deployment
-  - commands
-  - buildkite-agent meta-data set github_commit_status_description 'Deployment in
-    progress'
-  - buildkite-agent meta-data set github_commit_status_status 'pending'
-  - buildkite-agent meta-data set github_commit_status_target_url '${BUILDKITE_BUILD_URL}'
-  - "./deploy-app.sh"
-  - notify
-  - github_commit_status:
-      context: ci/bitrise/deployment
-  - commands
-  - buildkite-agent meta-data set github_commit_status_description 'Deployment finished'
-  - buildkite-agent meta-data set github_commit_status_status 'failure'
-  - buildkite-agent meta-data set github_commit_status_target_url 'https://example.com/release/$BITRISE_BUILD_NUMBER'
-  label: deploy
-  key: deploy
-- commands:
-  - notify
-  - github_commit_status:
-      context: ci/custom/validation
-  - commands
-  - buildkite-agent meta-data set github_commit_status_description 'Internal validation
-    failed'
-  - buildkite-agent meta-data set github_commit_status_status 'error'
-  - buildkite-agent meta-data set github_commit_status_target_url '${BUILDKITE_BUILD_URL}'
-  label: custom-endpoint
-  key: custom-endpoint
+      context: continuous-integration/buildkite

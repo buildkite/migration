@@ -14,14 +14,7 @@ workflows:
         - content: ./build-app.sh
     - github-status@3.0.1:
         inputs:
-        - auth_token: $GITHUB_TOKEN
-        - api_base_url: https://api.github.com
-        - repository_url: $GIT_REPOSITORY_URL
-        - commit_hash: $BITRISE_GIT_COMMIT
-        - set_specific_status: success
-        - context: ci/bitrise/build
-        - description: "Build completed successfully"
-        - build_url: $BITRISE_BUILD_URL
+        - status_identifier: custom-status
   
   test:
     steps:
@@ -33,60 +26,4 @@ workflows:
         inputs:
         - auth_token: $GITHUB_TOKEN
         - api_base_url: https://api.github.com
-        - repository_url: $GIT_REPOSITORY_URL
-        - commit_hash: $BITRISE_GIT_COMMIT
-        - set_specific_status: pending
-        - context: ci/bitrise/test
-        - description: "Tests are running"
-        - pipeline_build_url: $BITRISE_BUILD_URL
-    - script@1.1.5:
-        inputs:
-        - content: ./test.sh
-    - github-status@3.0.1:
-        inputs:
-        - auth_token: $GITHUB_TOKEN
-        - api_base_url: https://api.github.com
-        - repository_url: $GIT_REPOSITORY_URL
-        - commit_hash: $BITRISE_GIT_COMMIT
-        - set_specific_status: auto
-        - context: ci/bitrise/test
-        - description: "Test run completed"
-        - build_url: $BITRISE_BUILD_URL
-  
-  deploy:
-    steps:
-    - github-status@3.0.1:
-        inputs:
-        - auth_token: $GITHUB_TOKEN
-        - api_base_url: https://api.github.com
-        - repository_url: $GIT_REPOSITORY_URL
-        - commit_hash: $BITRISE_GIT_COMMIT
-        - set_specific_status: pending
-        - context: ci/bitrise/deployment
-        - description: "Deployment in progress"
-    - script@1.1.5:
-        inputs:
-        - content: ./deploy-app.sh
-    - github-status@3.0.1:
-        title: Update GitHub deployment status
-        inputs:
-        - auth_token: $GITHUB_TOKEN
-        - api_base_url: https://api.github.com
-        - repository_url: $GIT_REPOSITORY_URL
-        - commit_hash: $BITRISE_GIT_COMMIT
-        - set_specific_status: auto
-        - context: ci/bitrise/deployment
-        - description: "Deployment finished"
-        - build_url: https://example.com/release/$BITRISE_BUILD_NUMBER
-  
-  custom-endpoint:
-    steps:
-    - github-status@3.0.1:
-        inputs:
-        - auth_token: $GITHUB_TOKEN
-        - api_base_url: https://github.company.com/api/v3
-        - repository_url: git@github.company.com:example/internal-repo.git
-        - commit_hash: $BITRISE_GIT_COMMIT
-        - set_specific_status: error
-        - context: ci/custom/validation
-        - description: "Internal validation failed"
+
