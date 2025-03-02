@@ -1,0 +1,55 @@
+format_version: 11
+default_step_lib_source: https://github.com/bitrise-steplib/steps-github-release.git
+project_type: ios
+
+workflows:
+  build:
+    steps:
+    - git-clone@8.2.2:
+        inputs:
+        - clone_into_dir: /tmp/bitrise-ex/
+        - repository_url: git@github.com:example/example-repository.git
+    - script@1.1.5:
+        inputs:
+        - content: ./build-app.sh
+    - github-release@3.0.1:
+        inputs:
+        - api_token: $GITHUB_TOKEN
+        - username: example
+        - repository_url: git@github.com:example/example-repository.git
+        - tag: v1.0.0
+        - commit: $BITRISE_GIT_COMMIT
+        - name: Release v1.0.0
+        - body: This is the release body.
+        - draft: no
+        - pre_release: no
+        - files_to_upload: |
+            /tmp/bitrise-ex/artifacts/app-debug.apk|app-debug.apk
+            /tmp/bitrise-ex/artifacts/app-debug-androidTest.apk|app-debug-androidTest.apk
+        - api_base_url: https://api.github.com
+        - upload_base_url: https://uploads.github.com
+        - generate_release_notes: no
+
+  test:
+    steps:
+    - git-clone@8.2.2:
+        inputs:
+        - clone_into_dir: /tmp/bitrise-ex/
+        - repository_url: git@github.com:example/example-repository.git
+    - github-release@3.0.1:
+        inputs:
+        - api_token: $GITHUB_TOKEN
+        - username: example
+        - repository_url: git@github.com:example/example-repository.git
+        - tag: v1.0.0
+        - commit: $BITRISE_GIT_COMMIT
+        - name: Release v1.0.0
+        - body: This is the release body.
+        - draft: no
+        - pre_release: no
+        - files_to_upload: |
+            /tmp/bitrise-ex/artifacts/app-debug.apk|app-debug.apk
+            /tmp/bitrise-ex/artifacts/app-debug-androidTest.apk|app-debug-androidTest.apk
+        - api_base_url: https://api.github.com
+        - upload_base_url: https://uploads.github.com
+        - generate_release_notes: no
