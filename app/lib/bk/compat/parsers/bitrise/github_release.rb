@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'uri'
+
 module BK
   module Compat
     module BitriseSteps
@@ -9,9 +11,11 @@ module BK
           raise 'Invalid github-release step configuration!' unless validate_required_params(inputs)
 
           release_config = extract_release_config(inputs)
-          owner, repo_name = parse_repo(release_config[:repository_url])
+          repo_path = parse_repo(release_config['repository_url'])
 
-          commands = build_commands(release_config, owner, repo_name)
+          commands = []
+          add_upload_commands(commands, release_config, repo_path) if release_config['files_to_upload']
+
           BK::Compat::CommandStep.new(commands: commands)
         end
 
@@ -22,59 +26,47 @@ module BK
         end
 
         def extract_release_config(inputs)
-          {
-            api_token: inputs['api_token'],
-            commit: inputs['commit'],
-            name: inputs['name'],
-            repository_url: inputs['repository_url'],
-            tag: inputs['tag'],
-            body: inputs['body'] || '',
-            draft: inputs['draft'] || 'yes',
-            pre_release: inputs['pre_release'] || 'no',
-            files_to_upload: inputs['files_to_upload'],
-            api_base_url: inputs['api_base_url'] || 'https://api.github.com',
-            upload_base_url: inputs['upload_base_url'] || 'https://uploads.github.com',
-            generate_release_notes: inputs['generate_release_notes'] || 'no'
+          defaults = {
+            'body' => '',
+            'draft' => 'yes',
+            'pre_release' => 'no',
+            'api_base_url' => 'https://api.github.com',
+            'upload_base_url' => 'https://uploads.github.com',
+            'generate_release_notes' => 'no'
           }
+
+          defaults.merge(inputs)
         end
 
         def parse_repo(url)
-          url.chomp!('.git')
+          url = url.chomp('.git')
 
-          case url
-          when %r{^https://}, /^git@/, %r{^ssh://}
-            url = url.sub(%r{^(https://|git@|ssh://)}, '')
-            _, repo = url.split(%r{[:/]}, 2)
-          end
+          # URI.parse does not handle SSH-style URLs
+          path = if url.start_with?('git@')
+                   url.split(':', 2)[1]
+                 else
+                   URI.parse(url).path
+                 end
 
-          owner, repo_name = repo&.split('/') || []
-          raise 'Invalid repository URL!' if owner.nil? || repo_name.nil?
+          path_parts = path.split('/').reject(&:empty?)
+          raise 'Invalid repository URL!' if path_parts.size < 2
 
-          [owner, repo_name]
+          "#{path_parts[-2]}/#{path_parts[-1]}"
         end
 
-        def build_commands(config, owner, repo_name)
-          commands = []
-          commands << "git clone #{config[:repository_url]} /tmp/bitrise-ex"
-          commands << './build-app.sh'
-
-          add_upload_commands(commands, config, owner, repo_name) if config[:files_to_upload]
-
-          commands
-        end
-
-        def add_upload_commands(commands, config, owner, repo_name)
-          config[:files_to_upload].split("\n").each do |file|
+        def add_upload_commands(commands, config, repo_path)
+          commands << '# SECURITY NOTE: Storing API token in environment variable'
+          commands << "export GITHUB_API_TOKEN='#{config['api_token']}'"
+          config['files_to_upload'].split("\n").each do |file|
             file_path, file_name = file.split('|')
-            file_name ||= File.basename(file_path)
+            file_name ||= "$(basename #{file_path})"
 
             upload_config = {
-              api_token: config[:api_token],
-              owner: owner,
-              repo: repo_name,
+              api_token: config['api_token'],
+              repo_path: repo_path,
               file_path: file_path,
               file_name: file_name,
-              upload_base_url: config[:upload_base_url]
+              upload_base_url: config['upload_base_url']
             }
 
             commands << build_upload_asset_command(upload_config)
@@ -84,11 +76,11 @@ module BK
         def build_upload_asset_command(upload_config)
           <<~CMD.strip
             curl -X POST \\
-            -H "Authorization: token #{upload_config[:api_token]}" \\
+            -H "Authorization: token $GITHUB_API_TOKEN" \\
             -H "Accept: application/vnd.github.v3+json" \\
             -H "Content-Type: application/octet-stream" \\
             --data-binary @#{upload_config[:file_path]} \\
-            #{upload_config[:upload_base_url]}/repos/#{upload_config[:owner]}/#{upload_config[:repo]}/releases/assets?name=#{upload_config[:file_name]}
+            #{upload_config[:upload_base_url]}/repos/#{upload_config[:repo_path]}/releases/assets?name=#{upload_config[:file_name]}
           CMD
         end
       end
