@@ -45,11 +45,8 @@ module BK
             url = url.sub(':', '/')
             url = "ssh://#{url}"
           end
-          path = URI.parse(url).path
-          path_parts = path.split('/').reject(&:empty?)
-          raise 'Invalid repository URL!' if path_parts.size < 2
-
-          "#{path_parts[-2]}/#{path_parts[-1]}"
+          uri = URI.parse(url)
+          uri.path
         end
 
         def add_upload_commands(commands, config, repo_path)
@@ -78,7 +75,7 @@ module BK
             -H "Accept: application/vnd.github.v3+json" \\
             -H "Content-Type: application/octet-stream" \\
             --data-binary @#{upload_config[:file_path]} \\
-            #{upload_config[:upload_base_url]}/repos/#{upload_config[:repo_path]}/releases/assets?name=#{upload_config[:file_name]}
+            "#{upload_config[:upload_base_url]}/repos/#{upload_config[:repo_path]}/releases/assets?name=#{upload_config[:file_name]}"
           CMD
         end
       end
