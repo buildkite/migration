@@ -3,7 +3,7 @@ default_step_lib_source: https://github.com/bitrise-steplib/steps-github-release
 project_type: ios
 
 workflows:
-  build:
+  test-ssh:
     steps:
     - git-clone@8.2.2:
         inputs:
@@ -24,28 +24,28 @@ workflows:
         - draft: no
         - pre_release: no
         - files_to_upload: |
-            /tmp/bitrise-ex/artifacts/app-debug.apk|app-debug.apk
-            /tmp/bitrise-ex/artifacts/app-debug-androidTest.apk|app-debug-androidTest.apk
             /tmp/bitrise-ex/artifacts/no-alt-filename.apk
+            /tmp/bitrise-ex/artifacts/alt-filename.apk|alt-filename.apk
+            /tmp/bitrise-ex/artifacts/alt-filename.apk|alt-different-filename.apk
             /tmp/bitrise-ex/artifacts/${APP_NAME}-debug.apk
-            /tmp/bitrise-ex/artifacts/${APP_NAME}-debug-androidTest.apk
-            /tmp/bitrise-ex/artifacts/app-debug.apk|${APP_NAME}-debug.apk
-            /tmp/bitrise-ex/artifacts/app-debug-androidTest.apk|${APP_NAME}-debug-androidTest.apk
+            /tmp/bitrise-ex/artifacts/alt-filename-${APP_NAME}.apk|alt-filename-${APP_NAME}.apk
+            /tmp/${SUB_PATH}/artifacts/${APP_NAME}-debug.apk|${APP_NAME}-debug.apk
+            ${PATH}/${APP_NAME}-debug.apk|${APP_NAME}-debug.apk
         - api_base_url: https://api.github.com
         - upload_base_url: https://uploads.github.com
         - generate_release_notes: no
 
-  test:
+  test-git:
     steps:
     - git-clone@8.2.2:
         inputs:
         - clone_into_dir: /tmp/bitrise-ex/
-        - repository_url: git@github.com:example/example-repository.git
+        - repository_url: git://github.com/username/repo.git
     - github-release@3.0.1:
         inputs:
         - api_token: $GITHUB_TOKEN
         - username: example
-        - repository_url: git@github.com:example/example-repository.git
+        - repository_url: git://github.com/username/repo.git
         - tag: v1.0.0
         - commit: $BITRISE_GIT_COMMIT
         - name: Release v1.0.0
@@ -53,13 +53,41 @@ workflows:
         - draft: no
         - pre_release: no
         - files_to_upload: |
-            /tmp/bitrise-ex/artifacts/app-debug.apk|app-debug.apk
-            /tmp/bitrise-ex/artifacts/app-debug-androidTest.apk|app-debug-androidTest.apk
             /tmp/bitrise-ex/artifacts/no-alt-filename.apk
+            /tmp/bitrise-ex/artifacts/alt-filename.apk|alt-filename.apk
+            /tmp/bitrise-ex/artifacts/alt-filename.apk|alt-different-filename.apk
             /tmp/bitrise-ex/artifacts/${APP_NAME}-debug.apk
-            /tmp/bitrise-ex/artifacts/${APP_NAME}-debug-androidTest.apk
-            /tmp/bitrise-ex/artifacts/app-debug.apk|${APP_NAME}-debug.apk
-            /tmp/bitrise-ex/artifacts/app-debug-androidTest.apk|${APP_NAME}-debug-androidTest.apk
+            /tmp/bitrise-ex/artifacts/alt-filename-${APP_NAME}.apk|alt-filename-${APP_NAME}.apk
+            /tmp/${SUB_PATH}/artifacts/${APP_NAME}-debug.apk|${APP_NAME}-debug.apk
+            ${PATH}/${APP_NAME}-debug.apk|${APP_NAME}-debug.apk
+        - api_base_url: https://api.github.com
+        - upload_base_url: https://uploads.github.com
+        - generate_release_notes: no
+  test-https:
+    steps:
+    - git-clone@8.2.2:
+        inputs:
+        - clone_into_dir: /tmp/bitrise-ex/
+        - repository_url: https://github.com/username/repo.git
+    - github-release@3.0.1:
+        inputs:
+        - api_token: $GITHUB_TOKEN
+        - username: example
+        - repository_url: https://github.com/username/repo.git
+        - tag: v1.0.0
+        - commit: $BITRISE_GIT_COMMIT
+        - name: Release v1.0.0
+        - body: This is the release body.
+        - draft: no
+        - pre_release: no
+        - files_to_upload: |
+            /tmp/bitrise-ex/artifacts/no-alt-filename.apk
+            /tmp/bitrise-ex/artifacts/alt-filename.apk|alt-filename.apk
+            /tmp/bitrise-ex/artifacts/alt-filename.apk|alt-different-filename.apk
+            /tmp/bitrise-ex/artifacts/${APP_NAME}-debug.apk
+            /tmp/bitrise-ex/artifacts/alt-filename-${APP_NAME}.apk|alt-filename-${APP_NAME}.apk
+            /tmp/${SUB_PATH}/artifacts/${APP_NAME}-debug.apk|${APP_NAME}-debug.apk
+            ${PATH}/${APP_NAME}-debug.apk|${APP_NAME}-debug.apk
         - api_base_url: https://api.github.com
         - upload_base_url: https://uploads.github.com
         - generate_release_notes: no

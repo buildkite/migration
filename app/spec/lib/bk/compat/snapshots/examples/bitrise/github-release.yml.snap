@@ -10,52 +10,52 @@ steps:
     -H "Authorization: token $GITHUB_API_TOKEN" \
     -H "Accept: application/vnd.github.v3+json" \
     -H "Content-Type: application/octet-stream" \
-    --data-binary @/tmp/bitrise-ex/artifacts/app-debug.apk \
-    https://uploads.github.com/repos/["example", "example-repository"]/releases/assets?name=app-debug.apk
-  - |-
-    curl -X POST \
-    -H "Authorization: token $GITHUB_API_TOKEN" \
-    -H "Accept: application/vnd.github.v3+json" \
-    -H "Content-Type: application/octet-stream" \
-    --data-binary @/tmp/bitrise-ex/artifacts/app-debug-androidTest.apk \
-    https://uploads.github.com/repos/["example", "example-repository"]/releases/assets?name=app-debug-androidTest.apk
-  - |-
-    curl -X POST \
-    -H "Authorization: token $GITHUB_API_TOKEN" \
-    -H "Accept: application/vnd.github.v3+json" \
-    -H "Content-Type: application/octet-stream" \
     --data-binary @/tmp/bitrise-ex/artifacts/no-alt-filename.apk \
-    https://uploads.github.com/repos/["example", "example-repository"]/releases/assets?name=$(basename /tmp/bitrise-ex/artifacts/no-alt-filename.apk)
+    https://uploads.github.com/repos/example/example-repository/releases/assets?name=$(basename /tmp/bitrise-ex/artifacts/no-alt-filename.apk)
+  - |-
+    curl -X POST \
+    -H "Authorization: token $GITHUB_API_TOKEN" \
+    -H "Accept: application/vnd.github.v3+json" \
+    -H "Content-Type: application/octet-stream" \
+    --data-binary @/tmp/bitrise-ex/artifacts/alt-filename.apk \
+    https://uploads.github.com/repos/example/example-repository/releases/assets?name=alt-filename.apk
+  - |-
+    curl -X POST \
+    -H "Authorization: token $GITHUB_API_TOKEN" \
+    -H "Accept: application/vnd.github.v3+json" \
+    -H "Content-Type: application/octet-stream" \
+    --data-binary @/tmp/bitrise-ex/artifacts/alt-filename.apk \
+    https://uploads.github.com/repos/example/example-repository/releases/assets?name=alt-different-filename.apk
   - |-
     curl -X POST \
     -H "Authorization: token $GITHUB_API_TOKEN" \
     -H "Accept: application/vnd.github.v3+json" \
     -H "Content-Type: application/octet-stream" \
     --data-binary @/tmp/bitrise-ex/artifacts/${APP_NAME}-debug.apk \
-    https://uploads.github.com/repos/["example", "example-repository"]/releases/assets?name=$(basename /tmp/bitrise-ex/artifacts/${APP_NAME}-debug.apk)
+    https://uploads.github.com/repos/example/example-repository/releases/assets?name=$(basename /tmp/bitrise-ex/artifacts/${APP_NAME}-debug.apk)
   - |-
     curl -X POST \
     -H "Authorization: token $GITHUB_API_TOKEN" \
     -H "Accept: application/vnd.github.v3+json" \
     -H "Content-Type: application/octet-stream" \
-    --data-binary @/tmp/bitrise-ex/artifacts/${APP_NAME}-debug-androidTest.apk \
-    https://uploads.github.com/repos/["example", "example-repository"]/releases/assets?name=$(basename /tmp/bitrise-ex/artifacts/${APP_NAME}-debug-androidTest.apk)
+    --data-binary @/tmp/bitrise-ex/artifacts/alt-filename-${APP_NAME}.apk \
+    https://uploads.github.com/repos/example/example-repository/releases/assets?name=alt-filename-${APP_NAME}.apk
   - |-
     curl -X POST \
     -H "Authorization: token $GITHUB_API_TOKEN" \
     -H "Accept: application/vnd.github.v3+json" \
     -H "Content-Type: application/octet-stream" \
-    --data-binary @/tmp/bitrise-ex/artifacts/app-debug.apk \
-    https://uploads.github.com/repos/["example", "example-repository"]/releases/assets?name=${APP_NAME}-debug.apk
+    --data-binary @/tmp/${SUB_PATH}/artifacts/${APP_NAME}-debug.apk \
+    https://uploads.github.com/repos/example/example-repository/releases/assets?name=${APP_NAME}-debug.apk
   - |-
     curl -X POST \
     -H "Authorization: token $GITHUB_API_TOKEN" \
     -H "Accept: application/vnd.github.v3+json" \
     -H "Content-Type: application/octet-stream" \
-    --data-binary @/tmp/bitrise-ex/artifacts/app-debug-androidTest.apk \
-    https://uploads.github.com/repos/["example", "example-repository"]/releases/assets?name=${APP_NAME}-debug-androidTest.apk
-  label: build
-  key: build
+    --data-binary @${PATH}/${APP_NAME}-debug.apk \
+    https://uploads.github.com/repos/example/example-repository/releases/assets?name=${APP_NAME}-debug.apk
+  label: test-ssh
+  key: test-ssh
 - commands:
   - "# No need for cloning, the agent takes care of that"
   - "# SECURITY NOTE: Storing API token in environment variable"
@@ -65,49 +65,104 @@ steps:
     -H "Authorization: token $GITHUB_API_TOKEN" \
     -H "Accept: application/vnd.github.v3+json" \
     -H "Content-Type: application/octet-stream" \
-    --data-binary @/tmp/bitrise-ex/artifacts/app-debug.apk \
-    https://uploads.github.com/repos/["example", "example-repository"]/releases/assets?name=app-debug.apk
-  - |-
-    curl -X POST \
-    -H "Authorization: token $GITHUB_API_TOKEN" \
-    -H "Accept: application/vnd.github.v3+json" \
-    -H "Content-Type: application/octet-stream" \
-    --data-binary @/tmp/bitrise-ex/artifacts/app-debug-androidTest.apk \
-    https://uploads.github.com/repos/["example", "example-repository"]/releases/assets?name=app-debug-androidTest.apk
-  - |-
-    curl -X POST \
-    -H "Authorization: token $GITHUB_API_TOKEN" \
-    -H "Accept: application/vnd.github.v3+json" \
-    -H "Content-Type: application/octet-stream" \
     --data-binary @/tmp/bitrise-ex/artifacts/no-alt-filename.apk \
-    https://uploads.github.com/repos/["example", "example-repository"]/releases/assets?name=$(basename /tmp/bitrise-ex/artifacts/no-alt-filename.apk)
+    https://uploads.github.com/repos/username/repo/releases/assets?name=$(basename /tmp/bitrise-ex/artifacts/no-alt-filename.apk)
+  - |-
+    curl -X POST \
+    -H "Authorization: token $GITHUB_API_TOKEN" \
+    -H "Accept: application/vnd.github.v3+json" \
+    -H "Content-Type: application/octet-stream" \
+    --data-binary @/tmp/bitrise-ex/artifacts/alt-filename.apk \
+    https://uploads.github.com/repos/username/repo/releases/assets?name=alt-filename.apk
+  - |-
+    curl -X POST \
+    -H "Authorization: token $GITHUB_API_TOKEN" \
+    -H "Accept: application/vnd.github.v3+json" \
+    -H "Content-Type: application/octet-stream" \
+    --data-binary @/tmp/bitrise-ex/artifacts/alt-filename.apk \
+    https://uploads.github.com/repos/username/repo/releases/assets?name=alt-different-filename.apk
   - |-
     curl -X POST \
     -H "Authorization: token $GITHUB_API_TOKEN" \
     -H "Accept: application/vnd.github.v3+json" \
     -H "Content-Type: application/octet-stream" \
     --data-binary @/tmp/bitrise-ex/artifacts/${APP_NAME}-debug.apk \
-    https://uploads.github.com/repos/["example", "example-repository"]/releases/assets?name=$(basename /tmp/bitrise-ex/artifacts/${APP_NAME}-debug.apk)
+    https://uploads.github.com/repos/username/repo/releases/assets?name=$(basename /tmp/bitrise-ex/artifacts/${APP_NAME}-debug.apk)
   - |-
     curl -X POST \
     -H "Authorization: token $GITHUB_API_TOKEN" \
     -H "Accept: application/vnd.github.v3+json" \
     -H "Content-Type: application/octet-stream" \
-    --data-binary @/tmp/bitrise-ex/artifacts/${APP_NAME}-debug-androidTest.apk \
-    https://uploads.github.com/repos/["example", "example-repository"]/releases/assets?name=$(basename /tmp/bitrise-ex/artifacts/${APP_NAME}-debug-androidTest.apk)
+    --data-binary @/tmp/bitrise-ex/artifacts/alt-filename-${APP_NAME}.apk \
+    https://uploads.github.com/repos/username/repo/releases/assets?name=alt-filename-${APP_NAME}.apk
   - |-
     curl -X POST \
     -H "Authorization: token $GITHUB_API_TOKEN" \
     -H "Accept: application/vnd.github.v3+json" \
     -H "Content-Type: application/octet-stream" \
-    --data-binary @/tmp/bitrise-ex/artifacts/app-debug.apk \
-    https://uploads.github.com/repos/["example", "example-repository"]/releases/assets?name=${APP_NAME}-debug.apk
+    --data-binary @/tmp/${SUB_PATH}/artifacts/${APP_NAME}-debug.apk \
+    https://uploads.github.com/repos/username/repo/releases/assets?name=${APP_NAME}-debug.apk
   - |-
     curl -X POST \
     -H "Authorization: token $GITHUB_API_TOKEN" \
     -H "Accept: application/vnd.github.v3+json" \
     -H "Content-Type: application/octet-stream" \
-    --data-binary @/tmp/bitrise-ex/artifacts/app-debug-androidTest.apk \
-    https://uploads.github.com/repos/["example", "example-repository"]/releases/assets?name=${APP_NAME}-debug-androidTest.apk
-  label: test
-  key: test
+    --data-binary @${PATH}/${APP_NAME}-debug.apk \
+    https://uploads.github.com/repos/username/repo/releases/assets?name=${APP_NAME}-debug.apk
+  label: test-git
+  key: test-git
+- commands:
+  - "# No need for cloning, the agent takes care of that"
+  - "# SECURITY NOTE: Storing API token in environment variable"
+  - export GITHUB_API_TOKEN='$GITHUB_TOKEN'
+  - |-
+    curl -X POST \
+    -H "Authorization: token $GITHUB_API_TOKEN" \
+    -H "Accept: application/vnd.github.v3+json" \
+    -H "Content-Type: application/octet-stream" \
+    --data-binary @/tmp/bitrise-ex/artifacts/no-alt-filename.apk \
+    https://uploads.github.com/repos/username/repo/releases/assets?name=$(basename /tmp/bitrise-ex/artifacts/no-alt-filename.apk)
+  - |-
+    curl -X POST \
+    -H "Authorization: token $GITHUB_API_TOKEN" \
+    -H "Accept: application/vnd.github.v3+json" \
+    -H "Content-Type: application/octet-stream" \
+    --data-binary @/tmp/bitrise-ex/artifacts/alt-filename.apk \
+    https://uploads.github.com/repos/username/repo/releases/assets?name=alt-filename.apk
+  - |-
+    curl -X POST \
+    -H "Authorization: token $GITHUB_API_TOKEN" \
+    -H "Accept: application/vnd.github.v3+json" \
+    -H "Content-Type: application/octet-stream" \
+    --data-binary @/tmp/bitrise-ex/artifacts/alt-filename.apk \
+    https://uploads.github.com/repos/username/repo/releases/assets?name=alt-different-filename.apk
+  - |-
+    curl -X POST \
+    -H "Authorization: token $GITHUB_API_TOKEN" \
+    -H "Accept: application/vnd.github.v3+json" \
+    -H "Content-Type: application/octet-stream" \
+    --data-binary @/tmp/bitrise-ex/artifacts/${APP_NAME}-debug.apk \
+    https://uploads.github.com/repos/username/repo/releases/assets?name=$(basename /tmp/bitrise-ex/artifacts/${APP_NAME}-debug.apk)
+  - |-
+    curl -X POST \
+    -H "Authorization: token $GITHUB_API_TOKEN" \
+    -H "Accept: application/vnd.github.v3+json" \
+    -H "Content-Type: application/octet-stream" \
+    --data-binary @/tmp/bitrise-ex/artifacts/alt-filename-${APP_NAME}.apk \
+    https://uploads.github.com/repos/username/repo/releases/assets?name=alt-filename-${APP_NAME}.apk
+  - |-
+    curl -X POST \
+    -H "Authorization: token $GITHUB_API_TOKEN" \
+    -H "Accept: application/vnd.github.v3+json" \
+    -H "Content-Type: application/octet-stream" \
+    --data-binary @/tmp/${SUB_PATH}/artifacts/${APP_NAME}-debug.apk \
+    https://uploads.github.com/repos/username/repo/releases/assets?name=${APP_NAME}-debug.apk
+  - |-
+    curl -X POST \
+    -H "Authorization: token $GITHUB_API_TOKEN" \
+    -H "Accept: application/vnd.github.v3+json" \
+    -H "Content-Type: application/octet-stream" \
+    --data-binary @${PATH}/${APP_NAME}-debug.apk \
+    https://uploads.github.com/repos/username/repo/releases/assets?name=${APP_NAME}-debug.apk
+  label: test-https
+  key: test-https
