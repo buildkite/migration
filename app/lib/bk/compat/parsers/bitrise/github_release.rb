@@ -41,17 +41,18 @@ module BK
         def parse_repo(url)
           url = url.chomp('.git')
 
-          # URI.parse does not handle SSH-style URLs
-          path = if url.start_with?('git@')
-                   url.split(':', 2)[1]
-                 else
-                   URI.parse(url).path
-                 end
+          if url.start_with?('git@')
+            url = url.sub(':', '/')
+            url = "ssh://#{url}"
+          end
 
-          path_parts = path.split('/').reject(&:empty?)
+          uri = URI.parse(url)
+          path_parts = uri.path.split('/').reject(&:empty?)
+
           raise 'Invalid repository URL!' if path_parts.size < 2
 
-          "#{path_parts[-2]}/#{path_parts[-1]}"
+          owner, repo_name = path_parts[-2..]
+          [owner, repo_name]
         end
 
         def add_upload_commands(commands, config, repo_path)

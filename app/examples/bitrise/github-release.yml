@@ -26,6 +26,11 @@ workflows:
         - files_to_upload: |
             /tmp/bitrise-ex/artifacts/app-debug.apk|app-debug.apk
             /tmp/bitrise-ex/artifacts/app-debug-androidTest.apk|app-debug-androidTest.apk
+            /tmp/bitrise-ex/artifacts/no-alt-filename.apk
+            /tmp/bitrise-ex/artifacts/${APP_NAME}-debug.apk
+            /tmp/bitrise-ex/artifacts/${APP_NAME}-debug-androidTest.apk
+            /tmp/bitrise-ex/artifacts/app-debug.apk|${APP_NAME}-debug.apk
+            /tmp/bitrise-ex/artifacts/app-debug-androidTest.apk|${APP_NAME}-debug-androidTest.apk
         - api_base_url: https://api.github.com
         - upload_base_url: https://uploads.github.com
         - generate_release_notes: no
@@ -50,6 +55,11 @@ workflows:
         - files_to_upload: |
             /tmp/bitrise-ex/artifacts/app-debug.apk|app-debug.apk
             /tmp/bitrise-ex/artifacts/app-debug-androidTest.apk|app-debug-androidTest.apk
+            /tmp/bitrise-ex/artifacts/no-alt-filename.apk
+            /tmp/bitrise-ex/artifacts/${APP_NAME}-debug.apk
+            /tmp/bitrise-ex/artifacts/${APP_NAME}-debug-androidTest.apk
+            /tmp/bitrise-ex/artifacts/app-debug.apk|${APP_NAME}-debug.apk
+            /tmp/bitrise-ex/artifacts/app-debug-androidTest.apk|${APP_NAME}-debug-androidTest.apk
         - api_base_url: https://api.github.com
         - upload_base_url: https://uploads.github.com
         - generate_release_notes: no
