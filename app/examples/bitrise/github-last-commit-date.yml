@@ -1,0 +1,15 @@
+format_version: 11
+default_step_lib_source: https://github.com/bitrise-steplib/steps-github-last-commit-date.git
+project_type: ios
+
+workflows:
+  fetch-last-commit-date:
+    steps:
+      - git-clone@8.2.2:
+          inputs:
+          - clone_into_dir: /tmp/bitrise-ex/
+          - repository_url: git@github.com:example/example-repository.git
+      - github-last-commit-date@3.0.1:
+          title: Get Last Commit Date
+          inputs:
+            - repository_url: "https://github.com/bitrise-io/bitrise-steplib.git"

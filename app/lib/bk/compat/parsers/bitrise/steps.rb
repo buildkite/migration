@@ -2,14 +2,26 @@
 
 require_relative 'github_status'
 require_relative 'github_release'
+require_relative 'github_last_commit_date'
+require_relative 'slack'
 
 module BK
   module Compat
     module BitriseSteps
       # Implementation of Bitrise step translations
       class Translator
-        VALID_STEP_TYPES = %w[bundler brew-install change-workdir git-clone github-release github-status git-tag
-                              script].freeze
+        VALID_STEP_TYPES = %w[
+          bundler
+          brew-install
+          change-workdir
+          git-clone
+          github-last-commit-date
+          github-release
+          github-status
+          git-tag
+          script
+          slack
+        ].freeze
 
         def matcher(type, _inputs)
           VALID_STEP_TYPES.include?(type.downcase)

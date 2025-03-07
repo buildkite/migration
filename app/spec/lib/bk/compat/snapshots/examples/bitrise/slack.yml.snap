@@ -1,0 +1,74 @@
+---
+steps:
+- label: primary
+  key: primary
+  notify:
+  - slack:
+      channel: "#deployments"
+      message: 'Build completed with status: $BITRISE_BUILD_STATUS'
+      webhook: "$SLACK_WEBHOOK_URL"
+- label: minimal-notification
+  key: minimal-notification
+  notify:
+  - slack:
+      webhook: "$SLACK_WEBHOOK_URL"
+- label: different-channels
+  key: different-channels
+  notify:
+  - slack:
+      channel: "#general"
+      message: Build $BITRISE_BUILD_NUMBER completed successfully
+      webhook: "$SLACK_WEBHOOK_URL"
+      if: build.state == "passed"
+  - slack:
+      channel: "#alerts"
+      message: Build $BITRISE_BUILD_NUMBER failed
+      webhook: "$SLACK_WEBHOOK_URL"
+      if: build.state == "failed"
+- label: different-webhooks
+  key: different-webhooks
+  notify:
+  - slack:
+      channel: "#builds"
+      message: 'Build status: $BITRISE_BUILD_STATUS'
+      webhook: "$SLACK_WEBHOOK_URL"
+      if: build.state == "passed"
+  - slack:
+      channel: "#builds"
+      message: 'Build status: $BITRISE_BUILD_STATUS'
+      webhook: "$SLACK_WEBHOOK_URL_ALERTS"
+      if: build.state == "failed"
+- label: full-configuration
+  key: full-configuration
+  notify:
+  - slack:
+      channel: "#builds"
+      message: "✅ Build $BITRISE_BUILD_NUMBER succeeded on $BITRISE_GIT_BRANCH"
+      webhook: "$SLACK_WEBHOOK_URL"
+      if: build.state == "passed"
+  - slack:
+      channel: "#alerts"
+      message: "❌ Build $BITRISE_BUILD_NUMBER failed on $BITRISE_GIT_BRANCH"
+      webhook: "$SLACK_WEBHOOK_URL_ALERTS"
+      if: build.state == "failed"
+- label: with-attachments
+  key: with-attachments
+  notify:
+  - slack:
+      channel: "#builds"
+      webhook: "$SLACK_WEBHOOK_URL"
+      if: build.state == "passed"
+  - slack:
+      channel: "#builds"
+      webhook: "$SLACK_WEBHOOK_URL"
+      if: build.state == "failed"
+- commands:
+  - "# Warning: The following options are not supported in Buildkite and will be ignored:
+    unsupported_option, another_unsupported, custom_field"
+  label: with-unsupported-options
+  key: with-unsupported-options
+  notify:
+  - slack:
+      channel: "#builds"
+      message: Build notification
+      webhook: "$SLACK_WEBHOOK_URL"
