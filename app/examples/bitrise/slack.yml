@@ -63,8 +63,8 @@ workflows:
             - webhook_url: $SLACK_WEBHOOK_URL
             - title: "Build Report"
             - title_on_error: "Build Failure Report"
-            - message: "All tests passed successfully."
-            - message_on_error: "Some tests failed. Check the logs for details."
+            - text: "All tests passed successfully."
+            - text_on_error: "Some tests failed. Check the logs for details."
             - color: "good"
             - color_on_error: "danger"
             

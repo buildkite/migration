@@ -25,15 +25,8 @@ module BK
           supported_options = %w[
             channel channel_on_error
             text text_on_error
-            webhook_url webhook_url_on_error
-            emoji emoji_on_error
-            from_username from_username_on_error
-            color color_on_error
-            title title_on_error
-            message message_on_error
           ]
-
-          unsupported = inputs.keys.reject { |key| supported_options.include?(key) }
+          unsupported = inputs.keys.difference(supported_options)
           return nil if unsupported.empty?
 
           '# Warning: The following options are not supported in Buildkite and will be ignored: ' \
@@ -41,19 +34,27 @@ module BK
         end
 
         def build_base_config(inputs)
-          {
-            'channel' => inputs['channel'],
-            'message' => inputs['text'],
-            'webhook' => inputs['webhook_url']
+          config = {
+            'message' => inputs['text']
           }.compact
+
+          # Add channel as an array if it exists
+          config['channels'] = [inputs['channel']] if inputs['channel']
+
+          config
         end
 
-        def build_error_config(inputs, base_config)
-          {
-            'channel' => inputs['channel_on_error'] || base_config['channel'],
-            'message' => inputs['text_on_error'] || base_config['message'],
-            'webhook' => inputs['webhook_url_on_error'] || base_config['webhook']
+        def build_error_config(inputs)
+          config = {
+            'message' => inputs['text_on_error'] || inputs['text']
           }.compact
+
+          # Add channel as an array if it exists, with fallback to regular channel
+          if inputs['channel_on_error'] || inputs['channel']
+            config['channels'] = [inputs['channel_on_error'] || inputs['channel']]
+          end
+
+          config
         end
 
         def create_single_notification(inputs, warnings)
@@ -64,18 +65,19 @@ module BK
         end
 
         def create_dual_notifications(inputs, warnings)
-          base_config = build_base_config(inputs)
-          success_config = base_config.merge('if' => 'build.state == "passed"')
-          error_config = build_error_config(inputs, base_config)
+          # Start with the single notification step
+          step = create_single_notification(inputs, warnings)
+          # Get the notification from the step and add success condition
+          success_config = step.notify.first['slack'].merge('if' => 'build.state == "passed"')
+          # Create the error notification
+          error_config = build_error_config(inputs)
                          .merge('if' => 'build.state == "failed"')
+          step.notify = [
+            { 'slack' => success_config },
+            { 'slack' => error_config }
+          ]
 
-          BK::Compat::CommandStep.new(
-            notify: [
-              { 'slack' => success_config },
-              { 'slack' => error_config }
-            ],
-            commands: warnings.nil? ? nil : [warnings]
-          )
+          step
         end
       end
     end
