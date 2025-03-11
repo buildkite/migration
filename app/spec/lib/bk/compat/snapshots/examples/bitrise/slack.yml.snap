@@ -43,12 +43,6 @@ steps:
       message: 'Build status: $BITRISE_BUILD_STATUS'
       channels:
       - "#builds"
-      if: build.state == "passed"
-  - slack:
-      message: 'Build status: $BITRISE_BUILD_STATUS'
-      channels:
-      - "#builds"
-      if: build.state == "failed"
 - commands:
   - "# Warning: The following options are not supported in Buildkite and will be ignored:
     webhook_url, webhook_url_on_error, emoji, emoji_on_error, from_username, from_username_on_error,

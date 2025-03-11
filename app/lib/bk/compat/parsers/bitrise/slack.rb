@@ -18,7 +18,8 @@ module BK
         private
 
         def error_config?(inputs)
-          inputs.keys.any? { |k| k.end_with?('_on_error') && !inputs[k].to_s.empty? }
+          supported_error_keys = %w[channel_on_error text_on_error]
+          inputs.keys.any? { |k| supported_error_keys.include?(k) && !inputs[k].to_s.empty? }
         end
 
         def generate_warnings(inputs)
@@ -26,6 +27,7 @@ module BK
             channel channel_on_error
             text text_on_error
           ]
+
           unsupported = inputs.keys.difference(supported_options)
           return nil if unsupported.empty?
 
@@ -38,7 +40,6 @@ module BK
             'message' => inputs['text']
           }.compact
 
-          # Add channel as an array if it exists
           config['channels'] = [inputs['channel']] if inputs['channel']
 
           config
@@ -49,7 +50,6 @@ module BK
             'message' => inputs['text_on_error'] || inputs['text']
           }.compact
 
-          # Add channel as an array if it exists, with fallback to regular channel
           if inputs['channel_on_error'] || inputs['channel']
             config['channels'] = [inputs['channel_on_error'] || inputs['channel']]
           end
@@ -65,11 +65,8 @@ module BK
         end
 
         def create_dual_notifications(inputs, warnings)
-          # Start with the single notification step
           step = create_single_notification(inputs, warnings)
-          # Get the notification from the step and add success condition
           success_config = step.notify.first['slack'].merge('if' => 'build.state == "passed"')
-          # Create the error notification
           error_config = build_error_config(inputs)
                          .merge('if' => 'build.state == "failed"')
           step.notify = [

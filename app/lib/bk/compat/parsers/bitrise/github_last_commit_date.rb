@@ -5,15 +5,13 @@ module BK
     module BitriseSteps
       # Handles the translation of github-last-commit-date
       class Translator
-        def translate_github_last_commit_date(inputs)
-          raise 'Invalid github-last-commit-date step configuration!' unless inputs.key?('repository_url')
-
-          BK::Compat::CommandStep.new(commands: build_commands(inputs))
+        def translate_github_last_commit_date(_inputs)
+          BK::Compat::CommandStep.new(commands: build_commands)
         end
 
         private
 
-        def build_commands(_inputs)
+        def build_commands
           [
             'LAST_COMMIT_DATE=$(git log -1 --format=%ci)',
             'if [[ "$(uname)" == "Darwin" ]]; then',
