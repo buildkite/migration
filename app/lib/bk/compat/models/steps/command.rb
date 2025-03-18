@@ -4,11 +4,14 @@ require_relative 'base'
 require_relative 'block'
 require_relative 'wait'
 require_relative '../plugin'
+require_relative 'command_helpers'
 
 module BK
   module Compat
     # basic command step
     class CommandStep < BaseStep
+      include CommandHelpers
+
       attr_accessor :agents, :artifact_paths, :branches, :concurrency, :concurrency_group,
                     :conditional, :depends_on, :env, :key, :label, :matrix, :notify,
                     :parallelism, :plugins, :soft_fail, :timeout_in_minutes
@@ -43,6 +46,25 @@ module BK
 
       def prepend_commands(*values)
         @commands.prepend(*values.flatten)
+      end
+
+      # Sets the stack value for agents
+      # @param stack_value [String] the stack value to set
+      def stack=(stack_value)
+        @agents ||= {}
+        @agents[:stack] = stack_value if stack_value
+      end
+
+      # Updates agent targeting configuration
+      # @param targeting [Hash] targeting configuration
+      def agent_targeting=(targeting)
+        return unless targeting
+
+        @agents ||= {}
+
+        return unless targeting['stack']
+
+        @agents[:stack] = targeting['stack']
       end
 
       def to_h
@@ -111,29 +133,6 @@ module BK
 
       def assign_minimum(key, other)
         send("#{key}=", [send(key), other.send(key)].compact.min)
-      end
-
-      def instantiate(*, **)
-        unless @transformer.nil?
-          params = instance_attributes.transform_values { |val| recurse_to_string(val, @transformer.to_proc, *, **) }
-        end
-        params.delete(:parameters)
-
-        self.class.new(**params)
-      end
-
-      def recurse_to_string(value, block, *, **)
-        case value
-        when String
-          block.call(value, *, **)
-        when Hash
-          value.transform_values! { |elem| recurse_to_string(elem, block, *, **) }
-        when Array
-          value.map! { |elem| recurse_to_string(elem, block, *, **) }
-        else
-          # if we don't know how to do this, do nothing
-          value
-        end
       end
     end
   end

@@ -38,9 +38,12 @@ module BK
       def parse
         workflows = @config.fetch('workflows', {})
         bk_steps = workflows.map { |wf_name, wf_config| parse_workflow(wf_name, wf_config) }
+        pipeline_stack = @config.fetch('stack', nil)
+        agent_targeting = pipeline_stack ? { 'stack' => pipeline_stack } : nil
 
         Pipeline.new(
-          steps: bk_steps
+          steps: bk_steps,
+          agent_targeting: agent_targeting
         )
       end
 

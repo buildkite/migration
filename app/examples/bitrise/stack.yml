@@ -1,0 +1,80 @@
+---
+format_version: 11
+default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
+project_type: other
+
+workflows:
+  primary:
+    steps:
+      - slack:
+          inputs:
+            - channel: "#deployments"
+            - text: "Build completed with status: $BITRISE_BUILD_STATUS"
+            - webhook_url: $SLACK_WEBHOOK_URL
+
+  minimal-notification:
+    steps:
+      - slack:
+          inputs:
+            - webhook_url: $SLACK_WEBHOOK_URL
+
+  # Scenarios with _on_error suffix fields
+  different-channels:
+    steps:
+      - slack:
+          inputs:
+            - channel: "#general"
+            - channel_on_error: "#alerts"
+            - text: "Build $BITRISE_BUILD_NUMBER completed successfully"
+            - text_on_error: "Build $BITRISE_BUILD_NUMBER failed"
+            - webhook_url: $SLACK_WEBHOOK_URL
+
+  different-webhooks:
+    steps:
+      - slack:
+          inputs:
+            - channel: "#builds"
+            - text: "Build status: $BITRISE_BUILD_STATUS"
+            - webhook_url: $SLACK_WEBHOOK_URL
+            - webhook_url_on_error: $SLACK_WEBHOOK_URL_ALERTS
+
+  full-configuration:
+    steps:
+      - slack:
+          inputs:
+            - channel: "#builds"
+            - channel_on_error: "#alerts"
+            - text: "✅ Build $BITRISE_BUILD_NUMBER succeeded on $BITRISE_GIT_BRANCH"
+            - text_on_error: "❌ Build $BITRISE_BUILD_NUMBER failed on $BITRISE_GIT_BRANCH"
+            - webhook_url: $SLACK_WEBHOOK_URL
+            - webhook_url_on_error: $SLACK_WEBHOOK_URL_ALERTS
+            - emoji: ":white_check_mark:"
+            - emoji_on_error: ":x:"
+            - from_username: "Bitrise Bot"
+            - from_username_on_error: "Bitrise Alert Bot"
+            - color: "good"
+            - color_on_error: "danger"
+
+  with-attachments:
+    steps:
+      - slack:
+          inputs:
+            - channel: "#builds"
+            - webhook_url: $SLACK_WEBHOOK_URL
+            - title: "Build Report"
+            - title_on_error: "Build Failure Report"
+            - text: "All tests passed successfully."
+            - text_on_error: "Some tests failed. Check the logs for details."
+            - color: "good"
+            - color_on_error: "danger"
+            
+  with-unsupported-options:
+    steps:
+      - slack:
+          inputs:
+            - channel: "#builds"
+            - text: "Build notification"
+            - webhook_url: $SLACK_WEBHOOK_URL
+            - unsupported_option: "This will generate a warning"
+            - another_unsupported: "Another unsupported option"
+            - custom_field: "Custom field that isn't supported"
