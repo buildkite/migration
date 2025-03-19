@@ -7,23 +7,47 @@ module BK
       private
 
       def parse_workflow(wf_name, wf_config)
-        agents = { stack: wf_config['stack'] } if wf_config.include?('stack')
-        # Extend for other types of steps - approvals/waits for example.
-        BK::Compat::CommandStep.new(label: wf_name, key: wf_name, agents: agents || {}).tap do |cmd_step|
-          wf_config['steps'].each do |step|
-            step_key, step_config = step.first
-            step_inputs = (step_config['inputs'] || {}).reduce({}, :merge)
-            translated_step = load_workflow_step(step_key, step_inputs)
-            translated_step.stack = step_config['stack'] if step_config['stack']
-            cmd_step << translated_step
-          end
+        agents = extract_agents(wf_config)
+        cmd_step = create_command_step(wf_name, agents)
+
+        wf_config['steps'].each do |step|
+          step_key, step_config = step.first
+          translated_step = translate_step(step_key, step_config)
+          add_step_to_command_step(cmd_step, translated_step)
         end
+
+        cmd_step
+      end
+
+      def extract_agents(wf_config)
+        wf_config.include?('stack') ? { stack: wf_config['stack'] } : {}
+      end
+
+      def create_command_step(wf_name, agents)
+        BK::Compat::CommandStep.new(label: wf_name, key: wf_name, agents: agents)
+      end
+
+      def translate_step(step_key, step_config)
+        step_inputs = extract_step_inputs(step_config)
+        translated_step = load_workflow_step(step_key, step_inputs)
+        set_agents_for_step(translated_step, step_config)
+        translated_step
+      end
+
+      def extract_step_inputs(step_config)
+        (step_config['inputs'] || {}).reduce({}, :merge)
+      end
+
+      def set_agents_for_step(translated_step, step_config)
+        translated_step.agents['stack'] = step_config['stack'] if step_config.include?('stack')
+      end
+
+      def add_step_to_command_step(cmd_step, translated_step)
+        cmd_step << translated_step
       end
 
       def load_workflow_step(step_key, step_inputs)
         step_key_normalized = normalize_step_key(step_key)
-
-        # Translate step with normalized key (for translator) and its input configuration
         @translator.translate_step(step_key_normalized, step_inputs)
       end
 

@@ -12,7 +12,7 @@ module BK
       def initialize(steps: [], env: {}, agents: {})
         @steps = steps
         @env = env
-        @agents = agents || {} # Ensure @agents is always initialized
+        @agents = agents
       end
 
       def render(*, **)

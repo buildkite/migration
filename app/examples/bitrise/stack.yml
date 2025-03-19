@@ -2,6 +2,10 @@ format_version: 11
 default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 project_type: other
 
+meta:
+  bitrise.io:
+    stack: "macos-xcode:12.0"
+
 workflows:
   primary:
     stack: "macos-xcode:12.0"
@@ -9,3 +13,9 @@ workflows:
       - script:
           inputs:
             - content: echo "Running on macOS Xcode 12.0 stack"
+  override:
+    stack: "macos-xcode:13.0"
+    steps:
+      - script:
+          inputs:
+            - content: echo "Pipeline agent override from step"
