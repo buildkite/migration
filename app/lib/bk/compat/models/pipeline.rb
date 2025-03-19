@@ -7,12 +7,12 @@ module BK
   module Compat
     # Base BuildKite pipeline
     class Pipeline
-      attr_accessor :steps, :env
+      attr_accessor :agents, :steps, :env
 
-      def initialize(steps: [], env: {}, agent_targeting: nil)
+      def initialize(steps: [], env: {}, agents: {})
         @steps = steps
         @env = env
-        @agent_targeting = agent_targeting
+        @agents = agents || {} # Ensure @agents is always initialized
       end
 
       def render(*, **)
@@ -31,19 +31,8 @@ module BK
         {}.tap do |h|
           h[:env] = @env unless @env.empty?
           h[:steps] = simplify_steps
-          # Add agent targeting if it exists
-          h[:agent] = convert_agent_targeting(@agent_targeting) if @agent_targeting
+          h[:agents] = @agents unless @agents.empty?
         end
-      end
-
-      def convert_agent_targeting(targeting)
-        return nil unless targeting
-
-        targeting_strings = []
-
-        # Convert stack to Buildkite agent targeting
-        targeting_strings << "stack=#{targeting['stack']}" if targeting['stack']
-        targeting_strings.join(' ')
       end
     end
   end

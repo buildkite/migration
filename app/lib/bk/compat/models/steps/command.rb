@@ -3,20 +3,18 @@
 require_relative 'base'
 require_relative 'block'
 require_relative 'wait'
+require_relative 'command_step_extensions'
 require_relative '../plugin'
-require_relative 'command_helpers'
 
 module BK
   module Compat
-    # basic command step
+    # Basic command step
     class CommandStep < BaseStep
-      include CommandHelpers
-
       attr_accessor :agents, :artifact_paths, :branches, :concurrency, :concurrency_group,
                     :conditional, :depends_on, :env, :key, :label, :matrix, :notify,
                     :parallelism, :plugins, :soft_fail, :timeout_in_minutes
 
-      attr_reader :commands # we define special writers
+      attr_reader :commands # We define special writers
 
       def list_attributes
         %w[artifact_paths commands depends_on notify plugins].freeze
@@ -26,12 +24,12 @@ module BK
         %w[agents env matrix].freeze
       end
 
-      # attributes merged with the minimum value
+      # Attributes merged with the minimum value
       def min_attributes
         %w[concurrency parallelism].freeze
       end
 
-      # only for backwards compatibility
+      # Only for backwards compatibility
       def key_order
         %i[artifact_paths commands depends_on plugins agents env matrix label key concurrency].freeze
       end
@@ -48,25 +46,6 @@ module BK
         @commands.prepend(*values.flatten)
       end
 
-      # Sets the stack value for agents
-      # @param stack_value [String] the stack value to set
-      def stack=(stack_value)
-        @agents ||= {}
-        @agents[:stack] = stack_value if stack_value
-      end
-
-      # Updates agent targeting configuration
-      # @param targeting [Hash] targeting configuration
-      def agent_targeting=(targeting)
-        return unless targeting
-
-        @agents ||= {}
-
-        return unless targeting['stack']
-
-        @agents[:stack] = targeting['stack']
-      end
-
       def to_h
         @parameters = nil
         @transformer = nil
@@ -75,7 +54,7 @@ module BK
         super
       end
 
-      # add/merge step
+      # Add/merge step
       def <<(other)
         # would love to use `case/when` but it does not handle inheritance
         if [BK::Compat::WaitStep, BK::Compat::BlockStep].include?(other.class)
@@ -89,7 +68,7 @@ module BK
         end
       end
 
-      # prepend/merge steps
+      # Prepend/merge steps
       def >>(other)
         # would love to use `case/when` but it does not handle inheritance
         if [BK::Compat::WaitStep, BK::Compat::BlockStep].include?(other.class)
@@ -133,6 +112,29 @@ module BK
 
       def assign_minimum(key, other)
         send("#{key}=", [send(key), other.send(key)].compact.min)
+      end
+
+      def instantiate(*, **)
+        unless @transformer.nil?
+          params = instance_attributes.transform_values { |val| recurse_to_string(val, @transformer.to_proc, *, **) }
+        end
+        params.delete(:parameters)
+
+        self.class.new(**params)
+      end
+
+      def recurse_to_string(value, block, *, **)
+        case value
+        when String
+          block.call(value, *, **)
+        when Hash
+          value.transform_values! { |elem| recurse_to_string(elem, block, *, **) }
+        when Array
+          value.map! { |elem| recurse_to_string(elem, block, *, **) }
+        else
+          # If we don't know how to do this, do nothing
+          value
+        end
       end
     end
   end
