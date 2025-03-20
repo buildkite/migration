@@ -21,7 +21,10 @@ module BK
       def translate_step(step_key, step_config)
         step_inputs = (step_config['inputs'] || {}).reduce({}, :merge)
         load_workflow_step(step_key, step_inputs).tap do |translated_step|
-          translated_step.agents['stack'] = step_config['stack'] if step_config.include?('stack')
+          if translated_step.respond_to?(:agents) && step_config.include?('stack')
+            translated_step.agents ||= {}
+            translated_step.agents[:stack] = step_config['stack']
+          end
         end
       end
 

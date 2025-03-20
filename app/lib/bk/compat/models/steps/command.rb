@@ -3,7 +3,6 @@
 require_relative 'base'
 require_relative 'block'
 require_relative 'wait'
-require_relative 'command_step_extensions'
 require_relative '../plugin'
 
 module BK

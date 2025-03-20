@@ -43,7 +43,7 @@ module BK
         agents = stack_value ? { stack: stack_value } : {}
         Pipeline.new(
           steps: bk_steps,
-          agents: agents || {}
+          agents: agents
         )
       end
 
