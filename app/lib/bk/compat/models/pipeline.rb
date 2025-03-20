@@ -7,11 +7,12 @@ module BK
   module Compat
     # Base BuildKite pipeline
     class Pipeline
-      attr_accessor :steps, :env
+      attr_accessor :agents, :steps, :env
 
-      def initialize(steps: [], env: {})
+      def initialize(steps: [], env: {}, agents: {})
         @steps = steps
         @env = env
+        @agents = agents
       end
 
       def render(*, **)
@@ -30,6 +31,7 @@ module BK
         {}.tap do |h|
           h[:env] = @env unless @env.empty?
           h[:steps] = simplify_steps
+          h[:agents] = @agents unless @agents.empty?
         end
       end
     end

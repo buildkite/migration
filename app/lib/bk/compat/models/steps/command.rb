@@ -7,13 +7,13 @@ require_relative '../plugin'
 
 module BK
   module Compat
-    # basic command step
+    # Basic command step
     class CommandStep < BaseStep
       attr_accessor :agents, :artifact_paths, :branches, :concurrency, :concurrency_group,
                     :conditional, :depends_on, :env, :key, :label, :matrix, :notify,
                     :parallelism, :plugins, :soft_fail, :timeout_in_minutes
 
-      attr_reader :commands # we define special writers
+      attr_reader :commands # We define special writers
 
       def list_attributes
         %w[artifact_paths commands depends_on notify plugins].freeze
@@ -23,12 +23,12 @@ module BK
         %w[agents env matrix].freeze
       end
 
-      # attributes merged with the minimum value
+      # Attributes merged with the minimum value
       def min_attributes
         %w[concurrency parallelism].freeze
       end
 
-      # only for backwards compatibility
+      # Only for backwards compatibility
       def key_order
         %i[artifact_paths commands depends_on plugins agents env matrix label key concurrency].freeze
       end
@@ -53,7 +53,7 @@ module BK
         super
       end
 
-      # add/merge step
+      # Add/merge step
       def <<(other)
         # would love to use `case/when` but it does not handle inheritance
         if [BK::Compat::WaitStep, BK::Compat::BlockStep].include?(other.class)
@@ -67,7 +67,7 @@ module BK
         end
       end
 
-      # prepend/merge steps
+      # Prepend/merge steps
       def >>(other)
         # would love to use `case/when` but it does not handle inheritance
         if [BK::Compat::WaitStep, BK::Compat::BlockStep].include?(other.class)
@@ -131,7 +131,7 @@ module BK
         when Array
           value.map! { |elem| recurse_to_string(elem, block, *, **) }
         else
-          # if we don't know how to do this, do nothing
+          # If we don't know how to do this, do nothing
           value
         end
       end

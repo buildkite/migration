@@ -1,0 +1,16 @@
+---
+steps:
+- commands:
+  - echo "Running on macOS Xcode 12.0 stack"
+  agents:
+    stack: macos-xcode:12.0
+  label: primary
+  key: primary
+- commands:
+  - echo "Pipeline agent override from step"
+  agents:
+    stack: macos-xcode:13.0
+  label: override
+  key: override
+agents:
+  stack: macos-xcode:12.0
