@@ -4,11 +4,15 @@ module BK
   module Compat
     # Command step extensions
     class CommandStep < BaseStep
-      def agent_targeting=(targeting)
-        return if targeting.nil? || targeting['stack'].nil?
+      def stack
+        @agents&.dig(:stack)
+      end
+
+      def stack=(stack_value)
+        return if stack_value.nil?
 
         @agents ||= {}
-        @agents[:stack] = targeting['stack']
+        @agents[:stack] = stack_value
       end
     end
   end

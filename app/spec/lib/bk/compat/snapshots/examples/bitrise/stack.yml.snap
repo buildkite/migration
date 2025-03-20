@@ -12,3 +12,5 @@ steps:
     stack: macos-xcode:13.0
   label: override
   key: override
+agents:
+  stack: macos-xcode:12.0

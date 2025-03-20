@@ -39,11 +39,11 @@ module BK
         workflows = @config.fetch('workflows', {})
         bk_steps = workflows.map { |wf_name, wf_config| parse_workflow(wf_name, wf_config) }
 
-        targeting = { stack: @config['stack'] } if @config.include?('stack')
-
+        stack_value = @config.dig('meta', 'bitrise.io', 'stack')
+        agents = stack_value ? { stack: stack_value } : {}
         Pipeline.new(
           steps: bk_steps,
-          agents: targeting || {}
+          agents: agents || {}
         )
       end
 

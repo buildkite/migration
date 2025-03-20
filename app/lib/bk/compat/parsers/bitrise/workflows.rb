@@ -7,52 +7,28 @@ module BK
       private
 
       def parse_workflow(wf_name, wf_config)
-        agents = extract_agents(wf_config)
-        cmd_step = create_command_step(wf_name, agents)
-
+        stack_value = wf_config.dig('meta', 'bitrise.io', 'stack')
+        agents = stack_value ? { stack: stack_value } : {}
+        cmd_step = BK::Compat::CommandStep.new(label: wf_name, key: wf_name, agents: agents)
         wf_config['steps'].each do |step|
           step_key, step_config = step.first
-          translated_step = translate_step(step_key, step_config)
-          add_step_to_command_step(cmd_step, translated_step)
+          cmd_step << translate_step(step_key, step_config)
         end
 
         cmd_step
       end
 
-      def extract_agents(wf_config)
-        wf_config.include?('stack') ? { stack: wf_config['stack'] } : {}
-      end
-
-      def create_command_step(wf_name, agents)
-        BK::Compat::CommandStep.new(label: wf_name, key: wf_name, agents: agents)
-      end
-
       def translate_step(step_key, step_config)
-        step_inputs = extract_step_inputs(step_config)
-        translated_step = load_workflow_step(step_key, step_inputs)
-        set_agents_for_step(translated_step, step_config)
-        translated_step
-      end
-
-      def extract_step_inputs(step_config)
-        (step_config['inputs'] || {}).reduce({}, :merge)
-      end
-
-      def set_agents_for_step(translated_step, step_config)
-        translated_step.agents['stack'] = step_config['stack'] if step_config.include?('stack')
-      end
-
-      def add_step_to_command_step(cmd_step, translated_step)
-        cmd_step << translated_step
+        step_inputs = (step_config['inputs'] || {}).reduce({}, :merge)
+        load_workflow_step(step_key, step_inputs).tap do |translated_step|
+          translated_step.agents['stack'] = step_config['stack'] if step_config.include?('stack')
+        end
       end
 
       def load_workflow_step(step_key, step_inputs)
-        step_key_normalized = normalize_step_key(step_key)
+        step_key_normalized = step_key.split('@').first
+        # Translate step with normalized key (for translator) and its input configuration
         @translator.translate_step(step_key_normalized, step_inputs)
-      end
-
-      def normalize_step_key(step_key)
-        step_key.split('@').first
       end
     end
   end
