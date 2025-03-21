@@ -1,0 +1,21 @@
+format_version: "11"
+default_step_lib_source: https://github.com/example/example-bitrise.git
+project_type: other
+
+app:
+  envs:
+  - opts:
+      is_expand: false
+    TEST_KEY: test value
+    
+workflows:
+  deploy-alpha:
+    envs:
+    - ENV_TYPE: alpha
+    - DEPLOY_TARGET: staging
+    steps:
+    - script:
+        inputs:
+        - content: |
+            #!/bin/bash
+            envman add --key MY_RELEASE_NOTE --value "This is the release note for alpha"
