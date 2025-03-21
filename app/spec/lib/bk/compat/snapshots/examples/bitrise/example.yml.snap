@@ -1,4 +1,6 @@
 ---
+env:
+  MY_NAME: My Name
 steps:
 - commands:
   - echo "Hello ${MY_NAME}!"

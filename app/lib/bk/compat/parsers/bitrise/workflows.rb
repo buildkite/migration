@@ -14,8 +14,23 @@ module BK
           step_key, step_config = step.first
           cmd_step << translate_step(step_key, step_config)
         end
-
+        process_workflow_envs(wf_config, cmd_step)
         cmd_step
+      end
+
+      def process_workflow_envs(wf_config, cmd_step)
+        cmd_step.env ||= {}
+        (wf_config['envs'] || []).each do |env|
+          process_env_variable(env, cmd_step.env)
+        end
+      end
+
+      def process_env_variable(env, target_env)
+        env.each do |key, value|
+          next if key == 'opts' || key.to_s.strip.empty? || value.to_s.strip.empty?
+
+          target_env[key] = value
+        end
       end
 
       def translate_step(step_key, step_config)

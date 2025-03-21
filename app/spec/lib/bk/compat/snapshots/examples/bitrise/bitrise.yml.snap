@@ -1,0 +1,13 @@
+---
+env:
+  TEST_KEY: test value
+steps:
+- commands:
+  - |-
+    #!/bin/bash
+    envman add --key MY_RELEASE_NOTE --value "This is the release note for alpha"
+  env:
+    ENV_TYPE: alpha
+    DEPLOY_TARGET: staging
+  label: deploy-alpha
+  key: deploy-alpha

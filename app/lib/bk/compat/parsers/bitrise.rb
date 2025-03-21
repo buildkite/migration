@@ -41,10 +41,27 @@ module BK
 
         stack_value = @config.dig('meta', 'bitrise.io', 'stack')
         agents = stack_value ? { stack: stack_value } : {}
+
+        env = process_app_envs
+
         Pipeline.new(
           steps: bk_steps,
-          agents: agents
+          agents: agents,
+          env: env
         )
+      end
+
+      def process_app_envs
+        env = {}
+        (@config.dig('app', 'envs') || []).each do |env_var|
+          env_var.each do |key, value|
+            next if key == 'opts'
+            next if key.to_s.strip.empty? || value.to_s.strip.empty?
+
+            env[key] = value
+          end
+        end
+        env
       end
 
       private
