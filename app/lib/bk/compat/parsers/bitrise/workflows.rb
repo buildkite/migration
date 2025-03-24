@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'env_helper'
+
 module BK
   module Compat
     # Bitrise translation of workflows
@@ -20,9 +22,7 @@ module BK
 
       def process_workflow_envs(wf_config, cmd_step)
         cmd_step.env ||= {}
-        (wf_config['envs'] || []).each do |env|
-          process_env_variable(env, cmd_step.env)
-        end
+        BK::Compat::Bitrise::EnvHelper.process_env_variables(wf_config['envs'], cmd_step.env)
       end
 
       def process_env_variable(env, target_env)
@@ -40,7 +40,17 @@ module BK
             translated_step.agents ||= {}
             translated_step.agents[:stack] = step_config['stack']
           end
+
+          # Apply environment variables if available
+          apply_env_config(translated_step, step_config)
         end
+      end
+
+      def apply_env_config(step, config)
+        return unless step.respond_to?(:env) && config['envs']
+
+        step.env ||= {}
+        BK::Compat::Bitrise::EnvHelper.process_env_variables(config['envs'], step.env)
       end
 
       def load_workflow_step(step_key, step_inputs)

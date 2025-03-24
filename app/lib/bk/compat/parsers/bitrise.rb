@@ -4,6 +4,7 @@ require_relative '../translator'
 require_relative '../models/pipeline'
 require_relative 'bitrise/steps'
 require_relative 'bitrise/workflows'
+require_relative 'bitrise/env_helper'
 
 module BK
   module Compat
@@ -42,26 +43,19 @@ module BK
         stack_value = @config.dig('meta', 'bitrise.io', 'stack')
         agents = stack_value ? { stack: stack_value } : {}
 
-        env = process_app_envs
-
         Pipeline.new(
           steps: bk_steps,
           agents: agents,
-          env: env
+          env: process_app_envs(@config.dig('app', 'envs') || {})
         )
       end
 
-      def process_app_envs
-        env = {}
-        (@config.dig('app', 'envs') || []).each do |env_var|
-          env_var.each do |key, value|
-            next if key == 'opts'
-            next if key.to_s.strip.empty? || value.to_s.strip.empty?
+      def process_app_envs(vars)
+        return {} unless vars # takes care of empty vars and nils
 
-            env[key] = value
-          end
-        end
-        env
+        result = {}
+        BK::Compat::Bitrise::EnvHelper.process_env_variables(vars, result)
+        result
       end
 
       private
