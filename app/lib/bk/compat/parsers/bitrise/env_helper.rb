@@ -5,22 +5,22 @@ module BK
     class Bitrise
       # Helper methods for processing environment variables in Bitrise configuration
       module EnvHelper
-        def self.process_env_variable(env, target_env)
-          return unless env.is_a?(Hash)
+        def self.process_env_variable(env)
+          return {} unless env.is_a?(Hash)
 
-          env.each do |key, value|
-            next if key == 'opts' || key.to_s.strip.empty? || value.to_s.strip.empty?
+          env.delete('opts')
 
-            target_env[key] = value
-          end
+          env
         end
 
-        def self.process_env_variables(vars, target_env)
-          return unless vars.is_a?(Array)
+        def self.process_env_variables(vars)
+          return {} unless vars.is_a?(Array)
 
+          result = {}
           vars.each do |env|
-            process_env_variable(env, target_env)
+            result.merge!(process_env_variable(env))
           end
+          result
         end
       end
     end
