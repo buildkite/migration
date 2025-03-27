@@ -85,10 +85,6 @@ module BK
         list_attributes.each { |a| send(a).concat(other.send(a)) }
         hash_attributes.each { |a| send(a).merge!(other.send(a)) }
 
-        # Merge environment variables
-        @env ||= {}
-        @env.merge!(other.env) if other.respond_to?(:env)
-
         update_attributes!(other)
       end
 
@@ -96,10 +92,6 @@ module BK
         # almost the same as merge but self/other are reversed here
         list_attributes.each { |a| send("#{a}=", other.send(a).concat(send(a))) }
         hash_attributes.each { |a| send("#{a}=", other.send(a).merge(send(a))) }
-
-        # Merge environment variables
-        @env ||= {}
-        @env.merge!(other.env) if other.respond_to?(:env)
 
         update_attributes!(other)
       end
