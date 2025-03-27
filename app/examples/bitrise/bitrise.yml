@@ -8,9 +8,6 @@ app:
     - APP_ENV: production
       opts:
         is_expand: true
-    - API_KEY: app_level_key
-      opts:
-        is_sensitive: true
 
 workflows:
   primary:

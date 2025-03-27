@@ -1,7 +1,6 @@
 ---
 env:
   APP_ENV: production
-  API_KEY: app_level_key
 steps:
 - commands:
   - "# No need for checkout, the agent takes care of that"

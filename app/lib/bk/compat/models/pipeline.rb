@@ -29,7 +29,6 @@ module BK
 
       def to_h
         {}.tap do |h|
-          # Conditionally include the env section only if it contains valid environment variables
           h[:env] = @env unless @env.empty?
           h[:steps] = simplify_steps
           h[:agents] = @agents unless @agents.empty?
