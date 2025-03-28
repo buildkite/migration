@@ -1,0 +1,54 @@
+format_version: 11
+default_step_lib_source: https://github.com/example/example-bitrise.git
+project_type: ios
+
+# App-level environment variables
+app:
+  envs:
+    - APP_ENV: production
+      opts:
+        is_expand: true
+
+workflows:
+  primary:
+    # Workflow-level environment variables
+    envs:
+      - WORKFLOW_ENV: staging
+      - BUILD_TYPE: release    
+    steps:
+      - script:
+          title: Skip checkout
+          inputs:
+            - content: "# No need for checkout, the agent takes care of that"
+      - script:
+          title: Install dependencies
+          inputs:
+            - content: pip install -r requirements/dev.txt      
+      - script:
+          title: Set release notes
+          inputs:
+            - content: |
+                #!/bin/bash
+                echo "App ENV: $APP_ENV"
+                echo "Workflow ENV: $WORKFLOW_ENV"
+                echo "Setting MY_RELEASE_NOTE for alpha"
+                export MY_RELEASE_NOTE="This is the release note for alpha"
+                echo "My Release Note: $MY_RELEASE_NOTE"
+  secondary:
+    envs:
+      - WORKFLOW_ENV: staging
+      - BUILD_TYPE: release      
+    # Step-level environment variables
+    steps:
+      - script:
+          title: Set release notes
+          inputs:
+            - content: |
+                #!/bin/bash
+                echo "App ENV: $APP_ENV"
+                echo "Workflow ENV: $WORKFLOW_ENV"
+                echo "Setting MY_RELEASE_NOTE for alpha"
+                export MY_RELEASE_NOTE="This is the release note for alpha"
+                echo "My Release Note: $MY_RELEASE_NOTE"
+          envs:
+            - MY_RELEASE_NOTE: test

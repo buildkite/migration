@@ -4,6 +4,7 @@ require_relative '../translator'
 require_relative '../models/pipeline'
 require_relative 'bitrise/steps'
 require_relative 'bitrise/workflows'
+require_relative 'bitrise/env_helper'
 
 module BK
   module Compat
@@ -41,9 +42,11 @@ module BK
 
         stack_value = @config.dig('meta', 'bitrise.io', 'stack')
         agents = stack_value ? { stack: stack_value } : {}
+
         Pipeline.new(
           steps: bk_steps,
-          agents: agents
+          agents: agents,
+          env: BK::Compat::Bitrise::EnvHelper.process_env_variables(@config.dig('app', 'envs'))
         )
       end
 

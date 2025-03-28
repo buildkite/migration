@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'env_helper'
+
 module BK
   module Compat
     # Bitrise translation of workflows
@@ -14,7 +16,7 @@ module BK
           step_key, step_config = step.first
           cmd_step << translate_step(step_key, step_config)
         end
-
+        cmd_step.env.merge!(BK::Compat::Bitrise::EnvHelper.process_env_variables(wf_config['envs']))
         cmd_step
       end
 
