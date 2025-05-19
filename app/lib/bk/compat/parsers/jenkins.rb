@@ -2,6 +2,8 @@
 
 require_relative '../models/steps/command'
 
+require_relative 'jenkins/agent'
+
 module BK
   module Compat
     # Jenkins YAML converter
@@ -33,9 +35,12 @@ module BK
       end
 
       def parse
+        default_agent = translate_agent(@config['pipeline']['agent'])
         Pipeline.new(
-          steps: [CommandStep.new(commands: '# Can not translate this just yet')]
-        )
+          steps: translate_stages(@config['pipeline']['stages'], default_agent)
+        ).tap do |pipeline|
+          pipeline.agents = default_agent unless default_agent.nil?
+        end
       end
 
       private
@@ -44,6 +49,17 @@ module BK
         @translator = BK::Compat::StepTranslator.new
 
         @translator.register
+      end
+
+      def translate_stages(stages, default_agent)
+        default_agent = CommandStep.new if default_agent.nil?
+        stages.map do |stage|
+          default_agent.instantiate.tap do |cmd|
+            cmd.key = stage['stage']
+            cmd << translate_agent(stage['agent']) if stage['agent']
+            cmd << stage['steps']
+          end
+        end
       end
     end
   end
