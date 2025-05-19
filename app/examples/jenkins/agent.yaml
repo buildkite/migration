@@ -1,0 +1,73 @@
+agent:
+  label: "default"
+
+pipeline:
+  stages:
+    - stage: "Stage1"
+      agent:
+        none:
+      steps:
+        - echo "agent none"
+    - stage: "Any dict"
+      agent:
+        any:
+      steps:
+        - echo "agent any with dict"
+    - stage: "Any string"
+      agent: any
+      steps:
+        - echo "agent any with string"
+    - stage: "Docker"
+      agent:
+        docker:
+          image: test-image
+          label: 'docker'
+          args: '--network host'
+          registryUrl: https://registry.example.com
+          registryCredentialsId: docker-registry-credentials
+      steps:
+        - echo "agent docker"
+    - stage: "Dockerfile"
+      agent:
+        dockerfile:
+          filename: Dockerfile.other
+          dir: otherdir
+          label: 'dockerfile'
+          additionalBuildArgs: '--build-arg FOO=bar'
+          args: '--network host'
+          registryUrl: https://registry.example.com
+          registryCredentialsId: docker-registry-credentials
+      steps:
+        - echo "agent dockerfile"
+    - stage: "Kubernetes"
+      agent:
+        kubernetes:
+          yaml: |
+            apiVersion: v1
+            kind: Pod
+            spec:
+              imagePullSecrets:
+              - name: my-creds
+              containers:
+              - name: ubuntu
+                image: myimage:1.1
+                command: ['sleep', 'infinity']
+                tty: true
+                imagePullPolicy: Always
+      steps:
+        - echo "agent kubernetes"
+    - stage: "default"
+      steps:
+        - echo "default agent"
+    - stage: "Label"
+      agent:
+        label: "other-label"
+      steps:
+        - echo "agent label"
+    - stage: "Node label"
+      agent:
+        node:
+          label: "other-label"
+          customWorkspace: "/tmp/workspace"
+      steps:
+        - echo "agent node"

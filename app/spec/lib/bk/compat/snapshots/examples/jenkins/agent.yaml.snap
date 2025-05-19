@@ -1,0 +1,51 @@
+---
+steps:
+- commands:
+  - echo "agent none"
+  key: Stage1
+- commands:
+  - echo "agent any with dict"
+  key: Any dict
+- commands:
+  - echo "agent any with string"
+  agents:
+    label: any
+  key: Any string
+- commands:
+  - "# Configure Docker registry credentials with the corresponding plugin"
+  - "# Docker args are passed as other options to the docker plugin"
+  - echo "agent docker"
+  plugins:
+  - docker#v5.10.0:
+      image: test-image
+  agents:
+    label: docker
+  key: Docker
+- commands:
+  - docker build -f Dockerfile.other --network host --build-arg FOO=bar otherdir
+  - "# Configure Docker registry credentials with the corresponding plugin"
+  - "# Push this image to a registry and use it in other steps with the docker plugin"
+  - echo "agent dockerfile"
+  agents:
+    label: dockerfile
+  key: Dockerfile
+- commands:
+  - "# Kubernetes config is mostly defined in the cluster deployment"
+  - echo "agent kubernetes"
+  plugins:
+  - kubernetes:
+  key: Kubernetes
+- commands:
+  - echo "default agent"
+  key: default
+- commands:
+  - echo "agent label"
+  agents:
+    label: other-label
+  key: Label
+- commands:
+  - "# Workspace is defined on the agent"
+  - echo "agent node"
+  agents:
+    label: other-label
+  key: Node label
