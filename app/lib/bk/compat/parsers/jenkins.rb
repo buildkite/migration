@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
+require_relative '../models/steps/command'
+
 module BK
   module Compat
-    # GitHub Actions converter
+    # Jenkins YAML converter
     class Jenkins
       require 'yaml'
 
@@ -17,8 +19,8 @@ module BK
       def self.matches?(text)
         config = YAML.safe_load(text)
 
-        mandatory_keys = ['agent', 'stages']
-        
+        mandatory_keys = %w[agent stages].freeze
+
         # Mandatory keys are part of the pipeline element
         config.is_a?(Hash) && mandatory_keys & config.fetch('pipeline', {}).keys == mandatory_keys
       end
@@ -32,7 +34,7 @@ module BK
 
       def parse
         Pipeline.new(
-          steps: 'Can not translate this just yet',
+          steps: [CommandStep.new(commands: '# Can not translate this just yet')]
         )
       end
 
@@ -41,7 +43,7 @@ module BK
       def register_translators!
         @translator = BK::Compat::StepTranslator.new
 
-        @translator.register()
+        @translator.register
       end
     end
   end
