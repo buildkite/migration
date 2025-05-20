@@ -39,7 +39,7 @@ module BK
         Pipeline.new(
           steps: translate_stages(@config['pipeline']['stages'], default_agent)
         ).tap do |pipeline|
-          pipeline.agents = default_agent unless default_agent.nil?
+          pipeline.agents = default_agent.agents unless default_agent.nil?
         end
       end
 

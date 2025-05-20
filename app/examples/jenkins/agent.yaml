@@ -1,7 +1,6 @@
-agent:
-  label: "default"
-
 pipeline:
+  agent:
+    label: "default"
   stages:
     - stage: "Stage1"
       agent:

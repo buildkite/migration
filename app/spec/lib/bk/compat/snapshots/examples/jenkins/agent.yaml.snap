@@ -49,3 +49,5 @@ steps:
   agents:
     label: other-label
   key: Node label
+agents:
+  label: default
