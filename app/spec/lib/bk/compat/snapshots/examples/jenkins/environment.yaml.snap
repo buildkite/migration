@@ -1,0 +1,20 @@
+---
+env:
+  GENERAL: VAL1
+steps:
+- commands:
+  - echo "no env"
+  key: No Env
+- commands:
+  - echo "multi env"
+  env:
+    SPECIFIC: VAL1
+    OTHER: VAL2
+  key: Multi Env
+- commands:
+  - echo "not currently supported"
+  env:
+    SECRET: credentials('my-credentials')
+  key: credentials
+agents:
+  label: any
