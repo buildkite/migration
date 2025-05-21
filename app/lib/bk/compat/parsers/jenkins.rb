@@ -36,12 +36,12 @@ module BK
 
       def parse
         default_agent = translate_agent(@config['pipeline']['agent'])
-        Pipeline.new(
+        pipeline = Pipeline.new(
           steps: translate_stages(@config['pipeline']['stages'], default_agent),
           env: @config['pipeline'].fetch('environment', {})
-        ).tap do |pipeline|
-          pipeline.agents = default_agent.agents unless default_agent.nil?
-        end
+        )
+        pipeline.agents = default_agent.agents unless default_agent.nil?
+        translate_libraries(pipeline)
       end
 
       private
@@ -62,6 +62,19 @@ module BK
             cmd << stage['steps']
           end
         end
+      end
+
+      def translate_libraries(pipeline)
+        return pipeline unless @config['pipeline'].include?('library')
+
+        pipeline.steps.prepend(
+          CommandStep.new(
+            label: 'Libraries',
+            commands: '# Libraries are not supported at this time :('
+          )
+        )
+
+        pipeline
       end
     end
   end
