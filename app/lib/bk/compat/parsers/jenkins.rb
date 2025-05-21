@@ -41,6 +41,12 @@ module BK
           env: @config['pipeline'].fetch('environment', {})
         ).tap do |pipeline|
           pipeline.agents = default_agent.agents unless default_agent.nil?
+          pipeline.steps.prepend(
+            CommandStep.new(
+              label: 'Libraries',
+              commands: '# Libraries are not supported at this time :('
+            )
+          ) if @config['pipeline'].include?('library')
         end
       end
 
