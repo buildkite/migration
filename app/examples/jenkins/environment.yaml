@@ -1,0 +1,19 @@
+pipeline:
+  agent: 'any'
+  environment:
+    GENERAL: "VAL1"
+  stages:
+    - stage: No Env
+      steps:
+        - echo "no env"
+    - stage: Multi Env
+      environment:
+        SPECIFIC: "VAL1"
+        OTHER: VAL2
+      steps:
+        - echo "multi env"
+    - stage: credentials
+      environment:
+        SECRET: credentials('my-credentials')
+      steps:
+        - echo "not currently supported"

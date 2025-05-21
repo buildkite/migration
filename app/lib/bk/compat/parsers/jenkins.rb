@@ -37,7 +37,8 @@ module BK
       def parse
         default_agent = translate_agent(@config['pipeline']['agent'])
         Pipeline.new(
-          steps: translate_stages(@config['pipeline']['stages'], default_agent)
+          steps: translate_stages(@config['pipeline']['stages'], default_agent),
+          env: @config['pipeline'].fetch('environment', {})
         ).tap do |pipeline|
           pipeline.agents = default_agent.agents unless default_agent.nil?
         end
@@ -56,6 +57,7 @@ module BK
         stages.map do |stage|
           default_agent.instantiate.tap do |cmd|
             cmd.key = stage['stage']
+            cmd.env = stage.fetch('environment', {})
             cmd << translate_agent(stage['agent']) if stage['agent']
             cmd << stage['steps']
           end
