@@ -117,7 +117,7 @@ module BK
         unless @transformer.nil?
           params = instance_attributes.transform_values { |val| recurse_to_string(val, @transformer.to_proc, *, **) }
         end
-        params.delete(:parameters)
+        params&.delete(:parameters)
 
         self.class.new(**params)
       end

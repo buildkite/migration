@@ -1,4 +1,5 @@
 ---
 steps:
 - commands:
-  - "# Can not translate this just yet"
+  - echo "test-output-${env.BRANCH_NAME}"
+  key: Stage
