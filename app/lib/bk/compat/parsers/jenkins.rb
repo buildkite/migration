@@ -3,6 +3,7 @@
 require_relative '../models/steps/command'
 
 require_relative 'jenkins/agent'
+require_relative 'jenkins/parameters'
 
 module BK
   module Compat
@@ -35,15 +36,14 @@ module BK
       end
 
       def parse
-        default_agent = translate_agent(@config['pipeline']['agent'])
+        config = @config['pipeline']
+        default_agent = translate_agent(config['agent'])
         Pipeline.new(
-          steps: translate_stages(@config['pipeline']['stages'], default_agent),
-          env: @config['pipeline'].fetch('environment', {})
+          steps: translate_stages(config['stages'], default_agent),
+          env: config.fetch('environment', {})
         ).tap do |pipeline|
           pipeline.agents = default_agent.agents unless default_agent.nil?
-          pipeline.steps.prepend(translate_libraries(@config['pipeline']['library']))
-          pipeline.steps.prepend(translate_parameters(@config['pipeline']['parameters']))
-          pipeline.steps.compact!
+          pipeline.steps.prepend(translate_general_keys(config))
         end
       end
 
@@ -65,6 +65,13 @@ module BK
             cmd << stage['steps']
           end
         end
+      end
+
+      def translate_general_keys(config)
+        [
+          translate_libraries(config['library']),
+          translate_parameters(config['parameters'])
+        ].flatten.compact
       end
 
       def translate_libraries(library)

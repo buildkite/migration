@@ -6,6 +6,24 @@ module BK
   module Compat
     # Jenkins YAML converter
     class Jenkins
+      # TODO: use an actual parser instead of regex
+      PARAM_REGEXP = /\A
+        (?<type>\w+)  # type of the parameter
+        \(            # Opening parenthesis
+          (?:
+            \s*
+            (?:
+              name:\s*['"](?<name>[^'"]+)['"]
+            | description:\s*['"](?<description>[^'"]+)['"]
+            | defaultValue:\s*['"]?(?<defaultValue>[^'",)]*)['"]?
+            | choices:\s*\[(?<choices>[^\]]+)\]
+            )
+            \s*
+            ,?
+          )+
+        \)
+      \Z/x
+
       private
 
       def translate_parameters(parameters)
@@ -18,26 +36,8 @@ module BK
       end
 
       def parse_parameters(parameters)
-        # TODO: use an actual parser instead of regex
-        param_regexp = /\A
-          (?<type>\w+)  # type of the parameter
-          \(            # Opening parenthesis
-            (:?
-              \s*
-              (?:
-                name:\s*['"](?<name>[^'"]+)['"]
-              | description:\s*['"](?<description>[^'"]+)['"]
-              | defaultValue:\s*['"]?(?<defaultValue>[^'",)]*)['"]?
-              | choices:\s*\[(?<choices>[^\]]+)\]
-              )
-              \s*
-              ,?
-            )+
-          \)
-        \Z/x
-
         parameters.map do |parameter|
-          param_regexp.match(parameter) do |match|
+          PARAM_REGEXP.match(parameter) do |match|
             puts "Match: #{match.inspect}"
             param_data = match.named_captures.transform_values do |value|
               value.strip if value.is_a?(String)
