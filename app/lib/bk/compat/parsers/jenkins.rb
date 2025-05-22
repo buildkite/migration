@@ -43,7 +43,7 @@ module BK
           env: config.fetch('environment', {})
         ).tap do |pipeline|
           pipeline.agents = default_agent.agents unless default_agent.nil?
-          pipeline.steps.prepend(translate_general_keys(config))
+          pipeline.steps.prepend(*translate_general_keys(config))
         end
       end
 

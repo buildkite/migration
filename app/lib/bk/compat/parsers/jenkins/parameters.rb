@@ -38,7 +38,6 @@ module BK
       def parse_parameters(parameters)
         parameters.map do |parameter|
           PARAM_REGEXP.match(parameter) do |match|
-            puts "Match: #{match.inspect}"
             param_data = match.named_captures.transform_values do |value|
               value.strip if value.is_a?(String)
             end
