@@ -3,6 +3,7 @@
 require_relative '../models/steps/command'
 
 require_relative 'jenkins/agent'
+require_relative 'jenkins/parameters'
 
 module BK
   module Compat
@@ -35,13 +36,15 @@ module BK
       end
 
       def parse
-        default_agent = translate_agent(@config['pipeline']['agent'])
-        pipeline = Pipeline.new(
-          steps: translate_stages(@config['pipeline']['stages'], default_agent),
-          env: @config['pipeline'].fetch('environment', {})
-        )
-        pipeline.agents = default_agent.agents unless default_agent.nil?
-        translate_libraries(pipeline)
+        config = @config['pipeline']
+        default_agent = translate_agent(config['agent'])
+        Pipeline.new(
+          steps: translate_stages(config['stages'], default_agent),
+          env: config.fetch('environment', {})
+        ).tap do |pipeline|
+          pipeline.agents = default_agent.agents unless default_agent.nil?
+          pipeline.steps.prepend(*translate_general_keys(config))
+        end
       end
 
       private
@@ -64,17 +67,20 @@ module BK
         end
       end
 
-      def translate_libraries(pipeline)
-        return pipeline unless @config['pipeline'].include?('library')
+      def translate_general_keys(config)
+        [
+          translate_libraries(config['library']),
+          translate_parameters(config['parameters'])
+        ].flatten.compact
+      end
 
-        pipeline.steps.prepend(
-          CommandStep.new(
-            label: 'Libraries',
-            commands: '# Libraries are not supported at this time :('
-          )
+      def translate_libraries(library)
+        return nil if library.nil?
+
+        CommandStep.new(
+          label: 'Libraries',
+          commands: '# Libraries are not supported at this time :('
         )
-
-        pipeline
       end
     end
   end

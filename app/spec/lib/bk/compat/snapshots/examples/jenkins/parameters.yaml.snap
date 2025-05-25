@@ -1,0 +1,42 @@
+---
+steps:
+- key: parameters
+  fields:
+  - text: PERSON
+    key: PERSON
+    hint: Who should I say hello to?
+    default: Mr Jenkins
+  - text: BIOGRAPHY
+    key: BIOGRAPHY
+    hint: Enter some information about the person
+    default: ''
+  - select: TOGGLE
+    key: TOGGLE
+    hint: Toggle this value
+    default: 'true'
+    options:
+    - label: 'true'
+      value: true
+    - label: 'false'
+      value: false
+  - select: CHOICE
+    key: CHOICE
+    hint: Pick something
+    default:
+    options:
+    - label: One
+      value: One
+    - label: Two
+      value: Two
+    - label: Three
+      value: Three
+  - text: PASSWORD
+    key: PASSWORD
+    hint: Enter a password
+    default: SECRET
+  input: parameters
+- commands:
+  - echo "test-output-${env.BRANCH_NAME}"
+  key: Stage
+agents:
+  label: any
