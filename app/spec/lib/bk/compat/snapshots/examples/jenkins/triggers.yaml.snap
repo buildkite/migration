@@ -1,0 +1,10 @@
+---
+steps:
+- commands:
+  - "# Triggers are configured for the pipeline in the UI"
+  label: Triggers
+- commands:
+  - echo "Testing triggers"
+  key: Stage
+agents:
+  label: any
