@@ -5,7 +5,7 @@ require_relative '../../models/plugin'
 
 module BK
   module Compat
-    # GitHub Actions converter
+    # Jenkins agent key converter
     class Jenkins
       private
 
