@@ -1,0 +1,32 @@
+---
+steps:
+- commands:
+  - "# buildDiscarder: Build retention is managed through Buildkite's UI settings
+    (set to keep 5 builds)"
+  - "# disableConcurrentBuilds: Disabling concurrent builds is done through the pipeline
+    settings in the UI"
+  - "# disableRestartFromStage has no equivalent in Buildkite, you may be interested"
+  - '#   in setting "retry: { manual: false }" on the step to prevent retries'
+  - "# disableResume has no equivalent in Buildkite"
+  - "# newContainerPerStage: Different steps run in isolated environments by default"
+  - "# overrideIndexTriggers: what branches trigger a pipeline/step are handled in
+    the pipeline"
+  - "#   settings or in the `if` property of steps"
+  - "# preserveStashes: Artifacts are kept by default and can not be changed through
+    pipeline options"
+  - "# quietPeriod has no equivalent in Buildkite"
+  - "# skipStagesAfterUnstable has no equivalent in Buildkite, but you may want"
+  - '#   to use the "cancel_on_build_failing" property on subsequent steps'
+  - "# Timestamps are automatically shown in Buildkite logs and you can hide them
+    in the UI"
+  - echo "Testing options"
+  plugins:
+  - cultureamp/skip-checkout-buildkite-plugin:
+  key: Stage
+  retry:
+    automatic:
+      limit:
+        params: '3'
+  timeout_in_minutes: 60
+agents:
+  label: any
