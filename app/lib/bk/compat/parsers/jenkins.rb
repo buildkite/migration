@@ -51,4 +51,4 @@ end
 
 require_relative '../parsers'
 
-BK::Compat::Parsers.register_plugin(BK::Compat::GitHubActions)
+BK::Compat::Parsers.register_plugin(BK::Compat::Jenkins)
