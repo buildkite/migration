@@ -3,6 +3,7 @@
 require_relative '../models/steps/command'
 
 require_relative 'jenkins/agent'
+require_relative 'jenkins/options'
 require_relative 'jenkins/parameters'
 
 module BK
@@ -37,13 +38,15 @@ module BK
 
       def parse
         config = @config['pipeline']
-        default_agent = translate_agent(config['agent'])
+
+        agent, default_step, prepend_steps = parse_general_keys(config)
+
         Pipeline.new(
-          steps: translate_stages(config['stages'], default_agent),
+          steps: translate_stages(config['stages'], default_step),
           env: config.fetch('environment', {})
         ).tap do |pipeline|
-          pipeline.agents = default_agent.agents unless default_agent.nil?
-          pipeline.steps.prepend(*translate_general_keys(config))
+          pipeline.agents = agent
+          pipeline.steps.prepend(*prepend_steps)
         end
       end
 
@@ -55,16 +58,28 @@ module BK
         @translator.register
       end
 
-      def translate_stages(stages, default_agent)
-        default_agent = CommandStep.new if default_agent.nil?
+      def translate_stages(stages, default_step)
+        default_step = CommandStep.new if default_step.nil?
         stages.map do |stage|
-          default_agent.instantiate.tap do |cmd|
+          default_step.instantiate.tap do |cmd|
             cmd.key = stage['stage']
             cmd.env = stage.fetch('environment', {})
             cmd << translate_agent(stage['agent']) if stage['agent']
             cmd << stage['steps']
           end
         end
+      end
+
+      def parse_general_keys(config)
+        default_step = CommandStep.new.tap do |step|
+          step << translate_agent(config['agent'])
+          step << translate_options(config['options'])
+        end
+
+        agents = default_step.agents
+        default_step.agents = {}
+
+        [agents, default_step, translate_general_keys(config)]
       end
 
       def translate_general_keys(config)
