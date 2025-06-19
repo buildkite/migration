@@ -70,6 +70,7 @@ module BK
       def translate_general_keys(config)
         [
           translate_libraries(config['library']),
+          translate_triggers(config['triggers']),
           translate_parameters(config['parameters'])
         ].flatten.compact
       end
@@ -80,6 +81,15 @@ module BK
         CommandStep.new(
           label: 'Libraries',
           commands: '# Libraries are not supported at this time :('
+        )
+      end
+
+      def translate_triggers(triggers)
+        return nil if triggers.nil?
+
+        CommandStep.new(
+          label: 'Triggers',
+          commands: '# Triggers are configured for the pipeline in the UI'
         )
       end
     end
