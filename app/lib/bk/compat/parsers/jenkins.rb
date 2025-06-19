@@ -42,7 +42,7 @@ module BK
         agent, default_step, prepend_steps = parse_general_keys(config)
 
         Pipeline.new(
-          steps: translate_stages(config['stages'], default_step),
+          steps: config['stages'].map { |stg| translate_stage(stg, default_step) },
           env: config.fetch('environment', {})
         ).tap do |pipeline|
           pipeline.agents = agent
@@ -58,15 +58,14 @@ module BK
         @translator.register
       end
 
-      def translate_stages(stages, default_step)
+      def translate_stage(stage, default_step)
         default_step = CommandStep.new if default_step.nil?
-        stages.map do |stage|
-          default_step.instantiate.tap do |cmd|
-            cmd.key = stage['stage']
-            cmd.env = stage.fetch('environment', {})
-            cmd << translate_agent(stage['agent']) if stage['agent']
-            cmd << stage['steps']
-          end
+        default_step.instantiate.tap do |cmd|
+          cmd.key = stage['stage']
+          cmd.env = stage.fetch('environment', {})
+          cmd << translate_agent(stage['agent'])
+          cmd << translate_options(stage['options'])
+          cmd << stage['steps']
         end
       end
 
