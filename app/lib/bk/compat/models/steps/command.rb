@@ -114,10 +114,12 @@ module BK
       end
 
       def instantiate(*, **)
-        unless @transformer.nil?
-          params = instance_attributes.transform_values { |val| recurse_to_string(val, @transformer.to_proc, *, **) }
-        end
-        params&.delete(:parameters)
+        # clean up the instance attributes to avoid re-using empty arrays/hashes
+        params = clean_dict(instance_attributes)
+
+        params.transform_values! { |val| recurse_to_string(val, @transformer.to_proc, *, **) } unless @transformer.nil?
+
+        params.delete(:parameters)
 
         self.class.new(**params)
       end
