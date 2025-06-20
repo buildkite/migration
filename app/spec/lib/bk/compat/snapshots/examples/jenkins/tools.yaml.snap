@@ -1,0 +1,10 @@
+---
+steps:
+- commands:
+  - "# Tools should be pre-installed on the agents"
+  label: Tools
+- commands:
+  - echo "Testing tools"
+  key: Stage
+agents:
+  label: any
