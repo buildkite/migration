@@ -85,6 +85,7 @@ module BK
         [
           translate_libraries(config['library']),
           translate_triggers(config['triggers']),
+          translate_tools(config['tools']),
           translate_parameters(config['parameters'])
         ].flatten.compact
       end
@@ -95,6 +96,15 @@ module BK
         CommandStep.new(
           label: 'Libraries',
           commands: '# Libraries are not supported at this time :('
+        )
+      end
+
+      def translate_tools(tools)
+        return nil if tools.nil?
+
+        CommandStep.new(
+          label: 'Tools',
+          commands: '# Tools should be pre-installed on the agents'
         )
       end
 
