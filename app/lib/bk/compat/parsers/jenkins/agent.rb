@@ -10,7 +10,7 @@ module BK
       private
 
       def translate_agent(agent)
-        return CommandStep.new(agents: { 'label' => agent }) if agent.is_a?(String)
+        return CommandStep.new(agents: { label: agent }) if agent.is_a?(String)
         return nil unless agent.is_a?(Hash)
         return nil if agent.include?('any') || agent.include?('none')
 

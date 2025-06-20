@@ -1,0 +1,22 @@
+pipeline:
+  agent: 'any'
+  options:
+    - "buildDiscarder(logRotator(numToKeepStr: '5'))"
+    - "checkoutToSubdirectory('foo')"
+    - "disableConcurrentBuilds(abortPrevious: true)"
+    - "disableRestartFromStage()"
+    - "disableResume()"
+    - "newContainerPerStage()"
+    - "overrideIndexTriggers(true)"
+    - "parallelsAlwaysFailFast()"
+    - "preserveStashes(buildCount: 5)"
+    - "quietPeriod(10)"
+    - "retry(3)"
+    - "skipDefaultCheckout()"
+    - "skipStagesAfterUnstable()"
+    - "timeout(time: 1, unit: 'HOURS')"
+    - "timestamps()"
+  stages:
+    - stage: Stage
+      steps:
+        - echo "Testing options"

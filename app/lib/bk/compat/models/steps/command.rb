@@ -9,9 +9,9 @@ module BK
   module Compat
     # Basic command step
     class CommandStep < BaseStep
-      attr_accessor :agents, :artifact_paths, :branches, :concurrency, :concurrency_group,
-                    :conditional, :depends_on, :env, :key, :label, :matrix, :notify,
-                    :parallelism, :plugins, :soft_fail, :timeout_in_minutes
+      attr_accessor :agents, :artifact_paths, :branches, :cancel_on_build_failing, :concurrency,
+                    :concurrency_group, :conditional, :depends_on, :env, :key, :label, :matrix,
+                    :notify, :parallelism, :plugins, :retry, :soft_fail, :timeout_in_minutes
 
       attr_reader :commands # We define special writers
 
@@ -20,7 +20,7 @@ module BK
       end
 
       def hash_attributes
-        %w[agents env matrix].freeze
+        %w[agents env matrix retry].freeze
       end
 
       # Attributes merged with the minimum value
@@ -114,10 +114,12 @@ module BK
       end
 
       def instantiate(*, **)
-        unless @transformer.nil?
-          params = instance_attributes.transform_values { |val| recurse_to_string(val, @transformer.to_proc, *, **) }
-        end
-        params&.delete(:parameters)
+        # clean up the instance attributes to avoid re-using empty arrays/hashes
+        params = clean_dict(instance_attributes)
+
+        params.transform_values! { |val| recurse_to_string(val, @transformer.to_proc, *, **) } unless @transformer.nil?
+
+        params.delete(:parameters)
 
         self.class.new(**params)
       end
