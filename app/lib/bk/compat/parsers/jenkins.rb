@@ -47,6 +47,7 @@ module BK
         ).tap do |pipeline|
           pipeline.agents = agent
           pipeline.steps.prepend(*prepend_steps)
+          pipeline.steps.append(*translate_post(config['post']))
         end
       end
 
@@ -97,6 +98,23 @@ module BK
           label: 'Libraries',
           commands: '# Libraries are not supported at this time :('
         )
+      end
+
+      def translate_post(post)
+        return [] if post.nil?
+
+        post.map do |action, stage|
+          steps = stage.is_a?(Hash) ? stage['script'] : stage
+
+          CommandStep.new(
+            key: "post_#{action}",
+            commands: [
+              "# Post action #{action}",
+              '# Important: there is no translation of conditions for post actions',
+              steps
+            ].flatten
+          )
+        end
       end
 
       def translate_tools(tools)

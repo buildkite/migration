@@ -1,0 +1,31 @@
+pipeline:
+  agent: any
+  post:
+    always:
+      script:
+        - echo single script
+    changed:
+      script:
+        - echo multi script one
+        - echo multi script two
+    fixed:
+      - echo single step
+    regression:
+      - echo multi step one
+      - echo multi step two
+    aborted:
+      - echo aborted
+    failure:
+      - echo failure
+    success:
+      - echo success
+    unstable:
+      - echo unstable
+    unsuccessful:
+      - echo unsuccessful
+    cleanup:
+      - echo cleanup
+  stages:
+    - stage: Post
+      steps:
+        - echo "Testing post translation"

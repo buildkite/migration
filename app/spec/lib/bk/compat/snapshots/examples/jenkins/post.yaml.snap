@@ -1,0 +1,59 @@
+---
+steps:
+- commands:
+  - echo "Testing post translation"
+  key: Post
+- commands:
+  - "# Post action always"
+  - "# Important: there is no translation of conditions for post actions"
+  - echo single script
+  key: post_always
+- commands:
+  - "# Post action changed"
+  - "# Important: there is no translation of conditions for post actions"
+  - echo multi script one
+  - echo multi script two
+  key: post_changed
+- commands:
+  - "# Post action fixed"
+  - "# Important: there is no translation of conditions for post actions"
+  - echo single step
+  key: post_fixed
+- commands:
+  - "# Post action regression"
+  - "# Important: there is no translation of conditions for post actions"
+  - echo multi step one
+  - echo multi step two
+  key: post_regression
+- commands:
+  - "# Post action aborted"
+  - "# Important: there is no translation of conditions for post actions"
+  - echo aborted
+  key: post_aborted
+- commands:
+  - "# Post action failure"
+  - "# Important: there is no translation of conditions for post actions"
+  - echo failure
+  key: post_failure
+- commands:
+  - "# Post action success"
+  - "# Important: there is no translation of conditions for post actions"
+  - echo success
+  key: post_success
+- commands:
+  - "# Post action unstable"
+  - "# Important: there is no translation of conditions for post actions"
+  - echo unstable
+  key: post_unstable
+- commands:
+  - "# Post action unsuccessful"
+  - "# Important: there is no translation of conditions for post actions"
+  - echo unsuccessful
+  key: post_unsuccessful
+- commands:
+  - "# Post action cleanup"
+  - "# Important: there is no translation of conditions for post actions"
+  - echo cleanup
+  key: post_cleanup
+agents:
+  label: any
