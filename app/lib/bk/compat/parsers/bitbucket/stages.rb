@@ -8,7 +8,7 @@ module BK
     module BitBucketSteps
       # Implementation of stage translation
       class Stages
-        def matcher(conf, *, **)
+        def matcher?(conf, *, **)
           conf.include?('stage')
         end
 

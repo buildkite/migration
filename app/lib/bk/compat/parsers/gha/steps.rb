@@ -6,7 +6,7 @@ module BK
   module Compat
     # Implement GHA Builtin Steps
     class GHABuiltins
-      def matcher(conf)
+      def matcher?(conf)
         conf.include?('run')
       end
 

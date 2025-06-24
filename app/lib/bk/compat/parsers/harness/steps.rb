@@ -11,7 +11,7 @@ module BK
       class Translator
         VALID_TYPES = %w[background harnessapproval run].freeze
 
-        def matcher(type:, **_rest)
+        def matcher?(type:, **_rest)
           VALID_TYPES.include?(type.downcase)
         end
 

@@ -18,7 +18,7 @@ module BK
           load_services!(definitions.fetch('services', nil))
         end
 
-        def matcher(conf, *, **)
+        def matcher?(conf, *, **)
           conf.include?('step')
         end
 

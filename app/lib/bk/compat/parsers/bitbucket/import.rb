@@ -7,7 +7,7 @@ module BK
     module BitBucketSteps
       # Implementation of native step translation
       class Import
-        def matcher(conf, *, **)
+        def matcher?(conf, *, **)
           conf.include?('import')
         end
 

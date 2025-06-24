@@ -23,7 +23,7 @@ module BK
           slack
         ].freeze
 
-        def matcher(type, _inputs)
+        def matcher?(type, _inputs)
           VALID_STEP_TYPES.include?(type.downcase)
         end
 
@@ -50,7 +50,7 @@ module BK
         end
 
         def translate_bundler(inputs)
-          return '# Invalid bundler step configuration!' unless required_bundler_inputs(inputs)
+          return '# Invalid bundler step configuration!' unless required_bundler_inputs?(inputs)
 
           install_jobs = inputs['bundle_install_jobs']
           install_retry = inputs['bundle_install_retry']
@@ -58,7 +58,7 @@ module BK
           "bundle check || bundle install --jobs #{install_jobs} --retry #{install_retry}"
         end
 
-        def required_bundler_inputs(inputs)
+        def required_bundler_inputs?(inputs)
           inputs.include?('bundle_install_jobs') && inputs.include?('bundle_install_retry')
         end
 

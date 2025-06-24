@@ -4,7 +4,7 @@ module BK
   module Compat
     # Implement GHA actions
     class GHAActions
-      def matcher(conf)
+      def matcher?(conf)
         conf.include?('uses')
       end
 
