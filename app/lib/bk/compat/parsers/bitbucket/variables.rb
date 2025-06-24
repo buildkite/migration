@@ -7,7 +7,7 @@ module BK
     module BitBucketSteps
       # Implementation of native step translation
       class Variables
-        def matcher(conf, *, **)
+        def matcher?(conf, *, **)
           conf.include?('variables')
         end
 

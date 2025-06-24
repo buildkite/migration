@@ -20,7 +20,7 @@ module BK
 
       def translate_step(*, **)
         # we assume each translator has a matcher and a translator method
-        result = @translators.select { |translator| translator.matcher(*, **) }
+        result = @translators.select { |translator| translator.matcher?(*, **) }
                              .map { |translator| translator.translator(*, **) }
 
         simplify_result(result.flatten, *, **)

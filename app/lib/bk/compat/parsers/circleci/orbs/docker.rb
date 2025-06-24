@@ -17,7 +17,7 @@ module BK
     module CircleCISteps
       # Docker orb specific implementation
       class DockerOrb
-        def matcher(orb, _conf)
+        def matcher?(orb, _conf)
           orb.start_with?('docker/')
         end
 

@@ -13,7 +13,7 @@ module BK
           run save_cache setup_remote_docker store_artifacts store_test_results when
         ].freeze
 
-        def matcher(action, _config)
+        def matcher?(action, _config)
           VALID_ACTIONS.include?(action)
         end
 

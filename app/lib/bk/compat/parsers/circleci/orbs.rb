@@ -11,7 +11,7 @@ module BK
           @prefix = key
         end
 
-        def matcher(orb, _conf)
+        def matcher?(orb, _conf)
           orb.start_with?("#{@prefix}/")
         end
 
