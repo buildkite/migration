@@ -1,0 +1,41 @@
+---
+steps:
+- commands:
+  - echo "basic"
+  key: basic
+- commands:
+  - echo "script"
+  key: script
+- commands:
+  - echo "catchError"
+  key: catchError
+- commands:
+  - sh "echo testdir"
+  - "( cd 'myDir'"
+  - echo "MyDir"
+  - )
+  key: dir
+- commands:
+  - echo "1"
+  - echo "2"
+  - echo "3"
+  key: multiline
+- commands:
+  - echo "1"
+  - echo "2"
+  - echo "3"
+  key: script-multiline
+- commands:
+  - echo env.KEY1
+  - echo env.KEY2
+  env:
+    KEY2: VAL2
+    KEY1: VAL1
+  key: withEnv
+- commands:
+  - echo "No values"
+  - "# Credentials must be configured separately"
+  - echo $USERNAME
+  - "# Credentials must be configured separately"
+  - echo $CRED
+  key: with
