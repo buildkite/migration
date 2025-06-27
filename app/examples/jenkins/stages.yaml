@@ -1,0 +1,54 @@
+pipeline:
+  stages:
+    - stage: "basic"
+      steps:
+        - echo "basic"
+    - stage: "script"
+      steps:
+        script:
+          - echo "script"
+    - stage: "catchError"
+      steps:
+        script:
+          - catchError:
+            script:
+              - echo "catchError"
+    - stage: "dir"
+      steps:
+        script:
+          - sh "echo testdir"
+          - dir: "'myDir'"
+            script:
+              - echo "MyDir"
+    - stage: "multiline"
+      steps: |
+        echo "1"
+        echo "2"
+        echo "3"
+    - stage: "script-multiline"
+      steps:
+        script: |
+          echo "1"
+          echo "2"
+          echo "3"
+    - stage: "withEnv"
+      steps:
+        script:
+          - withEnv: "['KEY1=VAL1']"
+            script:
+              - echo env.KEY1
+              - withEnv: "['KEY2=VAL2']"
+                script:
+                  echo env.KEY2
+    - stage: "with"
+      steps:
+        script:
+          - withAnt:
+            script:
+              - echo "No values"
+          - withCredentials: "[usernamePassword(credentialsId: 'eedc7820-a4e0-4d87-a66d-b5b65ee42ad9', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]"
+            script:
+              - echo $USERNAME
+          - withCredentials: "[string(credentials: ''),variable: 'CRED']"
+            script:
+              - echo $CRED

@@ -5,6 +5,7 @@ require_relative '../models/steps/command'
 require_relative 'jenkins/agent'
 require_relative 'jenkins/options'
 require_relative 'jenkins/parameters'
+require_relative 'jenkins/stages'
 
 module BK
   module Compat
@@ -57,17 +58,6 @@ module BK
         @translator = BK::Compat::StepTranslator.new
 
         @translator.register
-      end
-
-      def translate_stage(stage, default_step)
-        default_step = CommandStep.new if default_step.nil?
-        default_step.instantiate.tap do |cmd|
-          cmd.key = stage['stage']
-          cmd.env = stage.fetch('environment', {})
-          cmd << translate_agent(stage['agent'])
-          cmd << translate_options(stage['options'])
-          cmd << stage['steps']
-        end
       end
 
       def parse_general_keys(config)

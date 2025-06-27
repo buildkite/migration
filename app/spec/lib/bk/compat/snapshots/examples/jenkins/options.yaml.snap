@@ -22,6 +22,8 @@ steps:
   - echo "Testing options"
   plugins:
   - cultureamp/skip-checkout-buildkite-plugin:
+  env:
+    BUILDKITE_BUILD_CHECKOUT_PATH: "$$BUILDKITE_BUILD_PATH/foo"
   key: Stage
   retry:
     automatic:

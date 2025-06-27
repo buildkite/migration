@@ -4,6 +4,5 @@ steps:
   - "# Libraries are not supported at this time :("
   label: Libraries
 - commands:
-  - script
   - myCustomStep
   key: Stage Library
