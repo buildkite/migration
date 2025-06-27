@@ -66,8 +66,12 @@ module BK
       end
 
       def translate_script_withEnv(env_string)
-        # TODO: implement a proper translation for withEnv
-        {var: env_string}
+        # create an array from a string of the form ['KEY=VALUE', 'KEY2=VALUE2']
+        return {} unless env_string.is_a?(String)
+
+        env_string.split("'").map { |e|
+          ['[', ',', ']'].include?(e.strip) ? nil : e.split('=', 2)
+        }.compact.to_h
       end
     end
   end
