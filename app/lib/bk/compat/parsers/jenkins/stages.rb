@@ -61,17 +61,17 @@ module BK
             cmd.add_commands(')')
           end
 
-          cmd.env.update(translate_script_withEnv(elem['withEnv']))
+          cmd.env.update(translate_script_with_env(elem['withEnv']))
         end
       end
 
-      def translate_script_withEnv(env_string)
+      def translate_script_with_env(env_string)
         # create an array from a string of the form ['KEY=VALUE', 'KEY2=VALUE2']
         return {} unless env_string.is_a?(String)
 
-        env_string.split("'").map { |e|
+        env_string.split("'").map do |e|
           ['[', ',', ']'].include?(e.strip) ? nil : e.split('=', 2)
-        }.compact.to_h
+        end.compact.to_h
       end
     end
   end
