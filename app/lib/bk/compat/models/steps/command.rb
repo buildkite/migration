@@ -65,6 +65,8 @@ module BK
         else
           add_commands(*other) unless other.nil?
         end
+
+        self
       end
 
       # Prepend/merge steps
