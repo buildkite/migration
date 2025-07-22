@@ -4,7 +4,7 @@ GEM
     ast (2.4.3)
     awesome_print (1.9.2)
     diff-lcs (1.6.2)
-    json (2.12.2)
+    json (2.13.0)
     language_server-protocol (3.17.0.5)
     lint_roller (1.1.0)
     nio4r (2.7.4)
@@ -25,7 +25,7 @@ GEM
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
       rspec-mocks (~> 3.13.0)
-    rspec-core (3.13.4)
+    rspec-core (3.13.5)
       rspec-support (~> 3.13.0)
     rspec-expectations (3.13.5)
       diff-lcs (>= 1.2.0, < 2.0)
@@ -48,7 +48,7 @@ GEM
       rubocop-ast (>= 1.45.1, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 2.4.0, < 4.0)
-    rubocop-ast (1.45.1)
+    rubocop-ast (1.46.0)
       parser (>= 3.3.7.2)
       prism (~> 1.4)
     ruby-progressbar (1.13.0)
@@ -70,4 +70,4 @@ DEPENDENCIES
   rubocop
 
 BUNDLED WITH
-   2.6.2
+   2.6.9
