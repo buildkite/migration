@@ -45,12 +45,9 @@ module BK
 
       # prevent leading colon in YAML keys (see https://github.com/ruby/psych/issues/396)
       class SymbolToStringYamlTreeVisitor < Psych::Visitors::YAMLTree
-        def visit_symbol(sym)
+        def visit_Symbol(sym) # rubocop:disable Naming/MethodName -- this is a Psych method
           visit_String(sym.to_s)
         end
-
-        # to prevent a rubocop warning
-        alias visit_Symbol visit_symbol
       end
 
       # prevent quoting single parenthesis in a line (used for commants)
