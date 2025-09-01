@@ -1,8 +1,9 @@
 [tools]
-    ruby = "3.4.5"
+## This is a placeholder; eventually we might move to listing the version here, but Mise will read .ruby-version
+## ruby = VERSION
 
 [tasks]
     install = "cd app && bundle install"
     test = { run = "cd app && bundle exec rspec", depends = ["install"] }
     lint = { run = "cd app && bundle exec rubocop", depends = ["install"] }
-    server = { run = "cd app && ruby bin/buildkite-compat", depends = ["install"] }
+    server = { run = "cd app && puma --port 9292", depends = ["install"] }
