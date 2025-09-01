@@ -1,0 +1,7 @@
+[tools]
+    ruby = "3.4.5"
+
+[tasks]
+    test = "cd app && bundle exec rspec"
+    lint = "cd app && bundle exec rubocop"
+    server = "cd app && ruby bin/buildkite-compat"

@@ -71,6 +71,25 @@ steps:
   key: build
 ```
 
+## Development
+
+This project supports [mise](https://mise.jdx.dev/) for development environment management. To use mise:
+
+```shell
+# Install mise (if not already installed)
+curl https://mise.run | sh
+
+OR
+
+brew install mise
+
+# Configure mise to respect .ruby-version files
+mise settings add idiomatic_version_file_enable_tools ruby
+
+# Install Ruby version specified in .ruby-version
+mise install
+```
+
 ## Translation results
 
 Buildkite has its own suggested best practices, these may differ to those from other providers, check out the [Buildkite Docs](https://buildkite.com/docs) for more information. Review and use the results of this tool as the basis towards Buildkite adoption, the output of the migration tool is a guide and manual editing is likely to be required.
