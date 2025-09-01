@@ -2,6 +2,7 @@
     ruby = "3.4.5"
 
 [tasks]
-    test = "cd app && bundle exec rspec"
-    lint = "cd app && bundle exec rubocop"
-    server = "cd app && ruby bin/buildkite-compat"
+    install = "cd app && bundle install"
+    test = { run = "cd app && bundle exec rspec", depends = ["install"] }
+    lint = { run = "cd app && bundle exec rubocop", depends = ["install"] }
+    server = { run = "cd app && ruby bin/buildkite-compat", depends = ["install"] }
