@@ -49,12 +49,12 @@ module BK
       end
 
       def reply(contents:, format:, content_type:)
-        parser = BK::Compat.guess(contents)
-        return error_message('Could not identify parser') if parser.nil?
+        parser = find_parser(contents)
+        return parser if parser.is_a?(Array) # Error response
 
         body = parser.new(contents).parse.render(colors: false, format: format)
         success_message(body, content_type: content_type)
-      rescue BK::Compat::Error::CompatError => e
+      rescue BK::Compat::Error::ParseError => e
         error_message(e.message, code: 501)
       rescue StandardError
         error_message(
@@ -64,6 +64,23 @@ module BK
             'Otherwise email support@buildkite.com about this with the file attached.'
           ].join(' ')
         )
+      end
+
+      def find_parser(contents)
+        parser = BK::Compat.guess(contents)
+        return parser unless parser.nil?
+
+        # Try to detect if it's a YAML syntax error
+        BK::Compat::Error::CompatError.safe_yaml do
+          YAML.safe_load(contents)
+          return error_message(
+            [
+              'Parser could not be identified.',
+              'Please ensure your file is valid YAML for a supported CI platform',
+              '(GitHub Actions, CircleCI, Jenkins, Bitbucket, Bitrise, or Harness).'
+            ]
+          )
+        end
       end
 
       def error_message(message, code: 500)

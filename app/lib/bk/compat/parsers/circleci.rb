@@ -45,16 +45,20 @@ module BK
           # legacy format support
           config.fetch('version', 2.1) == 2 && config['jobs'].include?('build')
         end
+      rescue Psych::SyntaxError
+        false
       end
 
       def initialize(text, options = {})
-        @config = YAML.safe_load(text, aliases: true)
-        @now = Time.now
-        @options = options
-        @commands_by_key = {}
-        @executors = {}
+        BK::Compat::Error::CompatError.safe_yaml do
+          @config = YAML.safe_load(text, aliases: true)
+          @now = Time.now
+          @options = options
+          @commands_by_key = {}
+          @executors = {}
 
-        register_translators!
+          register_translators!
+        end
       end
 
       def parse

@@ -29,13 +29,17 @@ module BK
         mandatory_keys = ['jobs', true]
 
         config.is_a?(Hash) && mandatory_keys & config.keys == mandatory_keys
+      rescue Psych::SyntaxError
+        false
       end
 
       def initialize(text, options = {})
-        @config = YAML.safe_load(text)
-        @options = options
+        BK::Compat::Error::CompatError.safe_yaml do
+          @config = YAML.safe_load(text)
+          @options = options
 
-        register_translators!
+          register_translators!
+        end
       end
 
       def parse
