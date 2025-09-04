@@ -34,12 +34,12 @@ module BK
       end
 
       def initialize(text, options = {})
-        @config = YAML.safe_load(text)
-        @options = options
-        
-        register_translators!
-      rescue Psych::SyntaxError => e
-        raise BK::Compat::Error::ConfigurationError, "Invalid YAML syntax: #{e.message}"
+        BK::Compat::Error::CompatError.safe_yaml do
+          @config = YAML.safe_load(text)
+          @options = options
+          
+          register_translators!
+        end
       end
 
       def parse
