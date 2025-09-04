@@ -73,7 +73,13 @@ module BK
         # Try to detect if it's a YAML syntax error
         BK::Compat::Error::CompatError.safe_yaml do
           YAML.safe_load(contents)
-          return error_message('Parser could not be identified. Please ensure your file is valid YAML for a supported CI platform (GitHub Actions, CircleCI, Jenkins, Bitbucket, Bitrise, or Harness).')
+          return error_message(
+            [
+              'Parser could not be identified.',
+              'Please ensure your file is valid YAML for a supported CI platform',
+              '(GitHub Actions, CircleCI, Jenkins, Bitbucket, Bitrise, or Harness).'
+            ]
+          )
         end
       end
 
