@@ -46,7 +46,7 @@ module BK
           config.fetch('version', 2.1) == 2 && config['jobs'].include?('build')
         end
       rescue Psych::SyntaxError
-        return false
+        false
       end
 
       def initialize(text, options = {})

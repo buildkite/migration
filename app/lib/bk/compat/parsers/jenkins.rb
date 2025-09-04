@@ -29,7 +29,7 @@ module BK
         # Mandatory keys are part of the pipeline element
         config.is_a?(Hash) && mandatory_keys & config.fetch('pipeline', {}).keys == mandatory_keys
       rescue Psych::SyntaxError
-        return false
+        false
       end
 
       def initialize(text, options = {})

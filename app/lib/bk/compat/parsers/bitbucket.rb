@@ -32,7 +32,7 @@ module BK
 
         config.is_a?(Hash) && mandatory_keys & config.keys == mandatory_keys
       rescue Psych::SyntaxError
-        return false
+        false
       end
 
       def initialize(text, options = {})

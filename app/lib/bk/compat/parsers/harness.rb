@@ -32,7 +32,7 @@ module BK
           false
         end
       rescue Psych::SyntaxError
-        return false
+        false
       end
 
       def initialize(text, options = {})

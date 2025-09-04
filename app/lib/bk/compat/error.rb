@@ -8,6 +8,7 @@ module BK
     module Error
       class ParseError < StandardError; end
 
+      # Base compatibility error with YAML parsing support
       class CompatError < ParseError
         def self.safe_yaml
           yield
