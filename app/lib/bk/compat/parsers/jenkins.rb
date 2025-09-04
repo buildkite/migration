@@ -28,6 +28,8 @@ module BK
 
         # Mandatory keys are part of the pipeline element
         config.is_a?(Hash) && mandatory_keys & config.fetch('pipeline', {}).keys == mandatory_keys
+      rescue Psych::SyntaxError
+        return false
       end
 
       def initialize(text, options = {})
@@ -35,6 +37,8 @@ module BK
         @options = options
 
         register_translators!
+      rescue Psych::SyntaxError => e
+        raise BK::Compat::Error::ConfigurationError, "Invalid YAML syntax: #{e.message}"
       end
 
       def parse

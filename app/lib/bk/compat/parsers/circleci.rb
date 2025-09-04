@@ -45,6 +45,8 @@ module BK
           # legacy format support
           config.fetch('version', 2.1) == 2 && config['jobs'].include?('build')
         end
+      rescue Psych::SyntaxError
+        return false
       end
 
       def initialize(text, options = {})
@@ -55,6 +57,8 @@ module BK
         @executors = {}
 
         register_translators!
+      rescue Psych::SyntaxError => e
+        raise BK::Compat::Error::ConfigurationError, "Invalid YAML syntax: #{e.message}"
       end
 
       def parse

@@ -50,7 +50,15 @@ module BK
 
       def reply(contents:, format:, content_type:)
         parser = BK::Compat.guess(contents)
-        return error_message('Could not identify parser') if parser.nil?
+        if parser.nil?
+          # Try to detect if it's a YAML syntax error
+          begin
+            YAML.safe_load(contents)
+            return error_message('Parser could not be identified.')
+          rescue Psych::SyntaxError => e
+            return error_message("Invalid YAML syntax: #{e.message}")
+          end
+        end
 
         body = parser.new(contents).parse.render(colors: false, format: format)
         success_message(body, content_type: content_type)
