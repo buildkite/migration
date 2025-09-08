@@ -33,7 +33,7 @@ module BK
       end
 
       def initialize(text, options = {})
-        @config = YAML.safe_load(text, aliases: true)
+        @config = YAML.safe_load(text)
         @options = options
 
         register_translators!
