@@ -13,8 +13,7 @@ Metrics/BlockLength:
   Exclude:
     - spec/**/*.rb
 
-Metrics/MethodLength:
-  Max: 12
+Metrics/MethodLength: 
   CountAsOne: [ 'array', 'hash', 'heredoc' ]
 
 Metrics/ParameterLists:
