@@ -64,12 +64,9 @@ module BK
         )
       end
 
-      private
-
       def process_contents(contents, format, content_type)
         parser = BK::Compat.guess(contents)
-        raise BK::Compat::Error::ParseError, 
-          'Could not detect the CI system from the provided YAML. Please ensure it is valid and try again.' unless parser
+        raise BK::Compat::Error::ParseError, 'Could not detect the CI system from the provided YAML.' unless parser
 
         body = parser.new(contents).parse.render(colors: false, format: format)
         success_message(body, content_type: content_type)
