@@ -37,14 +37,13 @@ module BK
         config = YAML.safe_load(text, aliases: true)
         mandatory_keys = %w[jobs version workflows].freeze
 
-        if config.is_a?(String)
-          false
-        elsif mandatory_keys & config.keys == mandatory_keys
-          true
-        else
-          # legacy format support
-          config.fetch('version', 2.1) == 2 && config['jobs'].include?('build')
-        end
+        return false if config.is_a?(String)
+        return true if mandatory_keys & config.keys == mandatory_keys
+
+        # legacy format support
+        config.fetch('version', 2.1) == 2 && config['jobs'].include?('build')
+      rescue Psych::SyntaxError => e
+        raise BK::Compat::Error::ParseError, "Invalid YAML syntax: #{e.message}"
       end
 
       def initialize(text, options = {})

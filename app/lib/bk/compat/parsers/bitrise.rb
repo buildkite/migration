@@ -27,6 +27,8 @@ module BK
         mandatory_keys = %w[format_version].freeze
 
         config.is_a?(Hash) && mandatory_keys & config.keys == mandatory_keys
+      rescue Psych::SyntaxError => e
+        raise BK::Compat::Error::ParseError, "Invalid YAML syntax: #{e.message}"
       end
 
       def initialize(text, options = {})

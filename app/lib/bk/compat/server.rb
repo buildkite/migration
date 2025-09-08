@@ -49,11 +49,9 @@ module BK
       end
 
       def reply(contents:, format:, content_type:)
-        parser = BK::Compat.guess(contents)
-        return error_message('Could not identify parser') if parser.nil?
-
-        body = parser.new(contents).parse.render(colors: false, format: format)
-        success_message(body, content_type: content_type)
+        process_contents(contents, format, content_type)
+      rescue BK::Compat::Error::ParseError => e
+        error_message(e.message, code: 400)
       rescue BK::Compat::Error::CompatError => e
         error_message(e.message, code: 501)
       rescue StandardError
@@ -64,6 +62,14 @@ module BK
             'Otherwise email support@buildkite.com about this with the file attached.'
           ].join(' ')
         )
+      end
+
+      def process_contents(contents, format, content_type)
+        parser = BK::Compat.guess(contents)
+        raise BK::Compat::Error::ParseError, 'Could not detect the CI system from the provided YAML.' unless parser
+
+        body = parser.new(contents).parse.render(colors: false, format: format)
+        success_message(body, content_type: content_type)
       end
 
       def error_message(message, code: 500)

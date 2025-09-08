@@ -1,10 +1,14 @@
 # frozen_string_literal: true
 
+require 'yaml'
+
 module BK
   module Compat
     # unsupported feature
     module Error
       class CompatError < StandardError; end
+
+      class ParseError < CompatError; end
 
       class NotSupportedError < CompatError; end
 

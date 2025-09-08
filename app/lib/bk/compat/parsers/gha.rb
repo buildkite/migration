@@ -29,6 +29,8 @@ module BK
         mandatory_keys = ['jobs', true]
 
         config.is_a?(Hash) && mandatory_keys & config.keys == mandatory_keys
+      rescue Psych::SyntaxError => e
+        raise BK::Compat::Error::ParseError, "Invalid YAML syntax: #{e.message}"
       end
 
       def initialize(text, options = {})
