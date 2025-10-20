@@ -1,6 +1,8 @@
 # Buildkite Migration tool [![Build status](https://badge.buildkite.com/5db82bf94b2c528cb9723cdd222b60baca00c6328265c8427c.svg)](https://buildkite.com/buildkite/migration-tool)
 
-A tool to help kick start the transition of pipelines from other CI providers to Buildkite.
+The Buildkite migration tool serves as a compatibility layer, enabling the conversion of your existing CI configurations into a format compatible with Buildkite's pipeline definitions.
+
+You can start the translation of your pipelines from other CI providers to Buildkite Pipelines by seeing how workflows from other CI/CD platforms map to the Buildkite Pipelines' concepts and architecture. Rather than serving as a complete automated migration solution, the Buildkite migration tool demonstrates how configurations from these other CI/CD platforms could be structured in a Buildkite pipeline configuration format.
 
 ```shell
 $ buildkite-compat examples/circleci/legacy.yml
@@ -96,8 +98,8 @@ Buildkite has its own suggested best practices, these may differ to those from o
 
 ## Further Details
 
-Further information on the currently supported attributes of CI provider pipeline translation to Buildkite pipelines can be found below (within the `/docs` directory):
+Further information on the currently supported attributes of CI provider pipeline translation to Buildkite pipelines can be found in the official Buildkite Documentation:
 
-- [Bitbucket Pipelines](/docs/Bitbucket.md)
-- [CircleCI](/docs/CircleCI.md)
-- [GitHub Actions](/docs/GHA.md)
+- [GitHub Actions](https://buildkite.com/docs/pipelines/migration/tool/github-actions)
+- [CircleCI](https://buildkite.com/docs/pipelines/migration/tool/circleci)
+- [Bitbucket Pipelines](https://buildkite.com/docs/pipelines/migration/tool/bitbucket-pipelines)
