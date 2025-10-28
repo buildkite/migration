@@ -4,6 +4,7 @@ require_relative 'jobs'
 require_relative 'logic'
 require_relative '../../error'
 require_relative '../../models/steps/block'
+require_relative '../../models/steps/command'
 require_relative '../../models/steps/group'
 
 module BK
@@ -31,6 +32,8 @@ module BK
           BK::Compat::BlockStep.new(key: key, depends_on: config.fetch('requires', []))
         elsif @commands_by_key.include?(key)
           process_job(key, config)
+        elsif orb_job?(key)
+          translate_orb_job(key, config)
         else
           raise BK::Compat::Error::ConfigurationError,
                 "Job '#{key}' is not defined"
@@ -81,6 +84,20 @@ module BK
           setup: params,
           adjustments: exclude&.map { |x| { with: x, skip: true } }
         }.compact
+      end
+
+      def orb_job?(key)
+        key.include?('/') && @orbs.include?(key.split('/').first)
+      end
+
+      def translate_orb_job(key, config)
+        BK::Compat::CommandStep.new(
+          label: key,
+          key: config.fetch('name', key),
+          commands: ["# Orb job '#{key}' requires manual translation"],
+          depends_on: config.fetch('requires', []),
+          conditional: parse_filters(config.fetch('filters', {}))
+        )
       end
     end
   end

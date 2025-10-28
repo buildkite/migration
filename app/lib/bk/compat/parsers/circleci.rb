@@ -24,6 +24,7 @@ module BK
       end
 
       def load_orb(key, _config)
+        @orbs << key
         case key
         when 'docker'
           @translator.register(CircleCISteps::DockerOrb.new)
@@ -52,6 +53,7 @@ module BK
         @options = options
         @commands_by_key = {}
         @executors = {}
+        @orbs = []
 
         register_translators!
       end
