@@ -29,15 +29,13 @@ module BK
         key, config = string_or_key(job)
 
         if config['type'] == 'approval'
-          BK::Compat::BlockStep.new(key: key, depends_on: config.fetch('requires', []))
-        elsif @commands_by_key.include?(key)
-          process_job(key, config)
-        elsif orb_job?(key)
-          translate_orb_job(key, config)
-        else
-          raise BK::Compat::Error::ConfigurationError,
-                "Job '#{key}' is not defined"
+          return BK::Compat::BlockStep.new(key: key, depends_on: config.fetch('requires', []))
         end
+
+        return process_job(key, config) if @commands_by_key.include?(key)
+        return translate_orb_job(key, config) if orb_job?(key)
+
+        raise BK::Compat::Error::ConfigurationError, "Job '#{key}' is not defined"
       end
 
       def process_workflow_conditions(config)
