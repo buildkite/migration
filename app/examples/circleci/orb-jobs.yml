@@ -1,0 +1,14 @@
+version: '2.1'
+setup: true
+orbs:
+  path-filtering: circleci/path-filtering@0.1.7
+workflows:
+  generate-config:
+    jobs:
+      - path-filtering/filter:
+          base-revision: main
+          config-path: .circleci/continue_config.yml
+          mapping: |
+            src/.* build-code true
+            doc/.* build-docs true
+            src/tests/.* string-parameter "value"

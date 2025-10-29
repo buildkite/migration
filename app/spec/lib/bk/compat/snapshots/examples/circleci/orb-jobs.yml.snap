@@ -1,0 +1,6 @@
+---
+steps:
+- commands:
+  - "# path-filtering/filter is part of orb path-filtering which is not supported
+    and should be translated by hand"
+  key: path-filtering/filter

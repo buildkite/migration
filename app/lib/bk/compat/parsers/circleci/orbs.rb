@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'orbs/docker'
+require_relative '../../models/steps/circleci'
 
 module BK
   module Compat
@@ -15,10 +16,13 @@ module BK
           orb.start_with?("#{@prefix}/")
         end
 
-        def translator(action, _config)
-          [
-            "# #{action} is part of orb #{@prefix} which is not supported and should be translated by hand"
-          ]
+        def translator(action, config)
+          BK::Compat::CircleCIStep.new(
+            key: config['name'] || action,
+            commands: [
+              "# #{action} is part of orb #{@prefix} which is not supported and should be translated by hand"
+            ]
+          )
         end
       end
     end
