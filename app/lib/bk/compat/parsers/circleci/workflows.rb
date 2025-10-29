@@ -31,7 +31,7 @@ module BK
           BK::Compat::BlockStep.new(key: key, depends_on: config.fetch('requires', []))
         elsif @commands_by_key.include?(key)
           process_job(key, config)
-        elsif key.include?('/') # orb jobs will not be defined in jobs
+        elsif key.include?('/') # orb jobs will not be defined in commands_by_key
           @translator.translate_step(key, config)
         else
           raise BK::Compat::Error::ConfigurationError, "Job '#{key}' is not defined"
