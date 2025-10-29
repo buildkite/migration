@@ -35,10 +35,12 @@ module BK
       def self.matches?(text)
         # sorting is important
         config = YAML.safe_load(text, aliases: true)
-        mandatory_keys = %w[jobs version workflows].freeze
+        mandatory_keys = %w[version workflows].freeze
+        has_mandatory = (mandatory_keys & config.keys == mandatory_keys)
+        at_least_one_of = %w[jobs orbs].any? { |k| config.include?(k) }
 
         return false if config.is_a?(String)
-        return true if mandatory_keys & config.keys == mandatory_keys
+        return true if has_mandatory && at_least_one_of
 
         # legacy format support
         config.fetch('version', 2.1) == 2 && config['jobs'].include?('build')
