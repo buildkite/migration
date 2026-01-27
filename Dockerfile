@@ -1,5 +1,5 @@
 # If this gets updated, update pipeline images and .ruby-version
-FROM ruby:4.0.0
+FROM ruby:4.0.1
 
 ENV RACK_ENV=production
 
